@@ -1,0 +1,12 @@
+Migrare modifiche nel db:
+    flask db init (solo prima volta)
+    flask db migrate --message "First migration"
+    flask db upgrade
+    flask db merge (allinea le versioni)
+
+Verifica DB:
+    flask db current
+    flask db stamp head
+
+Downgrade: flask db downgrade
+Storia: flask db history

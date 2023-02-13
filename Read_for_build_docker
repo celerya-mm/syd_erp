@@ -1,0 +1,60 @@
+# copiare l'intero progetto nella macchina sul quale si vuole installare e che ha Docker installato.
+# Una volta impostato il "dockerfile" lanciare il seguente comando dal prompt:
+# Spostarsi all'interno della cartella radice dell'applicazione dove è contenuto il Dockerfile
+
+### docker classico
+cd ../../Multimedia/05_Documenti/Flask/cbgc_server
+
+docker build --force-rm -t cbgc:latest .
+docker build --force-rm -t nginx:latest .
+
+# Verificare l'immagine creata
+docker image ls
+
+# Lanciare il docker usando l'immagine appena creata (fare attenzione a lanciare gunicorn con la porta 5000)
+docker run -d -p 8000:5000 --name cbgc-service --restart=always cbgc:latest
+docker run -d -p 80:80 -p 62233:62233 --name reverse-proxy --restart=always nginx:latest
+
+# Rimuovere immagini non utilizzate
+docker image ls -f dangling=true
+docker image prune -f --filter "dangling=true"
+
+# rimuove container non attivi
+docker container prune
+
+### docker-compose (da file docker-compose.yml)
+docker-compose up -d --build
+
+
+### Nginx setup ssl certificate (
+# salire sul container
+docker exec -it <id_container o nome > bash
+docker exec -it reverse-proxy bash
+
+# richieder certificato tramite "certbot" a Let' Encrypt (assicurarsi porta 80 reindirizza al docker nginx)
+certbot --nginx -d cbgc.celerya.com -d cbgc.celerya.com
+
+# file salvataggio chiavi (verificare in risposta)
+/etc/letsencrypt/live/cbgc.celerya.com/fullchain.pem
+/etc/letsencrypt/live/cbgc.celerya.com/privkey.pem
+
+# verifica attivazione rinnovo automatico
+certbot renew --dry-run
+
+# imposto aggiornamento automatico certificato dentro il container
+crontab -e
+# aggiungo la riga (premere i)
+0 12 * * * /usr/bin/certbot renew --quiet
+(premere esc o alt/esc) :wq (salva)
+
+# aprire file configurazione "default.config" e modificarlo come riportato in ssl.conf
+cd /etc/nginx/conf.d/
+vim default.conf
+
+# verifico la configurazione
+(sudo) nginx -t
+# ricarico nginx
+(sudo) nginx -s reload
+
+# copiare chiave certificato da fuori il container and save under ./nginx folder
+docker cp -L reverse_proxy:/etc/letsencrypt <your_path>

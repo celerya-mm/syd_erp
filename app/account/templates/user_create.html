@@ -1,0 +1,165 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="container text-center mt-2">
+	<div class="row no-gutters justify-content-center">
+		<h5 class="card-title">
+			<a class="btn btn-update" href="{{ url_for(view) }}" title="Annulla" type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
+			</a>
+			Aggiungi UTENTE.
+		</h5>
+		<div class="col-md-12">
+			<form enctype="multipart/form-data" method="POST">
+				{{ form.csrf_token }}
+				<div class="row no-gutters justify-content-center">
+					<div class="col-md-4 order-first">
+						<div class="form-group">
+							{{ form.username.label }}
+							{{ form.username(class="form-control emphasis") }}
+							{% if form.username.errors %}
+							{% for error in form.username.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-4 order-second">
+						<div class="form-group">
+							{{ form.name.label }}
+							{{ form.name(class="form-control") }}
+							{% if form.name.errors %}
+							{% for error in form.name.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-4 order-third">
+						<div class="form-group">
+							{{ form.last_name.label }}
+							{{ form.last_name(class="form-control") }}
+							{% if form.last_name.errors %}
+							{% for error in form.last_name.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center">
+					<div class="col-md-7 order-first">
+						<div class="form-group">
+							{{ form.email.label }}
+							{{ form.email(class="form-control emphasis") }}
+							{% if form.email.errors %}
+							{% for error in form.email.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-5 order-second">
+						<div class="form-group">
+							{{ form.phone.label }}
+							{{ form.phone(class="form-control") }}
+							{% if form.phone.errors %}
+							{% for error in form.phone.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center">
+					<div class="col-md-6 order-first">
+						<div class="form-group">
+							{{ form.address.label }}
+							{{ form.address(class="form-control") }}
+							{% if form.address.errors %}
+							{% for error in form.address.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-2 order-second">
+						<div class="form-group">
+							{{ form.cap.label }}
+							{{ form.cap(class="form-control") }}
+							{% if form.cap.errors %}
+							{% for error in form.cap.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-4 order-third">
+						<div class="form-group">
+							{{ form.city.label }}
+							{{ form.city(class="form-control") }}
+							{% if form.city.errors %}
+							{% for error in form.city.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center">
+					<div class="col-md-5 order-first">
+						<div class="form-group">
+							{{ form.new_password_1.label }}
+							{{ form.new_password_1(class="form-control emphasis") }}
+							{% if form.new_password_1.errors %}
+							{% for error in form.new_password_1.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-5 order-second">
+						<div class="form-group">
+							{{ form.new_password_2.label }}
+							{{ form.new_password_2(class="form-control emphasis") }}
+							{% if form.new_password_2.errors %}
+							{% for error in form.new_password_2.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center">
+					<div class="form-group">
+						{{ form.note.label }}
+						{{ form.note(class="form-control") }}
+						{% if form.note.errors %}
+						{% for error in form.note.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<br>
+				<button class="btn btn-update" id="button" title="Salva" type="submit" value="x">
+					<img alt="" class="icon-simple"
+						 src="{{ url_for('static', filename='icons/save.svg') }}"/>
+				</button>
+				<br>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

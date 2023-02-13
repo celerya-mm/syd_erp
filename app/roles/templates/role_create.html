@@ -1,0 +1,39 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="container text-center mt-2">
+	<div class="row no-gutters justify-content-center">
+		<h5 class="card-title">
+			<a class="btn btn-update" href="{{ url_for(view) }}" title="Annulla" type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
+			</a>
+			Aggiungi REGOLA ACCESSO.
+		</h5>
+		<div class="col-md-12">
+			<form enctype="multipart/form-data" method="POST">
+				{{ form.csrf_token }}
+				<div class="row no-gutters justify-content-center">
+					<div class="col-md-8 order-second">
+						<div class="form-group">
+							{{ form.name.label }}
+							{{ form.name(class="form-control") }}
+							{% if form.name.errors %}
+							{% for error in form.name.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<br>
+				<button class="btn btn-update" id="button" title="Salva" type="submit" value="x">
+					<img alt="" class="icon-simple"
+						 src="{{ url_for('static', filename='icons/save.svg') }}"/>
+				</button>
+				<br>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

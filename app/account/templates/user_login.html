@@ -1,0 +1,45 @@
+{% extends '_base_login.html' %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <div class="row no-gutters justify-content-center">
+        <div class="col-md-4 shadow rounded">
+            <br>
+            <form enctype="multipart/form-data" method="POST">
+                {{ form.csrf_token }}
+                <div class="form-group">
+                    {{ form.username.label }}
+                    {{ form.username(class="form-control") }}
+                    {% if form.username.errors %}
+                    {% for error in form.username.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                <br>
+                <div class="form-group">
+                    {{ form.password.label }}
+                    {{ form.password(class="form-control") }}
+                    {% if form.password.errors %}
+                    {% for error in form.password.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                <br>
+                <button id="button" class="btn btn-update" type="submit" title="Log In" value="x">
+                    <img class="icon-simple" src="{{ url_for('static', filename='icons/box-arrow-in-right.svg') }}"
+                         alt=""/>
+                </button>
+            </form>
+        
+        <div>
+            <img class="img-fluid justify-content-center" style="width: 200px; margin: 10px;"
+                 src="{{ url_for('static', filename='Logo_colore.svg') }}" alt="">
+        </div></div>
+    </div>
+    <br>
+</div>
+{% endblock %}

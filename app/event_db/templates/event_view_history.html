@@ -1,0 +1,182 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<form enctype="multipart/form-data" method="POST">
+    {{ form.csrf_token }}
+    <div class="container text-left mt-2">
+        <h5 class="card-title text-center">
+            <a class="btn btn-update" type="button" title="Vai al records"
+               href="{{ url_for(view_related, _id=id_related) }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}"
+                     alt=""/>
+            </a>
+            Record [ {{ id_related }} ] tabella [ {{ type_related }} ]:
+            <a class="btn btn-update" type="button" title="Ripristina record"
+               href="{{ url_for(restore, _id=form.id, id_record=id_related, form=form, table=table,
+               view_for=view_related) }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/restore.svg') }}" alt=""/>
+            </a>
+        </h5>
+        <div class="container rounded shadow">
+            <br>
+            <div class="form-group">
+                <p class="json-key">
+                    Record Modificato
+                    {% if form.admin_id %}
+                    Admin ID:
+                    <span class="json-value">
+                         [ {{ form.admin_id }} ]
+                    </span>
+
+                    {% elif form.user_id %}
+                    User ID:
+                    <span class="json-value">
+                        [ {{ form.user_id }} ]
+                    </span>
+
+                    {% elif form.farmer_id %}
+                    Farmer ID:
+                    <span class="json-value">
+                        [ {{ form.farmer_id }} ]
+                    </span>
+
+                    {% elif form.head_id %}
+                    Head ID:
+                    <span class="json-value">
+                        [ {{ form.head_id }} ]
+                    </span>
+
+                    {% elif form.buyer_id %}
+                    Acquirente ID:
+                    <span class="json-value">
+                        [ {{ form.buyer_id }} ]
+                    </span>
+
+                    {% elif form.slaughterhouse_id %}
+                    Macello ID:
+                    <span class="json-value">
+                        [ {{ form.slaughterhouse_id  }} ]
+                    </span>
+
+                    {% elif form.cert_cons_id %}
+                    Certificato Consorzio ID:
+                    <span class="json-value">
+                        [ {{ form.cert_cons_id }} ]
+                    </span>
+
+                    {% elif form.cert_dna_id %}
+                    Certificato DNA ID:
+                    <span class="json-value">
+                        [ {{ form.cert_dna_id }} ]
+                    </span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="form-group">
+                <p class="json-key">
+                    Data e Ora:
+                    <span class="json-value">
+                    {{ form.created_at }}
+                </span>
+                </p>
+            </div>
+            <div class="form-group">
+                <p class="json-key">
+                    Modifica:
+                    <span class="json-value">
+                    {{ form.event.Modification }}
+                </span>
+                </p>
+            </div>
+            <div class="form-group">
+                <p class="json-key">Previous Data:</p>
+                {% for key, value in form.event.Previous_data.items() %}
+                <p class="json-key" style="padding-left: 80px;">
+                    {{ key }}:
+                    <span class="json-value">
+                            {{ value }}
+                        </span>
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
+        <div class="accordion" id="accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="1">
+                    <button class="accordion-button" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne"
+                            aria-expanded="true"
+                            aria-controls="collapseOne">
+                        Storico Modifiche Record [ {{ h_len }} ]
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse"
+                     aria-labelledby="headingOne"
+                     data-bs-parent="#accordion">
+                    <div class="table-responsive" style="padding: 10px">
+                        <table id="data" class="table table-striped" style="width:100%">
+                            <thead>
+                            <tr style="background-color: #2B4692; vertical-align: center;">
+                                <th class="title" id="h1" data-defaultsort="desc">ID</th>
+                                <th class="title" id="h2">Modifica</th>
+                                <th class="title" id="h3">Data</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for row in history_list %}
+                            <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+                                <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                    <a class="btn-table" type="button" title="Visualizza Record"
+                                       href="{{ url_for(view, _id=row.id) }}">
+                                        {{ row.id|e }}
+                                    </a>
+                                </td>
+                                <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                    {{ row.event|e }}
+                                </td>
+                                <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                    {{ row.created_at|e }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    $(document).ready(function () {
+        $('#data').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            }
+        });
+    });
+
+
+
+
+
+</script>
+{% endblock %}

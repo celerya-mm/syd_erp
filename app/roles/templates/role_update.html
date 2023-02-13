@@ -1,0 +1,44 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+<div class="container text-center mt-2">
+	<div class="row no-gutters justify-content-center ">
+		<h5 class="card-title">
+			<a class="btn btn-update" href="{{ url_for(history, _id=id) }}" title="Annulla"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
+			</a>
+			Modifica la REGOLA [ {{ id }} ]:
+		</h5>
+		<form class="shadow rounded" enctype="multipart/form-data" method="POST"
+			  style="border: solid 2px #ED6666 !important;">
+			{{ form.csrf_token }}
+			<div class="row no-gutters justify-content-center">
+				<div class="col-md-8 order-second">
+					<div class="form-group">
+						{{ form.name.label }}
+						{{ form.name(class="form-control") }}
+						{% if form.name.errors %}
+						{% for error in form.name.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<br>
+			<button class="btn btn-update" id="button" title="Salva" type="submit" value="x">
+				<img alt="" class="icon-simple"
+					 src="{{ url_for('static', filename='icons/save.svg') }}"/>
+			</button>
+			<div>
+				<p class="info">Data Creazione: {{ info.created_at }}</p>
+				<p class="info">Ultima Modifica: {{ info.updated_at }}</p>
+			</div>
+		</form>
+	</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+version: "3.8"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: csbg-test
+    restart: always
+    env_file:
+      - .env
+    tty: true
+    volumes:
+      - appdata:/home/app/src
+      - static_volume:/home/app/src/app/static/
+    networks:
+      - frontend
+    expose:
+      - "8000"
+    ports:
+      - "8000:5000"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail localhost:5000/flask-health-check || exit 1" ]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    container_name: reverse_proxy
+    links:
+      - app
+    tty: true
+    networks:
+      - frontend
+    restart: always
+    volumes:
+      - static_volume:/home/app/src/app/static/
+    ports:
+      - "80:80"
+      - "62233:62233"
+    depends_on:
+      - app
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail localhost:5000/health-check; || exit 1;" ]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+
+networks:
+  frontend:
+    driver: bridge
+
+volumes:
+  appdata:
+  static_volume:
