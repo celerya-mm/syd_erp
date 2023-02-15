@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField, validators, SelectField
+from wtforms import PasswordField, StringField, SubmitField, EmailField, SelectField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
 from .functions import psw_verify, psw_contain_usr
 from .models import User
-from ..functions import status_si_no, mount_full_address, mount_full_name, status_true_false, not_empty
+from ..functions import mount_full_address, mount_full_name, status_true_false, not_empty
 
 
 def list_user():
@@ -66,11 +66,11 @@ class FormUserCreate(FlaskForm):
         """Valida la nuova password."""
         message = psw_verify(field.data)
         if message:
-            raise validators.ValidationError(message)
+            raise ValidationError(message)
 
         message = psw_contain_usr(field.data, self.username.data)
         if message:
-            raise validators.ValidationError(message)
+            raise ValidationError(message)
 
 
 class FormUserUpdate(FlaskForm):

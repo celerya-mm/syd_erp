@@ -1,6 +1,6 @@
 from datetime import datetime
 from config import db
-from ..functions import address_mount, mount_full_name
+from ..functions import mount_full_address, mount_full_name
 
 
 class User(db.Model):
@@ -25,8 +25,8 @@ class User(db.Model):
 	city = db.Column(db.String(55), index=False, unique=False, nullable=True)
 	full_address = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-	auth_tokens = db.relationship('AuthToken', backref='user_tokens', lazy=True)
-	events = db.relationship('EventDB', backref='user_events', lazy=True)
+	auth_tokens = db.relationship('AuthToken', backref='user_tokens', order_by='AuthToken.id.desc()', lazy='dynamic')
+	events = db.relationship('EventDB', backref='user_events', order_by='EventDB.id.desc()', lazy='dynamic')
 	roles = db.relationship('Role', secondary='user_roles', backref='roles_user', lazy='dynamic', viewonly=True)
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
@@ -35,10 +35,10 @@ class User(db.Model):
 	updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
 	def __repr__(self):
-		return f'<USER ID: {self.id}; username: {self.username}>'
+		return f'<USER: {self.id} - {self.username}>'
 
 	def __str__(self):
-		return f'<USER ID: {self.id}; username: {self.username}>'
+		return f'<USER: {self.id} - {self.username}>'
 
 	def __init__(self, username, password=None, active=None, name=None, last_name=None, phone=None, email=None,
 				 address=None, cap=None, city=None, auth_tokens=None, events=None, note=None):
@@ -57,7 +57,7 @@ class User(db.Model):
 		self.address = address
 		self.cap = cap
 		self.city = city
-		self.full_address = address_mount(address, cap, city)
+		self.full_address = mount_full_address(address, cap, city)
 
 		self.auth_tokens = auth_tokens or []
 
@@ -93,7 +93,7 @@ class User(db.Model):
 			'address': self.address,
 			'cap': self.cap,
 			'city': self.city,
-			'full_address': address_mount(self.address, self.cap, self.city),
+			'full_address': mount_full_address(self.address, self.cap, self.city),
 
 			'note': self.note,
 			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),

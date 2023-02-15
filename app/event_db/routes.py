@@ -5,7 +5,6 @@ from flask import Blueprint, flash, redirect, render_template, url_for
 from sqlalchemy.exc import IntegrityError
 
 from config import db
-from app.app import session
 from .models import EventDB
 
 from ..account.models import User
@@ -19,20 +18,21 @@ event_bp = Blueprint(
 )
 
 
-HISTORY = "/event/view/history/<int:_id>/"
-HISTORY_FOR = "event_bp.event_view_history"
-HISTORY_HTML = "event_view_history.html"
+DETAIL = "/event/view/detail/<int:_id>/"
+DETAIL_FOR = "event_bp.event_view_detail"
+DETAIL_HTML = "event_view_detail.html"
 
 RESTORE = "/event/restore/<int:_id>/<int:id_record>/<table>/<view_for>/"
 RESTORE_FOR = "event_bp.event_restore"
 
 
-def event_create(event, user_id=None):
+def event_create(event, user_id=None, partner_id=None):
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
 			event=event,
 			user_id=user_id,
+			partner_id=partner_id,
 		)
 
 		EventDB.create(new_event)
@@ -53,11 +53,11 @@ def event_create(event, user_id=None):
 		return str(err)
 
 
-@event_bp.route(HISTORY, methods=["GET", "POST"])
+@event_bp.route(DETAIL, methods=["GET", "POST"])
 @token_user_validate
-def event_view_history(_id):
-	"""Visualizzo la storia delle modifiche al record utente Administrator."""
-	from ..account.routes import HISTORY_FOR as USER_HISTORY_FOR
+def event_view_detail(_id):
+	"""Visualizzo il dettaglio del record."""
+	from ..account.routes import DETAIL_FOR as USER_HISTORY_FOR
 
 	# Interrogo il DB
 	event = EventDB.query.get(_id)
@@ -85,8 +85,8 @@ def event_view_history(_id):
 
 	db.session.close()
 	return render_template(
-		HISTORY_HTML, form=_event, restore=RESTORE_FOR, table=table,
-		history_list=history_list, h_len=len(history_list), view=HISTORY_FOR,
+		DETAIL_HTML, form=_event, restore=RESTORE_FOR, table=table,
+		history_list=history_list, h_len=len(history_list), view_detail=DETAIL_FOR,
 		id_related=id_related, view_related=view_related, type_related=type_related
 	)
 

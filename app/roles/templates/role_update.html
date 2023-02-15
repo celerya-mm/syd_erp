@@ -5,7 +5,7 @@
 <div class="container text-center mt-2">
 	<div class="row no-gutters justify-content-center ">
 		<h5 class="card-title">
-			<a class="btn btn-update" href="{{ url_for(history, _id=id) }}" title="Annulla"
+			<a class="btn btn-update" href="{{ url_for(detail, _id=id) }}" title="Annulla"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
 			</a>
@@ -14,7 +14,8 @@
 		<form class="shadow rounded" enctype="multipart/form-data" method="POST"
 			  style="border: solid 2px #ED6666 !important;">
 			{{ form.csrf_token }}
-			<div class="row no-gutters justify-content-center">
+			<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 				<div class="col-md-8 order-second">
 					<div class="form-group">
 						{{ form.name.label }}

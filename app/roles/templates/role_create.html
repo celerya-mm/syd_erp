@@ -9,10 +9,11 @@
 			</a>
 			Aggiungi REGOLA ACCESSO.
 		</h5>
-		<div class="col-md-12">
+		<div class="col-md-12 shadow rounded" style="border: solid 2px #ED6666 !important;">
 			<form enctype="multipart/form-data" method="POST">
 				{{ form.csrf_token }}
-				<div class="row no-gutters justify-content-center">
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 					<div class="col-md-8 order-second">
 						<div class="form-group">
 							{{ form.name.label }}

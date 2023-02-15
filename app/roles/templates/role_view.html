@@ -22,7 +22,7 @@
 						{% for row in form %}
 						<tr style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								<a class="tab-link" href="{{ url_for(history, _id=row.id) }}" style=""
+								<a class="tab-link" href="{{ url_for(detail, _id=row.id) }}" style=""
 								   title="Visualizza">
 									{{ row.id|e }}
 								</a>

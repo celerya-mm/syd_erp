@@ -90,6 +90,11 @@ body {
     margin: auto;
 }
 
+.checkbox {
+	width: 24px;
+    height: 24px;
+}
+
 .comment {
     font-family: 'Jost', sans-serif;
     font-size: 0.6rem;
@@ -234,12 +239,14 @@ input[type=search]:focus {
     font-weight: bold;
     font-size: 0.8rem;
     padding-left: 40px;
-    line-height: 0.6;
+    line-height: 0.75;
 }
 
 .json-value {
     font-family: 'Inter', sans-serif !important;
     font-weight: normal !important;
+    font-size: 0.8rem;
+    line-height: 0.75;
 }
 
 label {

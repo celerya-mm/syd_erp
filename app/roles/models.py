@@ -53,8 +53,8 @@ class UserRoles(db.Model):
     __tablename__ = 'user_roles'
     # Columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
-    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
+    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'), nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)

@@ -10,7 +10,7 @@ from .forms import FormUserLogin, FormUserCreate, FormUserUpdate, FormUserPswCha
 from .functions import psw_hash
 from .models import User
 from ..auth_token.functions import __save_auth_token
-from ..functions import token_user_validate, status_si_no, status_true_false
+from ..functions import token_user_validate, access_required, status_si_no, status_true_false
 from ..roles.models import Role
 
 account_bp = Blueprint(
@@ -27,9 +27,9 @@ CREATE = "/create/"
 CREATE_FOR = "account_bp.user_create"
 CREATE_HTML = "user_create.html"
 
-HISTORY = "/view/history/<int:_id>"
-HISTORY_FOR = "account_bp.user_view_history"
-HISTORY_HTML = "user_view_history.html"
+DETAIL = "/view/detail/<int:_id>"
+DETAIL_FOR = "account_bp.user_view_detail"
+DETAIL_HTML = "user_view_detail.html"
 
 UPDATE = "/update/<int:_id>"
 UPDATE_FOR = "account_bp.user_update"
@@ -45,12 +45,11 @@ def login():
 	"""Effettua la log-in."""
 	form = FormUserLogin()
 	if form.validate_on_submit():
-		# print(f"USER: {form.username.data}")
 		_user = User.query.filter_by(username=form.username.data, password=psw_hash(str(form.password.data))).first()
 		if _user not in [None, ""]:
-			record = len(_user.auth_tokens) - 1
-			if record >= 0 and _user.auth_tokens[record].expires_at > datetime.now():
-				token = _user.auth_tokens[record].token
+			record = _user.auth_tokens.first()
+			if record and record.expires_at > datetime.now():
+				token = record.token
 			else:
 				token = uuid4()
 				_auth_token = __save_auth_token(token, _user.id)
@@ -88,6 +87,7 @@ def logout():
 
 @account_bp.route(VIEW, methods=["GET", "POST"])
 @token_user_validate
+@access_required(roles=['account_admin', 'account_read'])
 def user_view():
 	"""Visualizzo informazioni User."""
 	# Estraggo l'utente corrente
@@ -100,13 +100,14 @@ def user_view():
 
 	db.session.close()
 	return render_template(VIEW_HTML, admin=_admin, form=_list, create=CREATE_FOR, update=UPDATE_FOR,
-						   update_psw=UPDATE_PSW_FOR, history=HISTORY_FOR)
+						   update_psw=UPDATE_PSW_FOR, detail=DETAIL_FOR)
 
 
 @account_bp.route(CREATE, methods=["GET", "POST"])
 @token_user_validate
+@access_required(roles=['account_admin', 'account_write'])
 def user_create():
-	"""Creazione Utente Consorzio."""
+	"""Creazione Utente personale."""
 	form = FormUserCreate()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
@@ -136,11 +137,12 @@ def user_create():
 		return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
 
 
-@account_bp.route(HISTORY, methods=["GET", "POST"])
+@account_bp.route(DETAIL, methods=["GET", "POST"])
 @token_user_validate
-def user_view_history(_id):
-	"""Visualizzo la storia delle modifiche al record utente."""
-	from app.event_db.routes import HISTORY_FOR as EVENT_HISTORY
+@access_required(roles=['account_admin', 'account_read'])
+def user_view_detail(_id):
+	"""Visualizzo il dettaglio del record."""
+	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 
 	# Estraggo l' ID dell'utente corrente
 	session["id_user"] = _id
@@ -158,13 +160,14 @@ def user_view_history(_id):
 
 	db.session.close()
 	return render_template(
-		HISTORY_HTML, form=_user, view=VIEW_FOR, update=UPDATE_FOR, update_psw=UPDATE_PSW_FOR,
-		history_list=history_list, h_len=len(history_list), event_history=EVENT_HISTORY,
+		DETAIL_HTML, form=_user, view=VIEW_FOR, update=UPDATE_FOR, update_psw=UPDATE_PSW_FOR,
+		history_list=history_list, h_len=len(history_list), event_detail=EVENT_DETAIL,
 	)
 
 
 @account_bp.route(UPDATE, methods=["GET", "POST"])
 @token_user_validate
+@access_required(roles=['account_admin', 'account_write'])
 def user_update(_id):
 	"""Aggiorna dati Utente."""
 	from app.event_db.routes import event_create
@@ -207,7 +210,7 @@ def user_update(_id):
 				'created_at': user.created_at,
 				'updated_at': user.updated_at,
 			}
-			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)
+			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=DETAIL_FOR)
 
 		_event = {
 			"username": session["user"]["username"],
@@ -216,7 +219,7 @@ def user_update(_id):
 			"Previous_data": previous_data
 		}
 		_event = event_create(_event, user_id=_id)
-		return redirect(url_for(HISTORY_FOR, _id=_id))
+		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.username.data = user.username
 		form.active.data = status_si_no(user.active)
@@ -234,10 +237,11 @@ def user_update(_id):
 			'updated_at': user.updated_at,
 		}
 		db.session.close()
-		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)
+		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=DETAIL_FOR)
 
 
 @account_bp.route(UPDATE_PSW, methods=["GET", "POST"])
+@access_required(roles=['account_admin', 'account_write'])
 def user_update_password(_id):
 	"""Aggiorna password Utente."""
 	from app.event_db.routes import event_create
@@ -252,7 +256,7 @@ def user_update_password(_id):
 		if new_password == _user.password:
 			session.clear()
 			flash("The 'New Password' inserted is equal to 'Registered Password'.")
-			return render_template(UPDATE_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
+			return render_template(UPDATE_PSW_HTML, form=form, id=_id, history=DETAIL_FOR)
 		else:
 			_user.password = new_password
 			_user.updated_at = datetime.now()
@@ -271,6 +275,6 @@ def user_update_password(_id):
 		if session["user"]["id"] != _id:
 			flash(f"Non hai i privilegi per effettuare il cambio password per l'utente con id: {_id}")
 			flash(f"La password di un utente può essere cambiata solo dall'utente stesso.")
-			return redirect(url_for(HISTORY_FOR, _id=_id))
+			return redirect(url_for(DETAIL_FOR, _id=_id))
 		else:
-			return render_template(UPDATE_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
+			return render_template(UPDATE_PSW_HTML, form=form, id=_id, history=DETAIL_FOR)

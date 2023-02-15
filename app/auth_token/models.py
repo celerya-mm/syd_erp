@@ -23,7 +23,7 @@ class AuthToken(db.Model):
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	token = db.Column(db.String(36), nullable=False, unique=True)
 
-	user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+	user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
 
 	created_at = db.Column(db.DateTime, index=False, nullable=False)
 	expires_at = db.Column(db.DateTime, index=False, nullable=False)

@@ -2,6 +2,7 @@ from datetime import datetime, date
 from functools import wraps
 
 from flask import url_for, redirect, flash
+from sqlalchemy import Null
 
 from .app import session
 
@@ -42,7 +43,6 @@ def token_user_validate(func):
 
 def access_required(roles='ANY'):
 	"""Verifica se l'utente ha la regola assegnata per accedere."""
-	from .roles.models import Role
 
 	def wrapper(fn):
 		@wraps(fn)
@@ -97,7 +97,7 @@ def mount_full_name(name, last_name):
 	return full_name
 
 
-def address_mount(address, cap, city):
+def mount_full_address(address, cap, city):
 	"""Monta indirizzo completo."""
 	if address and cap and city:
 		full_address = f"{address} - {cap} - {city}"
@@ -121,7 +121,7 @@ def address_mount(address, cap, city):
 
 def not_empty(_v):
 	"""Verifica se il dato passato è vuoto o da non considerare."""
-	if _v in ["", "-", None, 0]:
+	if _v in ["", "-", None, 0] or _v is Null:
 		return None
 	else:
 		_v = str(_v).strip()
@@ -130,10 +130,10 @@ def not_empty(_v):
 
 def status_true_false(_stat):
 	"""Cambia valori SI, NO in True, False."""
-	if _stat == "NO" or _stat is False:
-		return False
-	else:
+	if _stat in ['SI', 'si', True, 'y', 'Y', 1]:
 		return True
+	else:
+		return False
 
 
 def status_si_no(_str):
@@ -144,38 +144,3 @@ def status_si_no(_str):
 		return "SI"
 	else:
 		return "NO"
-
-
-def mount_full_name(name, last_name):
-	"""Monta il nome completo."""
-	if name is not None and last_name is not None:
-		full_name = f"{name} {last_name}"
-	elif name is not None and last_name is None:
-		full_name = name
-	elif name is None and last_name is not None:
-		full_name = last_name
-	else:
-		full_name = None
-	return full_name
-
-
-def mount_full_address(address, cap, city):
-	"""Monta indirizzo completo."""
-	if address and cap and city:
-		full_address = f"{address} - {cap} - {city}"
-	elif address and cap:
-		full_address = f"{address} - {cap}"
-	elif address and city:
-		full_address = f"{address} - {city}"
-	elif cap and city:
-		full_address = f"{cap} - {city}"
-	elif address:
-		full_address = address
-	elif city:
-		full_address = city
-	elif cap:
-		full_address = cap
-	else:
-		full_address = None
-
-	return full_address

@@ -7,43 +7,19 @@
 			<a class="btn btn-update" href="{{ url_for(view) }}" title="Annulla" type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
 			</a>
-			Aggiungi UTENTE.
+			Aggiungi un nuovo PARTNER:
 		</h5>
 		<div class="col-md-12 shadow rounded" style="border: solid 2px #ED6666 !important;">
 			<form enctype="multipart/form-data" method="POST">
 				{{ form.csrf_token }}
 				<div class="row no-gutters justify-content-center rounded"
 					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-					<div class="col-md-4 order-first">
+					<div class="col-md-12 order-first">
 						<div class="form-group">
-							{{ form.username.label }}
-							{{ form.username(class="form-control emphasis") }}
-							{% if form.username.errors %}
-							{% for error in form.username.errors %}
-							<span class="text-danger">{{ error }}</span>
-							<br>
-							{% endfor %}
-							{% endif %}
-						</div>
-					</div>
-					<div class="col-md-4 order-second">
-						<div class="form-group">
-							{{ form.name.label }}
-							{{ form.name(class="form-control") }}
-							{% if form.name.errors %}
-							{% for error in form.name.errors %}
-							<span class="text-danger">{{ error }}</span>
-							<br>
-							{% endfor %}
-							{% endif %}
-						</div>
-					</div>
-					<div class="col-md-4 order-third">
-						<div class="form-group">
-							{{ form.last_name.label }}
-							{{ form.last_name(class="form-control") }}
-							{% if form.last_name.errors %}
-							{% for error in form.last_name.errors %}
+							{{ form.organization.label(style="font-size: 1.2rem;") }}
+							{{ form.organization(class="form-control emphasis") }}
+							{% if form.organization.errors %}
+							{% for error in form.organization.errors %}
 							<span class="text-danger">{{ error }}</span>
 							<br>
 							{% endfor %}
@@ -53,9 +29,30 @@
 				</div>
 				<div class="row no-gutters justify-content-center rounded"
 					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-					<div class="col-md-7 order-first">
+					<div class="col-md-3 order-second">
 						<div class="form-group">
-							{{ form.email.label }}
+							{{ form.client.label(style="font-size: 1.2rem;") }}
+							{{ form.client(class="checkbox") }}
+						</div>
+					</div>
+					<div class="col-md-3 order-third">
+						<div class="form-group">
+							{{ form.supplier.label(style="font-size: 1.2rem;") }}
+							{{ form.supplier(class="checkbox") }}
+						</div>
+					</div>
+					<div class="col-md-3 order-fourth">
+						<div class="form-group">
+							{{ form.partner.label(style="font-size: 1.2rem;") }}
+							{{ form.partner(class="checkbox") }}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-6 order-first">
+						<div class="form-group">
+							{{ form.email.label(style="font-size: 1.2rem;") }}
 							{{ form.email(class="form-control emphasis") }}
 							{% if form.email.errors %}
 							{% for error in form.email.errors %}
@@ -65,12 +62,12 @@
 							{% endif %}
 						</div>
 					</div>
-					<div class="col-md-5 order-second">
+					<div class="col-md-6 order-second">
 						<div class="form-group">
-							{{ form.phone.label }}
-							{{ form.phone(class="form-control") }}
-							{% if form.phone.errors %}
-							{% for error in form.phone.errors %}
+							{{ form.pec.label(style="font-size: 1.2rem;") }}
+							{{ form.pec(class="form-control") }}
+							{% if form.pec.errors %}
+							{% for error in form.pec.errors %}
 							<span class="text-danger">{{ error }}</span>
 							<br>
 							{% endfor %}
@@ -82,7 +79,7 @@
 					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 					<div class="col-md-6 order-first">
 						<div class="form-group">
-							{{ form.address.label }}
+							{{ form.address.label(style="font-size: 1.2rem;") }}
 							{{ form.address(class="form-control") }}
 							{% if form.address.errors %}
 							{% for error in form.address.errors %}
@@ -94,7 +91,7 @@
 					</div>
 					<div class="col-md-2 order-second">
 						<div class="form-group">
-							{{ form.cap.label }}
+							{{ form.cap.label(style="font-size: 1.2rem;") }}
 							{{ form.cap(class="form-control") }}
 							{% if form.cap.errors %}
 							{% for error in form.cap.errors %}
@@ -106,7 +103,7 @@
 					</div>
 					<div class="col-md-4 order-third">
 						<div class="form-group">
-							{{ form.city.label }}
+							{{ form.city.label(style="font-size: 1.2rem;") }}
 							{{ form.city(class="form-control") }}
 							{% if form.city.errors %}
 							{% for error in form.city.errors %}
@@ -119,24 +116,51 @@
 				</div>
 				<div class="row no-gutters justify-content-center rounded"
 					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-					<div class="col-md-5 order-first">
+					<div class="col-md-6 order-second">
 						<div class="form-group">
-							{{ form.new_password_1.label }}
-							{{ form.new_password_1(class="form-control emphasis") }}
-							{% if form.new_password_1.errors %}
-							{% for error in form.new_password_1.errors %}
+							{{ form.phone.label(style="font-size: 1.2rem;") }}
+							{{ form.phone(class="form-control") }}
+							{% if form.phone.errors %}
+							{% for error in form.phone.errors %}
 							<span class="text-danger">{{ error }}</span>
 							<br>
 							{% endfor %}
 							{% endif %}
 						</div>
 					</div>
-					<div class="col-md-5 order-second">
+					<div class="col-md-6 order-second">
 						<div class="form-group">
-							{{ form.new_password_2.label }}
-							{{ form.new_password_2(class="form-control emphasis") }}
-							{% if form.new_password_2.errors %}
-							{% for error in form.new_password_2.errors %}
+							{{ form.sdi_code.label(style="font-size: 1.2rem;") }}
+							{{ form.sdi_code(class="form-control") }}
+							{% if form.sdi_code.errors %}
+							{% for error in form.sdi_code.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-6 order-first">
+						<div class="form-group">
+							{{ form.vat_number.label(style="font-size: 1.2rem;") }}
+							{{ form.vat_number(class="form-control emphasis") }}
+							{% if form.vat_number.errors %}
+							{% for error in form.vat_number.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6 order-second">
+						<div class="form-group">
+							{{ form.fiscal_code.label(style="font-size: 1.2rem;") }}
+							{{ form.fiscal_code(class="form-control emphasis") }}
+							{% if form.fiscal_code.errors %}
+							{% for error in form.fiscal_code.errors %}
 							<span class="text-danger">{{ error }}</span>
 							<br>
 							{% endfor %}
@@ -147,7 +171,7 @@
 				<div class="row no-gutters justify-content-center rounded"
 					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 					<div class="form-group">
-						{{ form.note.label }}
+						{{ form.note.label(style="font-size: 1.2rem;") }}
 						{{ form.note(class="form-control") }}
 						{% if form.note.errors %}
 						{% for error in form.note.errors %}

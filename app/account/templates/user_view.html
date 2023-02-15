@@ -11,7 +11,7 @@
             Bentornatə "{{admin.name}}"
         </h5>
         <a class="btn-update" type="button" title="Visualizza record"
-           href="{{ url_for(history, _id=admin.id) }}">
+           href="{{ url_for(detail, _id=admin.id) }}">
             <img class="icon-simple" src="{{ url_for('static', filename='icons/history_grey.svg') }}" alt=""/>
         </a>
         <a class="btn-update" type="button" title="Modifica utente"
@@ -61,6 +61,7 @@
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
                             <th class="title" id="h1">ID</th>
+							<th class="title" id="h2">Stato</th>
                             <th class="title" id="h3">Username</th>
                             <th class="title" id="h4">email</th>
                             <th class="title" id="h5">Nome Cognome</th>
@@ -73,16 +74,24 @@
                         <tr style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 <a class="tab-link" title="Visualizza" style=""
-                                   href="{{ url_for(history, _id=row.id) }}">
+                                   href="{{ url_for(detail, _id=row.id) }}">
                                     {{ row.id|e }}
                                 </a>
+                            </td>
+							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{% if row.active == True or row.active == SI %}
+                                <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
+                                {% endif %}
+								{{ row.active }}
                             </td>
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.username|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {% if row.email %}
-                                <a class="tab-link" title="Google Maps" style=""
+                                <a class="tab-link" title="Send email" style=""
                                    href="mailto:{{ row.email }}">
                                     <img src="{{ url_for('static', filename='icons/at.svg') }}" alt="">
                                 </a>

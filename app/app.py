@@ -43,8 +43,10 @@ with app.app_context():
 	from .account.routes import account_bp
 	from .event_db.routes import event_bp
 	from .roles.routes import role_bp
+	from .partner.routes import partner_bp
 
 	# registro i blueprints
 	app.register_blueprint(account_bp, url_prefix='/account')
 	app.register_blueprint(event_bp, url_prefix='/event')
 	app.register_blueprint(role_bp, url_prefix='/role')
+	app.register_blueprint(partner_bp, url_prefix='/partner')

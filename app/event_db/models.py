@@ -12,7 +12,8 @@ class EventDB(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     event = db.Column(JSONB, index=True, unique=True, nullable=False)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
+    partner_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
 
@@ -22,10 +23,11 @@ class EventDB(db.Model):
     def __str__(self):
         return '<EVENTO: {}>'.format(self.event)
 
-    def __init__(self, event, user_id=None):
+    def __init__(self, event, user_id=None, partner_id=None):
         self.event = event
 
         self.user_id = user_id
+        self.partner_id = partner_id
 
         self.created_at = datetime.now()
 
@@ -46,6 +48,7 @@ class EventDB(db.Model):
             'event': self.event,
 
             'user_id': self.user_id,
+            'partner_id': self.partner_id,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

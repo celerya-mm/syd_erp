@@ -88,6 +88,7 @@
                 </span>
                 </p>
             </div>
+			{% if form.event.Previous_data %}
             <div class="form-group">
                 <p class="json-key">Previous Data:</p>
                 {% for key, value in form.event.Previous_data.items() %}
@@ -99,6 +100,7 @@
                 </p>
                 {% endfor %}
             </div>
+			{% endif %}
         </div>
     </div>
     <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
@@ -130,11 +132,11 @@
                             <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
                                 <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                     <a class="btn-table" type="button" title="Visualizza Record"
-                                       href="{{ url_for(view, _id=row.id) }}">
+                                       href="{{ url_for(view_detail, _id=row.id) }}">
                                         {{ row.id|e }}
                                     </a>
                                 </td>
-                                <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.5rem;">
                                     {{ row.event|e }}
                                 </td>
                                 <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
@@ -173,10 +175,6 @@
             }
         });
     });
-
-
-
-
 
 </script>
 {% endblock %}
