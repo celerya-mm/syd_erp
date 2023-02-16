@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, BooleanField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
@@ -25,9 +27,9 @@ class FormPartnerCreate(FlaskForm):
 	"""Form per creare un Partner."""
 	organization = StringField('Rag. Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=80)])
 
-	client = BooleanField('Cliente', default=False)
-	supplier = BooleanField('Fornitore', default=False)
-	partner = BooleanField('Partner', default=False)
+	client = BooleanField('Cliente', false_values=False, default=False)
+	supplier = BooleanField('Fornitore', false_values=False, default=False)
+	partner = BooleanField('Partner', false_values=False, default=False)
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	pec = EmailField('pec', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80), Optional()])
@@ -85,9 +87,9 @@ class FormPartnerUpdate(FlaskForm):
 	"""Form per creare un Partner."""
 	organization = StringField('Rag. Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=80)])
 
-	client = BooleanField('Cliente')
-	supplier = BooleanField('Fornitore')
-	partner = BooleanField('Partner')
+	client = BooleanField('Cliente', false_values=False)
+	supplier = BooleanField('Fornitore', false_values=False)
+	partner = BooleanField('Partner', false_values=False)
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	pec = EmailField('pec', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
@@ -138,4 +140,5 @@ class FormPartnerUpdate(FlaskForm):
 			'sdi_code': not_empty(self.sdi_code.data),
 
 			'note': not_empty(self.note.data.strip()),
+			'updated_at': datetime.now()
 		}

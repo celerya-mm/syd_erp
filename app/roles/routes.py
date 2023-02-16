@@ -109,18 +109,14 @@ def role_view_detail(_id):
 @access_required(roles=['role_admin', 'role_write'])
 def role_update(_id):
 	"""Aggiorna dati Record."""
-
-	form = FormRuleUpdate()
 	# recupero i dati
 	role = Role.query.get(_id)
+	form = FormRuleUpdate(obj=role)
 
-	if form.validate_on_submit():
-		new_data = json.loads(json.dumps(request.form))
-
-		role.name = new_data["name"].strip()
-		role.updated_at = datetime.now()
+	if request.method == 'POST' and form.validate():
+		new_data = FormRuleUpdate(request.form).to_dict()
 		try:
-			Role.update()
+			Role.update(_id, new_data)
 			flash("REGOLA aggiornata correttamente.")
 			return redirect(url_for(DETAIL_FOR, _id=_id))
 		except IntegrityError as err:
@@ -133,8 +129,6 @@ def role_update(_id):
 			}
 			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, detail=DETAIL_FOR)
 	else:
-		form.name.data = role.name
-
 		_info = {
 			'created_at': role.created_at,
 			'updated_at': role.updated_at,

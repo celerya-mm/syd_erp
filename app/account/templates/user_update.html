@@ -15,7 +15,13 @@
 			{{ form.csrf_token }}
 			<div class="row no-gutters justify-content-center rounded"
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="col-md-4 order-first">
+				<div class="col-md-1 order-first">
+					<div class="form-group">
+						{{ form.active.label(style="font-size: 1.2rem;") }}
+						{{ form.active(class="checkbox") }}
+					</div>
+				</div>
+				<div class="col-md-3 order-second">
 					<div class="form-group">
 						{{ form.username.label }}
 						{{ form.username(class="form-control emphasis") }}
@@ -27,7 +33,7 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-4 order-second">
+				<div class="col-md-4 order-third">
 					<div class="form-group">
 						{{ form.name.label }}
 						{{ form.name(class="form-control") }}
@@ -39,7 +45,7 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-4 order-third">
+				<div class="col-md-4 order-fourth">
 					<div class="form-group">
 						{{ form.last_name.label }}
 						{{ form.last_name(class="form-control") }}

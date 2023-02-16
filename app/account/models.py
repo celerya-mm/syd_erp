@@ -9,7 +9,9 @@ class User(db.Model):
 	# Columns
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	username = db.Column(db.String(20), index=True, unique=True, nullable=False)
+
 	password = db.Column(db.String(64), index=False, unique=False, nullable=False)  # 64 char for hash code
+	psw_changed = db.Column(db.Boolean, unique=False, nullable=False)
 
 	active = db.Column(db.Boolean, unique=False, nullable=False)
 
@@ -40,10 +42,12 @@ class User(db.Model):
 	def __str__(self):
 		return f'<USER: {self.id} - {self.username}>'
 
-	def __init__(self, username, password=None, active=None, name=None, last_name=None, phone=None, email=None,
-				 address=None, cap=None, city=None, auth_tokens=None, events=None, note=None):
+	def __init__(self, username, password=None, psw_changed=False, active=None, name=None, last_name=None, phone=None,
+				 email=None, address=None, cap=None, city=None, auth_tokens=None, events=None, note=None):
 		self.username = username
+
 		self.password = password
+		self.psw_changed = psw_changed
 
 		self.active = active
 
@@ -72,8 +76,9 @@ class User(db.Model):
 		db.session.add(self)
 		db.session.commit()
 
-	def update():  # noqa
+	def update(_id, data):  # noqa
 		"""Salva le modifiche a un record."""
+		User.query.filter_by(id=_id).update(data)
 		db.session.commit()
 
 	def to_dict(self):
@@ -82,6 +87,9 @@ class User(db.Model):
 		return {
 			'id': self.id,
 			'username': self.username,
+
+			'psw_changed': self.psw_changed,
+			'active': self.active,
 
 			'phone': self.phone,
 			'email': self.email,

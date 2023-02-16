@@ -129,41 +129,18 @@ def partner_update(_id):
 	"""Aggiorna dati Utente."""
 	from app.event_db.routes import event_create
 
-	form = FormPartnerUpdate()
 	# recupero i dati
 	partner = Partner.query.get(_id)
+	form = FormPartnerUpdate(obj=partner)
 
-	if form.validate_on_submit():
+	if request.method == 'POST' and form.validate():
 		new_data = FormPartnerUpdate(request.form).to_dict()
-
-		print('NEW_DATA:', json.dumps(new_data, indent=2, default=str))
 
 		previous_data = partner.to_dict()
 		previous_data.pop("updated_at")
 
-		partner.organization = new_data["organization"]
-
-		partner.client = new_data["client"]
-		partner.supplier = new_data["supplier"]
-		partner.partner = new_data["partner"]
-
-		partner.email = new_data["email"]
-		partner.pec = new_data["pec"]
-		partner.phone = new_data["phone"]
-
-		partner.address = new_data["address"]
-		partner.cap = new_data["cap"]
-		partner.city = new_data["city"]
-		partner.full_address = new_data["full_address"]
-
-		partner.vat_number = new_data["vat_number"]
-		partner.fiscal_code = new_data["fiscal_code"]
-		partner.sdi_code = not_empty(new_data["sdi_code"])
-
-		partner.note = new_data["note"]
-		partner.updated_at = datetime.now()
 		try:
-			Partner.update()
+			Partner.update(_id, new_data)
 			flash("PARTNER aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -184,26 +161,6 @@ def partner_update(_id):
 		_event = event_create(_event, partner_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
-		form.organization.data = partner.organization
-
-		form.client.data = partner.client
-		form.supplier.data = partner.supplier
-		form.partner.data = partner.partner
-
-		form.email.data = partner.email
-		form.pec.data = partner.pec
-		form.phone.data = partner.phone
-
-		form.address.data = partner.address
-		form.cap.data = partner.cap
-		form.city.data = partner.city
-
-		form.vat_number.data = partner.vat_number
-		form.fiscal_code.data = partner.fiscal_code
-		form.sdi_code.data = partner.sdi_code
-
-		form.note.data = partner.note
-
 		_info = {
 			'created_at': partner.created_at,
 			'updated_at': partner.updated_at,

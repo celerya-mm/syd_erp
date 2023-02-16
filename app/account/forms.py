@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField, SelectField
+from wtforms import PasswordField, StringField, SubmitField, EmailField, SelectField, BooleanField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
 from .functions import psw_verify, psw_contain_usr
@@ -21,7 +23,7 @@ class FormUserCreate(FlaskForm):
         'Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)], default=""
     )
 
-    active = SelectField("Attivo", choices=["SI", "NO"], default="SI")
+    active = BooleanField("Attivo", false_values=False)
 
     syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
 
@@ -77,7 +79,7 @@ class FormUserUpdate(FlaskForm):
     """Form di modifica dati account escluso password ed e-mail"""
     username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)])
 
-    active = SelectField("Attivo", choices=["SI", "NO"], default="SI")
+    active = BooleanField("Attivo", false_values=False)
 
     name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
     last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
@@ -116,7 +118,9 @@ class FormUserUpdate(FlaskForm):
 
             'email': self.email.data.strip().replace(" ", ""),
             'phone': self.phone.data.strip(),
+
             'note': not_empty(self.note.data.strip()),
+            'updated_at': datetime.now()
         }
 
 

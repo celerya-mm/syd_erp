@@ -1,7 +1,7 @@
 from datetime import datetime, date
 from functools import wraps
 
-from flask import url_for, redirect, flash
+from flask import url_for, redirect
 from sqlalchemy import Null
 
 from .app import session
@@ -19,24 +19,29 @@ def token_user_validate(func):
 			authenticated = AuthToken.query.filter_by(token=str(session["token_login"])).first()
 			_user = User.query.get(authenticated.user_id)
 			if authenticated is None:
-				flash(f"Non è stato passato un token valido, ripetere la login.")
-				return redirect(url_for('account_bp.logout'))
+				print("AUTHORIZATION_CHECK_FAIL_2")
+				msg = f"Non è stato passato un token valido, ripetere la login."
+				return redirect(url_for('account_bp.logout', msg=msg))
 			elif authenticated.expires_at < datetime.now():
-				flash(f"Il token è scaduto, ripetere la login.")
-				return redirect(url_for('account_bp.logout'))
+				print("AUTHORIZATION_CHECK_FAIL_3")
+				msg = f"Il token è scaduto: {authenticated.expires_at}, ripetere la login."
+				return redirect(url_for('account_bp.logout', msg=msg))
 			elif authenticated.user_id in ["", None]:
-				flash(f"Non è stato registrato nessun utente, effettuare la login.")
-				return redirect(url_for('account_bp.logout'))
+				print("AUTHORIZATION_CHECK_FAIL_4")
+				msg = f"Non è stato registrato nessun utente, effettuare la login."
+				return redirect(url_for('account_bp.logout', msg=msg))
 			elif _user.active is False:
-				flash(f"L'utente {_user.username} non è abilitato all'accesso.")
-				return redirect(url_for('account_bp.logout'))
+				print("AUTHORIZATION_CHECK_FAIL_5")
+				msg = f"L'utente {_user.username} non è abilitato all'accesso."
+				return redirect(url_for('account_bp.logout', msg=msg))
 			else:
 				print("AUTHORIZATION_CHECK_PASS")
 				# esegue la funzione
 				return func(*args, **kwargs)
 		else:
 			print("AUTHORIZATION_CHECK_FAIL_1")
-			return redirect(url_for('account_bp.logout'))
+			msg = f'Login non effettuata'
+			return redirect(url_for('account_bp.logout', msg=msg))
 
 	return wrap
 
@@ -47,7 +52,35 @@ def access_required(roles='ANY'):
 	def wrapper(fn):
 		@wraps(fn)
 		def check_rule(roles_=roles, *args, **kwargs):
-			if 'user_roles' not in session.keys() or roles_ == 'ANY':
+			if session['user']['psw_changed'] is not True:
+				msg = 'Per poter proseguire devi aggiornare la tua password.'
+				redirect(url_for("account_bp.user_update_password", _id=session['user']['id'], msg=msg))
+			elif 'user_roles' not in session.keys() or roles_ == 'ANY':
+				msg = "Non hai i permessi per accedere alla risorsa richiesta."
+				return msg
+			else:
+				for r in session['user_roles']:
+					if r in roles_ or r == 'superuser':
+						print(f'CHECK_ROLE: {r} [OK]')
+						return fn(*args, **kwargs)
+
+				msg = f"Non hai i permessi per accedere alla risorsa richiesta. Contatta l'amministratore " \
+					  f"per farti assegnare il permesso d'accesso."
+				return msg
+
+		return check_rule
+	return wrapper
+
+
+def access_required_update_psw(roles='ANY'):
+	"""Verifica se l'utente ha il permesso per accedere."""
+
+	def wrapper(fn):
+		@wraps(fn)
+		def check_rule(roles_=roles, *args, **kwargs):
+			if session['user']['psw_changed'] is not True:
+				return fn(*args, **kwargs)
+			elif 'user_roles' not in session.keys() or roles_ == 'ANY':
 				msg = "Non hai i permessi per accedere alla risorsa richiesta."
 				return msg
 			else:

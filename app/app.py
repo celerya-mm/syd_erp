@@ -38,7 +38,7 @@ db.init_app(app)
 migrate.init_app(app, db)
 
 
-# importo le Classi
+# importo i Blueprint
 with app.app_context():
 	from .account.routes import account_bp
 	from .event_db.routes import event_bp

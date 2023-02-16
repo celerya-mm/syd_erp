@@ -10,11 +10,17 @@
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/list_blue.svg') }}"/>
 			</a>
 			Dati PARTNER [ {{ form.id }} ]
+			{%
+				if 'superuser' in session['user_roles']
+				or 'partner_admin' in session['user_roles']
+				or 'partner_write' in session['user_roles']
+			%}
 			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
 			   title="Modifica Partner"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
 			</a>
+			{%  endif %}
 		</h5>
 	</div>
 	
@@ -32,6 +38,7 @@
 			<div class="col-md-1 order-first">
 				<div class="form-group">
 					<h6> Cliente </h6>
+					<input class="checkbox" disabled readonly type="checkbox" value=form.client>
 					{% if form.client == True %}
 					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
 					{% else %}
@@ -128,7 +135,7 @@
 				<div class="form-group">
 					<h6> C.F. </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.sdi_code }}
+						{{ form.fiscal_code }}
 					</p>
 				</div>
 			</div>
@@ -151,21 +158,24 @@
 </form>
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
 	<div class="accordion" id="accordion">
+		<!--	Modifiche Record-->
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="1">
-				<button aria-controls="collapseOne" aria-expanded="true"
+				<button aria-controls="collapseOne"
+						aria-expanded="true"
 						class="accordion-button"
-						data-bs-target="#collapseOne"
+						data-bs-target="#collapse1"
 						data-bs-toggle="collapse"
 						type="button">
 					Elenco Modifiche al Record [ {{ h_len }} ]
 				</button>
 			</h2>
-			<div aria-labelledby="headingOne" class="accordion-collapse collapse"
+			<div aria-labelledby="heading1"
+				 class="accordion-collapse collapse"
 				 data-bs-parent="#accordion"
-				 id="collapseOne">
+				 id="collapse1">
 				<div class="table-responsive" style="padding: 10px">
-					<table class="table table-striped" id="data" style="width:100%">
+					<table class="table table-striped" id="events" style="width:100%">
 						<thead>
 						<tr style="background-color: #2B4692; vertical-align: center;">
 							<th class="title" data-defaultsort="desc" id="h1">ID</th>
@@ -177,11 +187,19 @@
 						{% for row in history_list %}
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+									if 'superuser' in session['user_roles']
+									or 'partner_admin' in session['user_roles']
+									or 'partner_write' in session['user_roles']
+								%}
 								<a class="btn-table" href="{{ url_for(event_detail, _id=row.id) }}"
 								   title="Visualizza Record"
 								   type="button">
 									{{ row.id|e }}
 								</a>
+								{% else %}
+									{{ row.id|e }}
+								{% endif %}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.5rem;">
 								{{ row.event|e }}
@@ -208,7 +226,7 @@
 {% block scripts %}
 <script>
     $(document).ready(function () {
-        $('#data').DataTable({
+        $('#events').DataTable({
             responsive: {
                 breakpoints: [
                     { name: 'bigdesktop', width: 1920 },
@@ -224,7 +242,6 @@
             },
         });
     });
-
 
 </script>
 {% endblock %}

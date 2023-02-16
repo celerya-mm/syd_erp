@@ -11,11 +11,13 @@
                      alt=""/>
             </a>
             Record [ {{ id_related }} ] tabella [ {{ type_related }} ]:
+			{% if form.event.Previous_data %}
             <a class="btn btn-update" type="button" title="Ripristina record"
                href="{{ url_for(restore, _id=form.id, id_record=id_related, form=form, table=table,
                view_for=view_related) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/restore.svg') }}" alt=""/>
             </a>
+			{% endif %}
         </h5>
         <div class="container rounded shadow">
             <br>

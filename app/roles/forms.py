@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, ValidationError
@@ -56,6 +58,7 @@ class FormRuleUpdate(FlaskForm):
         """Converte form in dict."""
         return {
             'name': self.name.data,
+            'updated_at': datetime.now()
         }
 
 
