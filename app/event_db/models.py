@@ -14,14 +14,15 @@ class EventDB(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
     partner_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=True)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id', ondelete='CASCADE'), nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<EVENTO: {}>'.format(self.event)
+        return f'<EVENTO: [{self.event}]>'
 
     def __str__(self):
-        return '<EVENTO: {}>'.format(self.event)
+        return f'<EVENTO: [{self.event}]>'
 
     def __init__(self, event, user_id=None, partner_id=None):
         self.event = event

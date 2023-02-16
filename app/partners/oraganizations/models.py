@@ -1,6 +1,6 @@
 from datetime import datetime
 from config import db
-from ..functions import mount_full_address, date_to_str
+from app.functions import mount_full_address, date_to_str
 
 
 class Partner(db.Model):
@@ -27,6 +27,7 @@ class Partner(db.Model):
 	fiscal_code = db.Column(db.String(13), index=False, unique=False, nullable=True)
 	sdi_code = db.Column(db.String(7), index=False, unique=False, nullable=True)
 
+	contacts = db.relationship('Contact', backref='partner_contacts', order_by='Contact.last_name.asc()', lazy='dynamic')
 	events = db.relationship('EventDB', backref='partner_events', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
@@ -35,10 +36,10 @@ class Partner(db.Model):
 	updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
 	def __repr__(self):
-		return f'<PARTNER: {self.id} - {self.organization}>'
+		return f'<PARTNER: [{self.id}] - {self.organization}>'
 
 	def __str__(self):
-		return f'<PARTNER: {self.id} - {self.organization}>'
+		return f'<PARTNER: [{self.id}] - {self.organization}>'
 
 	def __init__(self, organization, client, supplier, partner, email, pec, phone, address, cap, city, vat_number,
 				 fiscal_code, sdi_code=None, events=None, note=None):

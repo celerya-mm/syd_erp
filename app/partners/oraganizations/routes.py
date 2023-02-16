@@ -8,7 +8,7 @@ from config import db
 
 from .forms import FormPartnerCreate, FormPartnerUpdate
 from .models import Partner
-from ..functions import token_user_validate, access_required, status_true_false, not_empty, mount_full_address
+from app.functions import token_user_validate, access_required, status_true_false, not_empty, mount_full_address
 
 partner_bp = Blueprint(
 	'partner_bp', __name__,

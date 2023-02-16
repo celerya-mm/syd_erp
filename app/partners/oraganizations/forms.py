@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, Email, Length, ValidationError, Opt
 
 from config import db
 from .models import Partner
-from ..functions import mount_full_address, not_empty, status_true_false
+from app.functions import mount_full_address, not_empty, status_true_false
 
 
 def list_partners():

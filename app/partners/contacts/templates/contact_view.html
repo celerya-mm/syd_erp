@@ -10,20 +10,17 @@
 					   type="button">
 						<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}"/>
 					</a>
-					Elenco Partners:</h3>
+					Elenco Contati:</h3>
 				<div class="table-responsive" style="padding: 10px">
 					<table class="table table-striped" id="data" style="width:100%">
 						<thead>
 						<tr style="background-color: #2B4692; vertical-align: center;">
 							<th class="title" id="h1">ID</th>
-							<th class="title" id="h2">Rag. Sociale</th>
-							<th class="title" id="h3">Cliente</th>
-							<th class="title" id="h4">Fornitore</th>
+							<th class="title" id="h2">Nome Cognome</th>
+							<th class="title" id="h3">Email</th>
+							<th class="title" id="h4" data-sortable="false">Telefono</th>
 							<th class="title" id="h5">Partner</th>
-							<th class="title" id="h6">Email</th>
-							<th class="title" id="h7">pec</th>
-							<th class="title" data-sortable="false" id="h8">Telefono</th>
-							<th class="title" id="h9">Città</th>
+							<th class="title" id="h6">Ruolo</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -36,31 +33,7 @@
 								</a>
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.organization|e }}
-							</td>
-							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{% if row.client == True %}
-								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
-								{% else %}
-								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
-								{% endif %}
-								{{ row.client }}
-							</td>
-							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{% if row.supplier == True %}
-								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
-								{% else %}
-								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
-								{% endif %}
-								{{ row.supplier }}
-							</td>
-							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{% if row.partner == True %}
-								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
-								{% else %}
-								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
-								{% endif %}
-								{{ row.partner }}
+								{{ row.full_name|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{% if row.email %}
@@ -72,19 +45,21 @@
 								{{ row.email|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{% if row.pec %}
-								<a class="tab-link" href="mailto:{{ row.pec }}" style=""
-								   title="Send email">
-									<img alt="" src="{{ url_for('static', filename='icons/at.svg') }}">
-								</a>
-								{% endif %}
-								{{ row.pec|e }}
-							</td>
-							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{{ row.phone|e }}
 							</td>
-							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.city|e }}
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+									if 'superuser' in session['user_roles']
+									or 'partner_admin' in session['user_roles']
+									or 'partner_read' in session['user_roles']
+								%}
+								<a class="tab-link" href="{{ url_for(partner_detail, _id=row.partner_id) }}" style=""
+								   title="Visualizza">
+									{{ row.partner_id|e }}
+								</a>
+								{% else %}
+									{{ row.partner_id|e }}
+								{% endif %}
 							</td>
 						</tr>
 						{% endfor %}
@@ -118,24 +93,5 @@
             }
         });
     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
 {% endblock %}

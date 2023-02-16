@@ -37,10 +37,10 @@ class User(db.Model):
 	updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
 	def __repr__(self):
-		return f'<USER: {self.id} - {self.username}>'
+		return f'<USER: [{self.id}] - {self.username}>'
 
 	def __str__(self):
-		return f'<USER: {self.id} - {self.username}>'
+		return f'<USER: [{self.id}] - {self.username}>'
 
 	def __init__(self, username, password=None, psw_changed=False, active=None, name=None, last_name=None, phone=None,
 				 email=None, address=None, cap=None, city=None, auth_tokens=None, events=None, note=None):

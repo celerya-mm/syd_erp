@@ -1,0 +1,120 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="container text-center mt-2">
+	<div class="row no-gutters justify-content-center">
+		<h5 class="card-title">
+			<a class="btn btn-update" href="{{ url_for(view) }}" title="Annulla" type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
+			</a>
+			Aggiungi un nuovo CONTATTO:
+		</h5>
+		<div class="col-md-12 shadow rounded" style="border: solid 2px #ED6666 !important;">
+			<form enctype="multipart/form-data" method="POST">
+				{{ form.csrf_token }}
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-6 order-first">
+						<div class="form-group">
+							{{ form.name.label(style="font-size: 1.2rem;") }}
+							{{ form.name(class="form-control emphasis") }}
+							{% if form.name.errors %}
+							{% for error in form.name.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6 order-first">
+						<div class="form-group">
+							{{ form.last_name.label(style="font-size: 1.2rem;") }}
+							{{ form.last_name(class="form-control emphasis") }}
+							{% if form.last_name.errors %}
+							{% for error in form.last_name.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-7 order-first">
+						<div class="form-group">
+							{{ form.email.label(style="font-size: 1.2rem;") }}
+							{{ form.email(class="form-control emphasis") }}
+							{% if form.email.errors %}
+							{% for error in form.email.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-5 order-second">
+						<div class="form-group">
+							{{ form.phone.label(style="font-size: 1.2rem;") }}
+							{{ form.phone(class="form-control") }}
+							{% if form.phone.errors %}
+							{% for error in form.phone.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-7 order-first">
+						<div class="form-group">
+							{{ form.partner_id.label(style="font-size: 1.2rem;") }}
+							{{ form.partner_id(class="form-control emphasis") }}
+							{% if form.partner_id.errors %}
+							{% for error in form.partner_id.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-5 order-second">
+						<div class="form-group">
+							{{ form.role.label(style="font-size: 1.2rem;") }}
+							{{ form.role(class="form-control") }}
+							{% if form.role.errors %}
+							{% for error in form.role.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="form-group">
+						{{ form.note.label(style="font-size: 1.2rem;") }}
+						{{ form.note(class="form-control") }}
+						{% if form.note.errors %}
+						{% for error in form.note.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<br>
+				<button class="btn btn-update" id="button" title="Salva" type="submit" value="x">
+					<img alt="" class="icon-simple"
+						 src="{{ url_for('static', filename='icons/save.svg') }}"/>
+				</button>
+				<br>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}
