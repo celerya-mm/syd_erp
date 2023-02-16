@@ -23,7 +23,7 @@
 				</div>
 				<div class="col-md-3 order-second">
 					<div class="form-group">
-						{{ form.username.label }}
+						{{ form.username.label(style="font-size: 1.2rem;") }}
 						{{ form.username(class="form-control emphasis") }}
 						{% if form.username.errors %}
 						{% for error in form.username.errors %}
@@ -35,7 +35,7 @@
 				</div>
 				<div class="col-md-4 order-third">
 					<div class="form-group">
-						{{ form.name.label }}
+						{{ form.name.label(style="font-size: 1.2rem;") }}
 						{{ form.name(class="form-control") }}
 						{% if form.name.errors %}
 						{% for error in form.name.errors %}
@@ -47,7 +47,7 @@
 				</div>
 				<div class="col-md-4 order-fourth">
 					<div class="form-group">
-						{{ form.last_name.label }}
+						{{ form.last_name.label(style="font-size: 1.2rem;") }}
 						{{ form.last_name(class="form-control") }}
 						{% if form.last_name.errors %}
 						{% for error in form.last_name.errors %}
@@ -62,7 +62,7 @@
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 				<div class="col-md-7 order-first">
 					<div class="form-group">
-						{{ form.email.label }}
+						{{ form.email.label(style="font-size: 1.2rem;") }}
 						{{ form.email(class="form-control emphasis") }}
 						{% if form.email.errors %}
 						{% for error in form.email.errors %}
@@ -74,7 +74,7 @@
 				</div>
 				<div class="col-md-5 order-second">
 					<div class="form-group">
-						{{ form.phone.label }}
+						{{ form.phone.label(style="font-size: 1.2rem;") }}
 						{{ form.phone(class="form-control") }}
 						{% if form.phone.errors %}
 						{% for error in form.phone.errors %}
@@ -89,7 +89,7 @@
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 				<div class="col-md-6 order-first">
 					<div class="form-group">
-						{{ form.address.label }}
+						{{ form.address.label(style="font-size: 1.2rem;") }}
 						{{ form.address(class="form-control") }}
 						{% if form.address.errors %}
 						{% for error in form.address.errors %}
@@ -101,7 +101,7 @@
 				</div>
 				<div class="col-md-2 order-second">
 					<div class="form-group">
-						{{ form.cap.label }}
+						{{ form.cap.label(style="font-size: 1.2rem;") }}
 						{{ form.cap(class="form-control") }}
 						{% if form.cap.errors %}
 						{% for error in form.cap.errors %}
@@ -113,7 +113,7 @@
 				</div>
 				<div class="col-md-4 order-third">
 					<div class="form-group">
-						{{ form.city.label }}
+						{{ form.city.label(style="font-size: 1.2rem;") }}
 						{{ form.city(class="form-control") }}
 						{% if form.city.errors %}
 						{% for error in form.city.errors %}

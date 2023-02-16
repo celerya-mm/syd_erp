@@ -23,7 +23,7 @@ class FormUserCreate(FlaskForm):
         'Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)], default=""
     )
 
-    active = BooleanField("Attivo", false_values=False)
+    active = BooleanField("Attivo")
 
     syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
 
@@ -79,7 +79,7 @@ class FormUserUpdate(FlaskForm):
     """Form di modifica dati account escluso password ed e-mail"""
     username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)])
 
-    active = BooleanField("Attivo", false_values=False)
+    active = BooleanField("Attivo")
 
     name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
     last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])

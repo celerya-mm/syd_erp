@@ -70,24 +70,7 @@
                         </a>
                     </li>
 					{% endif %}
-					<!--  Regole-->
-					{%
-					if 'superuser' in session['user_roles']
-					or 'role_admin' in session['user_roles']
-					or 'role_read' in session['user_roles']
-					%}
-                    <li class="nav-item">
-                        <a class="nav-item nav-link {% if request.path == '/role/view/' %} active {% endif %}"
-                           title="Regole Accesso" href="{{ url_for('role_bp.role_view') }}">
-                            {% if request.path == '/role/view/' %}
-                            <img src="{{ url_for('static', filename='icons/settings_active.svg') }}" alt="">
-                            {% else %}
-                            <img src="{{ url_for('static', filename='icons/settings_white.svg') }}" alt="">
-                            {% endif %}
-                            Regole
-                        </a>
-                    </li>
-					{% endif %}
+					
 					<!--  Partners-->
 					{%
 					if 'superuser' in session['user_roles']
@@ -106,6 +89,26 @@
                         </a>
                     </li>
 					{% endif %}
+					
+					<!--  Regole-->
+					{%
+					if 'superuser' in session['user_roles']
+					or 'role_admin' in session['user_roles']
+					or 'role_read' in session['user_roles']
+					%}
+                    <li class="nav-item">
+                        <a class="nav-item nav-link {% if request.path == '/role/view/' %} active {% endif %}"
+                           title="Regole Accesso" href="{{ url_for('role_bp.role_view') }}">
+                            {% if request.path == '/role/view/' %}
+                            <img src="{{ url_for('static', filename='icons/settings_active.svg') }}" alt="">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='icons/settings_white.svg') }}" alt="">
+                            {% endif %}
+                            Regole
+                        </a>
+                    </li>
+					{% endif %}
+					
                     <li class="nav-item dropdown" style="background-color: #2B4692 !important;">
 						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">

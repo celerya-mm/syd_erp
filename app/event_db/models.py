@@ -24,11 +24,12 @@ class EventDB(db.Model):
     def __str__(self):
         return f'<EVENTO: [{self.event}]>'
 
-    def __init__(self, event, user_id=None, partner_id=None):
+    def __init__(self, event, user_id=None, partner_id=None, contact_id=None):
         self.event = event
 
         self.user_id = user_id
         self.partner_id = partner_id
+        self.contact_id = contact_id
 
         self.created_at = datetime.now()
 
@@ -50,6 +51,7 @@ class EventDB(db.Model):
 
             'user_id': self.user_id,
             'partner_id': self.partner_id,
+            'contact_id': self.contact_id,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

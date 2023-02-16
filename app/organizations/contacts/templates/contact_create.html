@@ -4,7 +4,7 @@
 <div class="container text-center mt-2">
 	<div class="row no-gutters justify-content-center">
 		<h5 class="card-title">
-			<a class="btn btn-update" href="{{ url_for(view) }}" title="Annulla" type="button">
+			<a class="btn btn-update" href="{{ url_for(partner_view, _id=p_id) }}" title="Annulla" type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
 			</a>
 			Aggiungi un nuovo CONTATTO:
@@ -71,7 +71,7 @@
 					<div class="col-md-7 order-first">
 						<div class="form-group">
 							{{ form.partner_id.label(style="font-size: 1.2rem;") }}
-							{{ form.partner_id(class="form-control emphasis") }}
+							{{ form.partner_id(class="form-control emphasis", style="text-align: center;") }}
 							{% if form.partner_id.errors %}
 							{% for error in form.partner_id.errors %}
 							<span class="text-danger">{{ error }}</span>
@@ -83,7 +83,7 @@
 					<div class="col-md-5 order-second">
 						<div class="form-group">
 							{{ form.role.label(style="font-size: 1.2rem;") }}
-							{{ form.role(class="form-control") }}
+							{{ form.role(class="form-control", style="text-align: center;") }}
 							{% if form.role.errors %}
 							{% for error in form.role.errors %}
 							<span class="text-danger">{{ error }}</span>

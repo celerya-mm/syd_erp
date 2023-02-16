@@ -26,13 +26,14 @@ RESTORE = "/event/restore/<int:_id>/<int:id_record>/<table>/<view_for>/"
 RESTORE_FOR = "event_bp.event_restore"
 
 
-def event_create(event, user_id=None, partner_id=None):
+def event_create(event, user_id=None, partner_id=None, contact_id=None):
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
 			event=event,
 			user_id=user_id,
 			partner_id=partner_id,
+			contact_id=contact_id
 		)
 
 		EventDB.create(new_event)

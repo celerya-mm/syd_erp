@@ -21,7 +21,7 @@ def list_contacts():
 
 
 def list_partners():
-	from app.partners.oraganizations.models import Partner
+	from app.organizations.partners.models import Partner
 
 	_list = ["-"]
 	try:

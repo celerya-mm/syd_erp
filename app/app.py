@@ -44,8 +44,8 @@ with app.app_context():
 	from .event_db.routes import event_bp
 	from .roles.routes import role_bp
 
-	from app.partners.oraganizations.routes import partner_bp
-	from .partners.contacts.routes import contact_bp
+	from app.organizations.partners.routes import partner_bp
+	from .organizations.contacts.routes import contact_bp
 
 	# registro i blueprints
 	app.register_blueprint(account_bp, url_prefix='/account')

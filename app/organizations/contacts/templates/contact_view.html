@@ -6,10 +6,6 @@
 		<div class="row no-gutters justify-content-center">
 			<div class="col-md-12 shadow rounded">
 				<h3 style="padding-top: 10px;">
-					<a class="btn btn-update" href="{{ url_for(create) }}" title="Crea nuovo Partner"
-					   type="button">
-						<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}"/>
-					</a>
 					Elenco Contati:</h3>
 				<div class="table-responsive" style="padding: 10px">
 					<table class="table table-striped" id="data" style="width:100%">
@@ -60,6 +56,9 @@
 								{% else %}
 									{{ row.partner_id|e }}
 								{% endif %}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.role|e }}
 							</td>
 						</tr>
 						{% endfor %}

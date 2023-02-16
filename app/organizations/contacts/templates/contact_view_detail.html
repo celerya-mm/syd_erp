@@ -27,7 +27,7 @@
 	<div class="container text-center mt-2">
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding: 10px;">
-			<div class="col-md-12 order-first">
+			<div class="col-md-10 order-first">
 				<div class="form-group">
 					<h6> Nome e Cognome </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
@@ -54,7 +54,7 @@
 					</p>
 				</div>
 			</div>
-			<div class="col-md-6 order-second">
+			<div class="col-md-5 order-second">
 				<div class="form-group">
 					<h6>Telefono</h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
@@ -67,13 +67,15 @@
 			 style="background-color: #DEDEDE; padding: 10px;">
 			<div class="col-md-7 order-first">
 				<div class="form-group">
-					<h6> Azienda </h6>
+					<a title="Vai all'azienda" href="{{ url_for(partner_detail, _id=p_id) }}">
+                        Azienda
+                    </a>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
 						{{ form.partner_id }}
 					</p>
 				</div>
 			</div>
-			<div class="col-md-6 order-second">
+			<div class="col-md-5 order-second">
 				<div class="form-group">
 					<h6> Ruolo </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">

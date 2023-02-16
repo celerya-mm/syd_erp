@@ -35,7 +35,17 @@
 	<div class="container text-center mt-2">
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding: 10px;">
-			<div class="col-md-4 order-first">
+			<div class="col-md-2 order-first">
+				<div class="form-group">
+					<h6> Attivo </h6>
+					{% if form.active == True  or form.active == SI %}
+					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
+					{% else %}
+					<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
+					{% endif %}
+				</div>
+			</div>
+			<div class="col-md-4 order-second">
 				<div class="form-group">
 					<h6> Username </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
@@ -43,7 +53,7 @@
 					</p>
 				</div>
 			</div>
-			<div class="col-md-6 order-second">
+			<div class="col-md-6 order-third">
 				<div class="form-group">
 					<h6>
 						{% if form.email %}
@@ -57,16 +67,6 @@
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
 						{{ form.email }}
 					</p>
-				</div>
-			</div>
-			<div class="col-md-2 order-third">
-				<div class="form-group">
-					<h6> Attivo </h6>
-					{% if form.active == True  or form.active == SI %}
-					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
-					{% else %}
-					<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
-					{% endif %}
 				</div>
 			</div>
 		</div>

@@ -1,14 +1,12 @@
 import json
-from datetime import datetime
 
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
+from app.functions import token_user_validate, access_required, status_true_false, not_empty
 from config import db
-
 from .forms import FormPartnerCreate, FormPartnerUpdate
 from .models import Partner
-from app.functions import token_user_validate, access_required, status_true_false, not_empty, mount_full_address
 
 partner_bp = Blueprint(
 	'partner_bp', __name__,
@@ -54,14 +52,14 @@ def partner_create():
 	form = FormPartnerCreate()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
-		# print('NEW_PARTNER:', json.dumps(form_data, indent=2))
+		# print('TYPE:', type(form_data), 'NEW_PARTNER:', json.dumps(form_data, indent=2))
 
-		if "client" not in form_data.keys() or form_data["client"] is None:
-			form_data["client"] = False
-		if "supplier" not in form_data.keys() or form_data["supplier"] is None:
-			form_data["supplier"] = False
-		if "partner" not in form_data.keys() or form_data["partner"] is None:
-			form_data["partner"] = False
+		if "client" not in form_data.keys():
+			form_data['client'] = 'False'
+		if "supplier" not in form_data.keys():
+			form_data['supplier'] = 'False'
+		if "partner" not in form_data.keys():
+			form_data['partner'] = 'False'
 
 		new_p = Partner(
 			organization=form_data["organization"].strip().replace('  ', ' '),
@@ -103,22 +101,33 @@ def partner_create():
 def partner_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
+	from app.organizations.contacts.routes import DETAIL_FOR as CONTACT_DETAIL
+	from app.organizations.contacts.routes import CREATE_FOR as CONTACT_CREATE_FOR
 
 	# Interrogo il DB
 	partner = Partner.query.get(_id)
 	_partner = partner.to_dict()
 
-	# Estraggo la storia delle modifiche per l'utente
+	# Estraggo la storia delle modifiche per il record
 	history_list = partner.events
 	if history_list:
 		history_list = [history.to_dict() for history in history_list]
 	else:
 		history_list = []
 
+	# Estraggo la lista dei contatti
+	contacts_list = partner.contacts
+	if contacts_list:
+		contacts_list = [contact.to_dict() for contact in contacts_list]
+	else:
+		contacts_list = []
+
 	db.session.close()
 	return render_template(
-		DETAIL_HTML, form=_partner, view=VIEW_FOR, update=UPDATE_FOR, event_detail=EVENT_DETAIL,
-		history_list=history_list, h_len=len(history_list)
+		DETAIL_HTML, form=_partner, view=VIEW_FOR, update=UPDATE_FOR,
+		event_detail=EVENT_DETAIL, history_list=history_list, h_len=len(history_list),
+		contact_detail=CONTACT_DETAIL, contacts_list=contacts_list, c_len=len(contacts_list),
+		contact_create=CONTACT_CREATE_FOR
 	)
 
 

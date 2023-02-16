@@ -27,9 +27,9 @@ class FormPartnerCreate(FlaskForm):
 	"""Form per creare un Partner."""
 	organization = StringField('Rag. Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=80)])
 
-	client = BooleanField('Cliente', false_values=False, default=False)
-	supplier = BooleanField('Fornitore', false_values=False, default=False)
-	partner = BooleanField('Partner', false_values=False, default=False)
+	client = BooleanField('Cliente')
+	supplier = BooleanField('Fornitore')
+	partner = BooleanField('Partner')
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	pec = EmailField('pec', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80), Optional()])
@@ -87,9 +87,9 @@ class FormPartnerUpdate(FlaskForm):
 	"""Form per creare un Partner."""
 	organization = StringField('Rag. Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=80)])
 
-	client = BooleanField('Cliente', false_values=False)
-	supplier = BooleanField('Fornitore', false_values=False)
-	partner = BooleanField('Partner', false_values=False)
+	client = BooleanField('Cliente')
+	supplier = BooleanField('Fornitore')
+	partner = BooleanField('Partner')
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	pec = EmailField('pec', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
@@ -119,6 +119,7 @@ class FormPartnerUpdate(FlaskForm):
 
 	def to_dict(self):
 		"""Converte form in dict."""
+
 		return {
 			'organization': self.organization.data.strip(),
 

@@ -2,11 +2,13 @@ import json
 
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
 from config import db
 
 from .forms import FormContactCreate, FormContactUpdate
 from .models import Contact
+from ..partners.models import Partner
 from app.functions import token_user_validate, access_required, not_empty
 
 contact_bp = Blueprint(
@@ -19,7 +21,7 @@ VIEW = "/view/"
 VIEW_FOR = "contact_bp.contact_view"
 VIEW_HTML = "contact_view.html"
 
-CREATE = "/create/"
+CREATE = "/create/<p_id>/"
 CREATE_FOR = "contact_bp.contact_create"
 CREATE_HTML = "contact_create.html"
 
@@ -37,7 +39,7 @@ UPDATE_HTML = "contact_update.html"
 @access_required(roles=['contacts_admin', 'contacts_read'])
 def contact_view():
 	"""Visualizzo informazioni Contacts."""
-	from app.partners.oraganizations.routes import DETAIL_FOR as PARTNER_DETAIL
+	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 
 	# Estraggo la lista dei partners
 	_list = Contact.query.all()
@@ -50,15 +52,17 @@ def contact_view():
 @contact_bp.route(CREATE, methods=["GET", "POST"])
 @token_user_validate
 @access_required(roles=['contacts_admin', 'contacts_write'])
-def contact_create():
+def contact_create(p_id):
 	"""Creazione Contact."""
+	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL_FOR
+
 	form = FormContactCreate()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
 		# print('NEW_CONTACT:', json.dumps(form_data, indent=2))
 
 		new_p = Contact(
-			name=form_data['form_data'],
+			name=form_data['name'],
 			last_name=form_data['last_name'],
 
 			role=form_data['role'],
@@ -72,14 +76,17 @@ def contact_create():
 		try:
 			Contact.create(new_p)
 			flash("CONTACT creato correttamente.")
-			return redirect(url_for(VIEW_FOR))
+			return redirect(url_for(PARTNER_DETAIL_FOR, _id=p_id))
 		except IntegrityError as err:
 			db.session.rollback()
 			db.session.close()
 			flash(f"ERRORE: {str(err.orig)}")
-			return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
+			return render_template(CREATE_HTML, form=form, partner_view=PARTNER_DETAIL_FOR, p_id=p_id)
 	else:
-		return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
+		partner = Partner.query.get(p_id)
+		form.partner_id.data = f'{partner.id} - {partner.organization}'
+		# print('PARTNER:', form.partner_id.data)
+		return render_template(CREATE_HTML, form=form, partner_view=PARTNER_DETAIL_FOR, p_id=p_id)
 
 
 @contact_bp.route(DETAIL, methods=["GET", "POST"])
@@ -88,10 +95,10 @@ def contact_create():
 def contact_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
-	from app.partners.oraganizations.routes import DETAIL_FOR as PARTNER_DETAIL
+	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 
 	# Interrogo il DB
-	contact = Contact.query.get(_id)
+	contact = Contact.query.options(joinedload(Contact.partner)).get(_id)
 	_contact = contact.to_dict()
 
 	# Estraggo la storia delle modifiche per l'utente
@@ -101,10 +108,13 @@ def contact_view_detail(_id):
 	else:
 		history_list = []
 
+	_contact["partner_id"] = f'{contact.partner.id} - {contact.partner.organization}'
+	p_id = contact.partner.id
+
 	db.session.close()
 	return render_template(
 		DETAIL_HTML, form=_contact, view=VIEW_FOR, update=UPDATE_FOR, event_detail=EVENT_DETAIL,
-		history_list=history_list, h_len=len(history_list), partner_detail=PARTNER_DETAIL
+		history_list=history_list, h_len=len(history_list), partner_detail=PARTNER_DETAIL, p_id=p_id
 	)
 
 
@@ -116,7 +126,7 @@ def contact_update(_id):
 	from app.event_db.routes import event_create
 
 	# recupero i dati
-	contact = Contact.query.get(_id)
+	contact = Contact.query.options(joinedload(Contact.partner)).get(_id)
 	form = FormContactUpdate(obj=contact)
 
 	if request.method == 'POST' and form.validate():
@@ -141,12 +151,13 @@ def contact_update(_id):
 		_event = {
 			"username": session["user"]["username"],
 			"table": Contact.__tablename__,
-			"Modification": f"Update PARTNER whit id: {_id}",
+			"Modification": f"Update CONTCT whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, partner_id=_id)
+		_event = event_create(_event, contact_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
+		form.partner_id.data = f'{contact.partner.id} - {contact.partner.organization}'
 		_info = {
 			'created_at': contact.created_at,
 			'updated_at': contact.updated_at,

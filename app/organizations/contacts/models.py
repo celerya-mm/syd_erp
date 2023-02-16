@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from sqlalchemy.orm import relationship
+
 from config import db
 from app.functions import date_to_str, mount_full_name
 
@@ -19,6 +22,7 @@ class Contact(db.Model):
 	phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
 	partner_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=False)
+	partner = relationship('Partner', viewonly=True)
 
 	events = db.relationship('EventDB', backref='contact_events', order_by='EventDB.id.desc()', lazy='dynamic')
 

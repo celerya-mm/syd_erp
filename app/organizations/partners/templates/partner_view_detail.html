@@ -21,6 +21,17 @@
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
 			</a>
 			{%  endif %}
+			{%
+				if 'superuser' in session['user_roles']
+				or 'contact_admin' in session['user_roles']
+				or 'contact_write' in session['user_roles']
+			%}
+			<a class="btn btn-update" href="{{ url_for(contact_create, p_id=form.id) }}"
+			   title="Aggiungi Contatto"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}"/>
+			</a>
+			{%  endif %}
 		</h5>
 	</div>
 	
@@ -38,7 +49,6 @@
 			<div class="col-md-1 order-first">
 				<div class="form-group">
 					<h6> Cliente </h6>
-					<input class="checkbox" disabled readonly type="checkbox" value=form.client>
 					{% if form.client == True %}
 					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
 					{% else %}
@@ -158,6 +168,76 @@
 </form>
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
 	<div class="accordion" id="accordion">
+		<!--	Contatti collegati-->
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="2">
+				<button aria-controls="collapse2"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse2"
+						data-bs-toggle="collapse"
+						type="button">
+					Elenco Contatti [ {{ c_len }} ]
+				</button>
+			</h2>
+			<div aria-labelledby="heading1"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse2">
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="contacts" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" data-defaultsort="desc" id="c1">ID</th>
+							<th class="title" id="c2">Nome e Cognome</th>
+							<th class="title" id="c3">Email</th>
+							<th class="title" id="c4">Telefono</th>
+							<th class="title" id="c5">Ruolo</th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in contacts_list %}
+						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+									if 'superuser' in session['user_roles']
+									or 'contact_admin' in session['user_roles']
+									or 'contact_read' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(contact_detail, _id=row.id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.id|e }}
+								</a>
+								{% else %}
+									{{ row.id|e }}
+								{% endif %}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.full_name|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{% if row.email %}
+								<a class="tab-link" href="mailto:{{ row.email }}" style=""
+								   title="Send email">
+									<img alt="" src="{{ url_for('static', filename='icons/at.svg') }}">
+								</a>
+								{% endif %}
+								{{ row.email|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.phone|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.role|e }}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 		<!--	Modifiche Record-->
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="1">
@@ -227,6 +307,24 @@
 <script>
     $(document).ready(function () {
         $('#events').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            },
+        });
+    });
+    
+    $(document).ready(function () {
+        $('#contacts').DataTable({
             responsive: {
                 breakpoints: [
                     { name: 'bigdesktop', width: 1920 },
