@@ -3,172 +3,234 @@
 <html lang="en">
 
 <head>
-    <!-- Condiviso con tutte le views con barra di navigazione-->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{% block title %}{% endblock %}Celerya-ERP</title>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='Favicon.png') }}">
-
-    <!-- CSS only boostrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-
-    <!-- FONT -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet">
-
-    <!-- link a file .css -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css">
-
-    <!-- import plugin script -->
-    <script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="/functions.js"></script>
-
-    <!-- import plugin script -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"
-            integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<!-- Condiviso con tutte le views con barra di navigazione-->
+	<meta charset="UTF-8">
+	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+	<meta content="ie=edge" http-equiv="X-UA-Compatible">
+	<title>{% block title %}{% endblock %}Celerya-ERP</title>
+	<link href="{{ url_for('static', filename='Favicon.png') }}" rel="shortcut icon">
+	
+	<!-- CSS only boostrap -->
+	<link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+		  integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" rel="stylesheet">
+	
+	<!-- FONT -->
+	<link href="https://fonts.googleapis.com" rel="preconnect">
+	<link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+	<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet">
+	
+	<!-- link a file .css -->
+	<link href="{{ url_for('static', filename='app.css') }}" rel="stylesheet">
+	<link href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css" rel="stylesheet" type="text/css">
+	
+	<!-- import plugin script -->
+	<script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
+	
+	<!-- import plugin script -->
+	<script crossorigin="anonymous"
+			integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA=="
+			referrerpolicy="no-referrer"
+			src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 
 <body>
 <div style="paddin: 0px; margin: 0px;">
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-bg-white"
-         style="padding-left: 20px; padding-rigth: 20px;">
-        <!-- MENU-->
-        <div class="container-fluid">
-            <a class="navbar-brand" title="Home" href="{{ url_for('account_bp.user_view') }}">
-                <img src="{{ url_for('static', filename='Logo_white.svg') }}" alt="" width="100" height="50"/>
-            </a>
-
-            <button class="navbar-toggler" style="color: white;" type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon" style="color: white"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ml-auto">
-					<!--  Utenti-->
-					{%
-					if 'superuser' in session['user_roles']
-					or 'account_admin' in session['user_roles']
-					or 'account_read' in session['user_roles']
-					%}
-                    <li class="nav-item">
-                        <a class="nav-item nav-link {% if request.path == '/account/view/' %} active {% endif %}"
-                           title="Utenti" href="{{ url_for('account_bp.user_view') }}">
-                            {% if request.path == '/account/view/' %}
-                            <img src="{{ url_for('static', filename='icons/person-fill-active.svg') }}" alt="">
-                            {% else %}
-                            <img src="{{ url_for('static', filename='icons/person-fill.svg') }}" alt="">
-                            {% endif %}
-                            Personale
-                        </a>
-                    </li>
-					{% endif %}
+	<nav class="navbar navbar-expand-lg navbar-dark navbar-bg-white"
+		 style="padding-left: 20px; padding-rigth: 20px;">
+		<!-- MENU-->
+		<div class="container-fluid">
+			<a class="navbar-brand" href="{{ url_for('account_bp.user_view') }}" title="Home">
+				<img alt="" height="50" src="{{ url_for('static', filename='Logo_white.svg') }}" width="100"/>
+			</a>
+			
+			<button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+					class="navbar-toggler"
+					data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse"
+					style="color: white;" type="button">
+				<span class="navbar-toggler-icon" style="color: white"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item dropdown" style="background-color: #2B4692 !important;" title="Partners">
+						<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+						   href="#Partners"
+						   id="DropdownMenuUtenti" role="button">
+							Staff
+						</a>
+						
+						<ul aria-labelledby="DropdownMenuPartners" class="dropdown-menu">
+							
+							<!--  Utenti-->
+							{%
+							if 'superuser' in session['user_roles']
+							or 'users_admin' in session['user_roles']
+							or 'users_read' in session['user_roles']
+							%}
+							<li class="nav-item">
+								<a class="nav-item nav-link {% if request.path == '/account/view/' %} active {% endif %}"
+								   href="{{ url_for('account_bp.user_view') }}" title="Utenti">
+									{% if request.path == '/account/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/person-fill-active.svg') }}">
+									{% else %}
+									<img alt="" src="{{ url_for('static', filename='icons/person-fill.svg') }}">
+									{% endif %}
+									Staff
+								</a>
+							</li>
+							{% endif %}
+							
+							<!--  Regole-->
+							{%
+							if 'superuser' in session['user_roles']
+							or 'roles_admin' in session['user_roles']
+							or 'roles_read' in session['user_roles']
+							%}
+							<li class="nav-item">
+								<a class="nav-item nav-link {% if request.path == '/role/view/' %} active {% endif %}"
+								   href="{{ url_for('role_bp.role_view') }}" title="Regole Accesso">
+									{% if request.path == '/role/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/settings_active.svg') }}">
+									{% else %}
+									<img alt="" src="{{ url_for('static', filename='icons/settings_white.svg') }}">
+									{% endif %}
+									Roles
+								</a>
+							</li>
+							{% endif %}
+						</ul>
+					</li>
 					
-					<!--  Partners-->
-					{%
-					if 'superuser' in session['user_roles']
-					or 'partners_admin' in session['user_roles']
-					or 'partners_read' in session['user_roles']
-					%}
-                    <li class="nav-item">
-                        <a class="nav-item nav-link {% if request.path == '/partner/view/' %} active {% endif %}"
-                           title="Partners" href="{{ url_for('partner_bp.partner_view') }}">
-                            {% if request.path == '/partner/view/' %}
-                            <img src="{{ url_for('static', filename='icons/building-active.svg') }}" alt="">
-                            {% else %}
-                            <img src="{{ url_for('static', filename='icons/building.svg') }}" alt="">
-                            {% endif %}
-                            Partners
-                        </a>
-                    </li>
-					{% endif %}
+					<li class="nav-item dropdown" style="background-color: #2B4692 !important;" title="Partners">
+						<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+						   href="#Partners"
+						   id="DropdownMenuPartners" role="button">
+							Partners
+						</a>
+						
+						<ul aria-labelledby="DropdownMenuPartners" class="dropdown-menu">
+							
+							<!--  Partners-->
+							{%
+							if 'superuser' in session['user_roles']
+							or 'partners_admin' in session['user_roles']
+							or 'partners_read' in session['user_roles']
+							%}
+							<li class="nav-item">
+								<a class="nav-item nav-link {% if request.path == '/partner/view/' %} active {% endif %}"
+								   href="{{ url_for('partner_bp.partner_view') }}" title="Partners">
+									{% if request.path == '/partner/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/building-active.svg') }}">
+									{% else %}
+									<img alt="" src="{{ url_for('static', filename='icons/building.svg') }}">
+									{% endif %}
+									Partners
+								</a>
+							</li>
+							{% endif %}
+							
+							<!--  Siti-->
+							{%
+							if 'superuser' in session['user_roles']
+							or 'partner_sites_admin' in session['user_roles']
+							or 'partner_sites_read' in session['user_roles']
+							%}
+							<li class="nav-item">
+								<a class="nav-item nav-link {% if request.path == '/partner/site/view/' %} active {% endif %}"
+								   href="{{ url_for('partner_site_bp.partner_site_view') }}" title="Sites">
+									{% if request.path == '/partner/site/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/building-active.svg') }}">
+									{% else %}
+									<img alt="" src="{{ url_for('static', filename='icons/building.svg') }}">
+									{% endif %}
+									Sites
+								</a>
+							</li>
+							{% endif %}
+							
+							<!--  Contatti-->
+							{%
+							if 'superuser' in session['user_roles']
+							or 'partner_contacts_admin' in session['user_roles']
+							or 'partner_contacts_read' in session['user_roles']
+							%}
+							<li class="nav-item">
+								<a class="nav-item nav-link {% if request.path == '/partner/contact/view/' %} active {% endif %}"
+								   href="{{ url_for('partner_contact_bp.contact_view') }}" title="Contacts">
+									{% if request.path == '/partner/contact/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/person-fill-active.svg') }}">
+									{% else %}
+									<img alt="" src="{{ url_for('static', filename='icons/person-fill.svg') }}">
+									{% endif %}
+									Contacts
+								</a>
+							</li>
+							{% endif %}
+						</ul>
+					</li>
 					
-					<!--  Regole-->
-					{%
-					if 'superuser' in session['user_roles']
-					or 'role_admin' in session['user_roles']
-					or 'role_read' in session['user_roles']
-					%}
-                    <li class="nav-item">
-                        <a class="nav-item nav-link {% if request.path == '/role/view/' %} active {% endif %}"
-                           title="Regole Accesso" href="{{ url_for('role_bp.role_view') }}">
-                            {% if request.path == '/role/view/' %}
-                            <img src="{{ url_for('static', filename='icons/settings_active.svg') }}" alt="">
-                            {% else %}
-                            <img src="{{ url_for('static', filename='icons/settings_white.svg') }}" alt="">
-                            {% endif %}
-                            Regole
-                        </a>
-                    </li>
-					{% endif %}
-					
-                    <li class="nav-item dropdown" style="background-color: #2B4692 !important;">
-						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <!--  LogOut-->
-                            <li>
-                                <a class="dropdown-item nav-link" title="Log-out" href="{{ url_for('account_bp.logout') }}">
-                                    <img src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}"
-                                         alt="">
-                                    LogOut
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <!-- Messaggio gestione errori std -->
-    <div class="container text-center mt-3 message">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        {% for message in messages %}
-        <p style="color: #ED6666; line-height: 0.6;">{{ message }}</p>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-    </div>
+					<li class="nav-item dropdown" style="background-color: #2B4692 !important;">
+						<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
+						   id="navbarDropdownMenuLink" role="button">
+						</a>
+						
+						<ul aria-labelledby="navbarDropdownMenuLink" class="dropdown-menu">
+							<!--  LogOut-->
+							<li>
+								<a class="dropdown-item nav-link" href="{{ url_for('account_bp.logout') }}"
+								   title="Log-out">
+									<img alt=""
+										 src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}">
+									LogOut
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- Messaggio gestione errori std -->
+	<div class="container text-center mt-3 message">
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		{% for message in messages %}
+		<p style="color: #ED6666; line-height: 0.6;">{{ message }}</p>
+		{% endfor %}
+		{% endif %}
+		{% endwith %}
+	</div>
 </div>
 
 {% block content %}
 {% endblock %}
 
 <!-- JavaScript Bundle with Popper for boostrap -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
-        crossorigin="anonymous">
+<script crossorigin="anonymous"
+		integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js">
 </script>
-<script type="text/javascript" charset="utf8"
-        src="https://code.jquery.com/jquery-3.6.0.min.js">
+<script charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"
+		type="text/javascript">
 </script>
-<script type="text/javascript" charset="utf8"
-        src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js">
+<script charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"
+		type="text/javascript">
 </script>
-<script type="text/javascript" charset="utf8"
-        src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js">
+<script charset="utf8" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js"
+		type="text/javascript">
 </script>
 
 {% block scripts %}
 {% endblock %}
 </body>
 <footer class="footer">
-    <hr>
-    <br>
-    <th class="footer-text"> Celerya S.r.l. - © Copyright 2021 - Tutti i diritti riservati - I marchi
-        riportati appartengono ai legittimi proprietari.
-    </th>
-    <br><br>
-    <hr>
+	<hr>
+	<br>
+	<th class="footer-text"> Celerya S.r.l. - © Copyright 2021 - Tutti i diritti riservati - I marchi
+		riportati appartengono ai legittimi proprietari.
+	</th>
+	<br><br>
+	<hr>
 </footer>
 
 </html>

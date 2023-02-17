@@ -9,26 +9,39 @@ from ..account.models import User
 
 
 def list_roles():
-    records = Role.query.all()
-    _list = [x.to_dict() for x in records]
-    _name = [d["name"] for d in _list if "name" in d]
-    return _name
+    _list = []
+    try:
+        records = Role.query.all()
+        for r in records:
+            _list.append(r.name)
+        return _list
+    except Exception as err:
+        print(err)
+        return _list
 
 
 def list_Users():
-    records = User.query.all()
-    _list = [x.to_dict() for x in records]
-    _name = [f"{d['id']} - {d['username']}" for d in _list]
-    return _name
+    _list = []
+    try:
+        records = User.query.all()
+        for r in records:
+            if r.username == 'celerya_superuser':
+                pass
+            else:
+                _list.append(f'{r.id} - {r.username}')
+        return _list
+    except Exception as err:
+        print(err)
+        return _list
 
 
-class FormRuleCreate(FlaskForm):
+class FormRoleCreate(FlaskForm):
     """Form dati signup account Utente."""
     name = StringField(
         'name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=50)], default=""
     )
 
-    submit = SubmitField("SIGNUP")
+    submit = SubmitField("SAVE")
 
     def __repr__(self):
         return f'<RULE: {self.name}>'
@@ -42,11 +55,11 @@ class FormRuleCreate(FlaskForm):
             raise ValidationError("Nome regola già utilizzato.")
 
 
-class FormRuleUpdate(FlaskForm):
+class FormRoleUpdate(FlaskForm):
     """Form di modifica dati account escluso password ed e-mail"""
     name = StringField('Nome', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=50)])
 
-    submit = SubmitField("MODIFICA")
+    submit = SubmitField("SAVE")
 
     def __repr__(self):
         return f'<UPDATE_RULE - name: {self.name}>'
@@ -62,11 +75,11 @@ class FormRuleUpdate(FlaskForm):
         }
 
 
-class FormRuleAddUser(FlaskForm):
+class FormRoleAddUser(FlaskForm):
     """Form di modifica dati account escluso password ed e-mail"""
     username = SelectField('username', choices=list_Users())
 
-    submit = SubmitField("MODIFICA")
+    submit = SubmitField("SAVE")
 
     def __repr__(self):
         return f'<USER: {self.username}>'

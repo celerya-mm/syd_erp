@@ -23,7 +23,7 @@ class FormUserCreate(FlaskForm):
         'Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)], default=""
     )
 
-    active = BooleanField("Attivo")
+    active = BooleanField("Attivo", false_values=(False, ))
 
     syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
 
@@ -46,7 +46,7 @@ class FormUserCreate(FlaskForm):
 
     note = StringField('Note', validators=[Length(max=255), Optional()])
 
-    submit = SubmitField("SIGNUP")
+    submit = SubmitField("SAVE")
 
     def __repr__(self):
         return f'<USER SIGNUP with username: {self.username}>'
@@ -93,7 +93,7 @@ class FormUserUpdate(FlaskForm):
 
     note = StringField('Note', validators=[Length(max=255)])
 
-    submit = SubmitField("MODIFICA")
+    submit = SubmitField("SAVE")
 
     def __repr__(self):
         return f'<UPDATE - username: {self.username}>'
@@ -105,7 +105,7 @@ class FormUserUpdate(FlaskForm):
         """Converte form in dict."""
         return {
             'username': self.username.data.strip().replace(" ", ""),
-            'active': status_true_false(self.active),
+            'active': status_true_false(self.active.data),
 
             'name': self.name.data.strip(),
             'last_name': self.last_name.data.strip(),
@@ -120,7 +120,7 @@ class FormUserUpdate(FlaskForm):
             'phone': self.phone.data.strip(),
 
             'note': not_empty(self.note.data.strip()),
-            'updated_at': datetime.now()
+            'updated_at': datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")
         }
 
 
@@ -128,7 +128,7 @@ class FormUserResetPsw(FlaskForm):
     """Form reset password utente."""
     email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 
-    submit = SubmitField("MODIFICA")
+    submit = SubmitField("SAVE")
 
     def __repr__(self):
         return f'<RESET PSW - email: {self.email}>'
@@ -152,7 +152,7 @@ class FormUserLogin(FlaskForm):
 class FormUserInsertMail(FlaskForm):
     """Form d'invio mail per reset password"""
     email = EmailField('Current e-mail', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-    submit = SubmitField("SEND EMAIL")
+    submit = SubmitField("SEND_EMAIL")
 
 
 class FormUserPswChange(FlaskForm):

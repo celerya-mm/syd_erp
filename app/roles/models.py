@@ -17,10 +17,10 @@ class Role(db.Model):
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<REGOLA: {}>'.format(self.name)
+        return '<RUOLO: {}>'.format(self.name)
 
     def __str__(self):
-        return '<REGOLA: {}>'.format(self.name)
+        return '<RUOLO: {}>'.format(self.name)
 
     def __init__(self, name):
         self.name = name
@@ -61,10 +61,10 @@ class UserRoles(db.Model):
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<REGOLA: {}>'.format(self.name)
+        return f'<RUOLO: {self.role_id} - UTENTE: {self.user_id}>'
 
     def __str__(self):
-        return '<REGOLA: {}>'.format(self.name)
+        return f'<RUOLO: {self.role_id} - UTENTE: {self.user_id}>'
 
     def __init__(self, user_id, role_id):
         self.user_id = user_id

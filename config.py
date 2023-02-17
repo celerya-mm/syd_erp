@@ -32,7 +32,7 @@ class Config:
 	SQLALCHEMY_DATABASE_URI = 'postgresql://{username}:{password}@{host}:{port}/{db_name}'.format(
 		username=os.getenv('DB_USERNAME'),
 		password=os.getenv('DB_PASSWORD'),
-		host=os.getenv('DB_HOST'),
+		host=os.getenv('DB_HOST', 'DB_HOST_OUT'),
 		port=os.getenv('DB_PORT'),
 		db_name=os.getenv('DB_NAME')
 	)

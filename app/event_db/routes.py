@@ -7,8 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from config import db
 from .models import EventDB
 
-from ..account.models import User
-from ..functions import token_user_validate, date_to_str
+from app.functions import token_user_validate, date_to_str
 
 
 event_bp = Blueprint(
@@ -26,14 +25,15 @@ RESTORE = "/event/restore/<int:_id>/<int:id_record>/<table>/<view_for>/"
 RESTORE_FOR = "event_bp.event_restore"
 
 
-def event_create(event, user_id=None, partner_id=None, contact_id=None):
+def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None):
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
 			event=event,
 			user_id=user_id,
 			partner_id=partner_id,
-			contact_id=contact_id
+			partner_contact_id=partner_contact_id,
+			partner_site_id=partner_site_id,
 		)
 
 		EventDB.create(new_event)
@@ -58,6 +58,7 @@ def event_create(event, user_id=None, partner_id=None, contact_id=None):
 @token_user_validate
 def event_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
+	from ..account.models import User
 	from ..account.routes import DETAIL_FOR as USER_HISTORY_FOR
 
 	# Interrogo il DB
@@ -95,6 +96,7 @@ def event_view_detail(_id):
 @event_bp.route(RESTORE, methods=["GET", "POST"])
 @token_user_validate
 def event_restore(_id, id_record, table, view_for):
+	from ..account.models import User
 	try:
 		models = [User]
 		model = next((m for m in models if m.__tablename__ == table), None)

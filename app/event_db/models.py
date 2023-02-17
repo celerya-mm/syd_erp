@@ -14,7 +14,9 @@ class EventDB(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
     partner_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=True)
-    contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id', ondelete='CASCADE'), nullable=True)
+
+    partner_contact_id = db.Column(db.Integer, db.ForeignKey('partner_contacts.id', ondelete='CASCADE'), nullable=True)
+    partner_site_id = db.Column(db.Integer, db.ForeignKey('partner_sites.id', ondelete='CASCADE'), nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
 
@@ -24,12 +26,13 @@ class EventDB(db.Model):
     def __str__(self):
         return f'<EVENTO: [{self.event}]>'
 
-    def __init__(self, event, user_id=None, partner_id=None, contact_id=None):
+    def __init__(self, event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None):
         self.event = event
 
         self.user_id = user_id
         self.partner_id = partner_id
-        self.contact_id = contact_id
+        self.partner_contact_id = partner_contact_id
+        self.partner_site_id = partner_site_id
 
         self.created_at = datetime.now()
 
@@ -51,7 +54,8 @@ class EventDB(db.Model):
 
             'user_id': self.user_id,
             'partner_id': self.partner_id,
-            'contact_id': self.contact_id,
+            'partner_contact_id': self.partner_contact_id,
+            'partner_site_id': self.partner_site_id,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

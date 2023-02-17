@@ -12,8 +12,8 @@
 			Dati UTENTE [ {{ form.id }} ]
 			{%
 				if 'superuser' in session['user_roles']
-				or 'account_admin' in session['user_roles']
-				or 'account_write' in session['user_roles']
+				or 'users_admin' in session['user_roles']
+				or 'users_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
 			   title="Modifica utente"
@@ -136,8 +136,8 @@
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
 									if 'superuser' in session['user_roles']
-									or 'account_admin' in session['user_roles']
-									or 'account_write' in session['user_roles']
+									or 'users_admin' in session['user_roles']
+									or 'users_write' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(event_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -191,9 +191,8 @@
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
 									if 'superuser' in session['user_roles']
-									or 'role_admin' in session['user_roles']
-									or 'role_write' in session['user_roles']
-									or 'role_read' in session['user_roles']
+									or 'roles_admin' in session['user_roles']
+									or 'roles_read' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(role_detail, _id=row.id) }}"
 								   title="Visualizza Record"

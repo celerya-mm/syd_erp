@@ -10,6 +10,11 @@
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/list_blue.svg') }}"/>
 			</a>
 			REGOLA [ {{ form.id }} ]
+			{%
+			if 'superuser' in session['user_roles']
+			or 'roles_admin' in session['user_roles']
+			or 'roles_write' in session['user_roles']
+			%}
 			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
 			   title="Modifica regola"
 			   type="button">
@@ -20,6 +25,7 @@
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}"/>
 			</a>
+			{% endif %}
 		</h5>
 	</div>
 	
@@ -59,17 +65,25 @@
 							<th class="title" data-defaultsort="desc" id="h1">ID</th>
 							<th class="title" id="h2">Username</th>
 							<th class="title" id="h3">Nome Completo</th>
-							<th class="title" id="h4" data-sortable="false"></th>
+							<th class="title" data-sortable="false" id="h4"></th>
 						</tr>
 						</thead>
 						<tbody>
 						{% for row in users %}
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'users_admin' in session['user_roles']
+								or 'users_write' in session['user_roles']
+								%}
 								<a class="btn-table" href="{{ url_for(user_detail, _id=row.id) }}"
 								   title="Visualizza Record" type="button">
 									{{ row.id|e }}
 								</a>
+								{% else %}
+								{{ row.id|e }}
+								{% endif %}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{{ row.username|e }}
@@ -119,5 +133,6 @@
             },
         });
     });
+
 </script>
 {% endblock %}

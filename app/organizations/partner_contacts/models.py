@@ -1,14 +1,12 @@
 from datetime import datetime
 
-from sqlalchemy.orm import relationship
-
 from config import db
 from app.functions import date_to_str, mount_full_name
 
 
-class Contact(db.Model):
+class PartnerContact(db.Model):
 	# Table
-	__tablename__ = 'contacts'
+	__tablename__ = 'partner_contacts'
 	# Columns
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
@@ -22,9 +20,12 @@ class Contact(db.Model):
 	phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
 	partner_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=False)
-	partner = relationship('Partner', viewonly=True)
+	partner_site_id = db.Column(db.Integer, db.ForeignKey('partner_sites.id', ondelete='CASCADE'), nullable=True)
 
-	events = db.relationship('EventDB', backref='contact_events', order_by='EventDB.id.desc()', lazy='dynamic')
+	partner = db.relationship('Partner', backref='partner_contacts', viewonly=True)
+	partner_site = db.relationship('PartnerSite', backref='partner_contacts', viewonly=True)
+
+	events = db.relationship('EventDB', backref='partner_contacts', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
@@ -32,12 +33,12 @@ class Contact(db.Model):
 	updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
 	def __repr__(self):
-		return f'<CONTACT: [{self.id}] - {self.full_name}>'
+		return f'<PARTNER_CONTACT: [{self.id}] - {self.full_name}>'
 
 	def __str__(self):
-		return f'<CONTACT: [{self.id}] - {self.full_name}>'
+		return f'<PARTNER_CONTACT: [{self.id}] - {self.full_name}>'
 
-	def __init__(self, name, last_name, role, email, phone, partner_id, events=None, note=None):
+	def __init__(self, name, last_name, role, email, phone, partner_id, partner_site_id=None, events=None, note=None):
 		self.name = name.strip().replace('  ', ' ')
 		self.last_name = last_name.strip().replace('  ', ' ')
 		self.full_name = mount_full_name(self.name, self.last_name)
@@ -48,6 +49,13 @@ class Contact(db.Model):
 		self.phone = phone.strip()
 
 		self.partner_id = partner_id.split(' - ')[0]
+
+		if partner_site_id is not None and partner_site_id != '-':
+			partner_site_id = partner_site_id.split(' - ')[0]
+		else:
+			partner_site_id = None
+
+		self.partner_site_id = partner_site_id
 
 		self.events = events or []
 
@@ -62,11 +70,14 @@ class Contact(db.Model):
 
 	def update(_id, data):  # noqa
 		"""Salva le modifiche a un record."""
-		Contact.query.filter_by(id=_id).update(data)
+		PartnerContact.query.filter_by(id=_id).update(data)
 		db.session.commit()
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
+
+		site_id = self.partner_site_id or None
+
 		return {
 			'id': self.id,
 
@@ -77,6 +88,7 @@ class Contact(db.Model):
 			'role': self.role,
 
 			'partner_id': self.partner_id,
+			'partner_site_id': site_id,
 
 			'email': self.email,
 			'phone': self.phone,

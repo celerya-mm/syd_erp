@@ -64,6 +64,7 @@ def access_required(roles='ANY'):
 						print(f'CHECK_ROLE: {r} [OK]')
 						return fn(*args, **kwargs)
 
+				# print(f"RUOLI: {session['user_roles']}")
 				msg = f"Non hai i permessi per accedere alla risorsa richiesta. Contatta l'amministratore " \
 					  f"per farti assegnare il permesso d'accesso."
 				return msg
@@ -163,7 +164,7 @@ def not_empty(_v):
 
 def status_true_false(_stat):
 	"""Cambia valori SI, NO in True, False."""
-	if _stat in ['SI', 'si', True, 'y', 'Y', 1]:
+	if _stat in ['SI', 'si', True, 'True', 'y', 'Y', 1]:
 		return True
 	else:
 		return False

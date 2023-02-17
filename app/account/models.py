@@ -1,6 +1,6 @@
+import hashlib
 from datetime import datetime
 from config import db
-from ..functions import mount_full_address, mount_full_name
 
 
 class User(db.Model):
@@ -44,6 +44,8 @@ class User(db.Model):
 
 	def __init__(self, username, password=None, psw_changed=False, active=None, name=None, last_name=None, phone=None,
 				 email=None, address=None, cap=None, city=None, auth_tokens=None, events=None, note=None):
+		from app.functions import mount_full_address, mount_full_name
+
 		self.username = username
 
 		self.password = password
@@ -83,7 +85,7 @@ class User(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
-		from app.functions import date_to_str
+		from app.functions import date_to_str, mount_full_address, mount_full_name
 		return {
 			'id': self.id,
 			'username': self.username,

@@ -87,16 +87,16 @@ def login():
 @account_bp.route("/logout/")
 def logout(msg=None):
 	"""Effettua il log-out ed elimina i dati della sessione."""
-	session.clear()
 	if msg:
 		flash(msg)
 	flash("Log-Out effettuato.")
+	session.clear()
 	return redirect(url_for('account_bp.login'))
 
 
 @account_bp.route(VIEW, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['account_admin', 'account_read'])
+@access_required(roles=['users_admin', 'users_read'])
 def user_view():
 	"""Visualizzo informazioni Utente."""
 	try:
@@ -118,7 +118,7 @@ def user_view():
 
 @account_bp.route(CREATE, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['account_admin', 'account_write'])
+@access_required(roles=['users_admin', 'users_write'])
 def user_create():
 	"""Creazione Utente personale."""
 	form = FormUserCreate()
@@ -153,7 +153,7 @@ def user_create():
 
 @account_bp.route(DETAIL, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['account_admin', 'account_read'])
+@access_required(roles=['users_admin', 'users_read'])
 def user_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
@@ -177,7 +177,6 @@ def user_view_detail(_id):
 	roles_list = user.roles
 	if roles_list:
 		roles_list = [role.to_dict() for role in roles_list]
-		print(f"ROLES:", json.dumps(roles_list, indent=2))
 	else:
 		roles_list = []
 
@@ -191,7 +190,7 @@ def user_view_detail(_id):
 
 @account_bp.route(UPDATE, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['account_admin', 'account_write'])
+@access_required(roles=['users_admin', 'users_write'])
 def user_update(_id):
 	"""Aggiorna dati Utente."""
 	from app.event_db.routes import event_create
@@ -202,6 +201,7 @@ def user_update(_id):
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormUserUpdate(request.form).to_dict()
+		# print("NEW_DATA_USER:", json.dumps(new_data, indent=2))
 
 		previous_data = user.to_dict()
 		previous_data.pop("updated_at")
@@ -237,7 +237,7 @@ def user_update(_id):
 
 
 @account_bp.route(UPDATE_PSW, methods=["GET", "POST"])
-@access_required_update_psw(roles=['account_admin', 'account_write'])
+@access_required_update_psw(roles=['users_admin', 'users_write'])
 def user_update_password(_id, msg=None):
 	"""Aggiorna password Utente."""
 	from app.event_db.routes import event_create

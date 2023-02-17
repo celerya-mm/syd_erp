@@ -1,12 +1,11 @@
 import json
-from datetime import datetime
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
 from config import db
 
-from .forms import FormRuleCreate, FormRuleUpdate, FormRuleAddUser
+from .forms import FormRoleCreate, FormRoleUpdate, FormRoleAddUser
 from ..account.models import User
 from ..functions import token_user_validate, access_required
 from .models import Role, UserRoles
@@ -44,7 +43,7 @@ REMOVE_FOR = "role_bp.remove_role_to_user"
 
 @role_bp.route(VIEW, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['role_admin', 'roles_read'])
+@access_required(roles=['roles_admin', 'roles_read'])
 def role_view():
 	"""Visualizzo informazioni User."""
 
@@ -58,10 +57,10 @@ def role_view():
 
 @role_bp.route(CREATE, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['role_admin', 'role_write'])
+@access_required(roles=['roles_admin', 'roles_write'])
 def role_create():
 	"""Creazione Utente Consorzio."""
-	form = FormRuleCreate()
+	form = FormRoleCreate()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
 		new_role = Role(
@@ -82,7 +81,7 @@ def role_create():
 
 @role_bp.route(DETAIL, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['role_admin', 'role_read'])
+@access_required(roles=['roles_admin', 'roles_read'])
 def role_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from ..account.routes import DETAIL_FOR as USER_DETAIL_FOR
@@ -106,15 +105,15 @@ def role_view_detail(_id):
 
 @role_bp.route(UPDATE, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['role_admin', 'role_write'])
+@access_required(roles=['roles_admin', 'roles_write'])
 def role_update(_id):
 	"""Aggiorna dati Record."""
 	# recupero i dati
 	role = Role.query.get(_id)
-	form = FormRuleUpdate(obj=role)
+	form = FormRoleUpdate(obj=role)
 
 	if request.method == 'POST' and form.validate():
-		new_data = FormRuleUpdate(request.form).to_dict()
+		new_data = FormRoleUpdate(request.form).to_dict()
 		try:
 			Role.update(_id, new_data)
 			flash("REGOLA aggiornata correttamente.")
@@ -139,11 +138,11 @@ def role_update(_id):
 
 @role_bp.route(ADD, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['role_admin'])
+@access_required(roles=['roles_admin'])
 def add_role_to_user(_id):
 	"""Aggiunge una regala a un utente."""
 
-	form = FormRuleAddUser()
+	form = FormRoleAddUser()
 
 	if form.validate_on_submit():
 		new_data = json.loads(json.dumps(request.form))
@@ -164,7 +163,7 @@ def add_role_to_user(_id):
 
 @role_bp.route(REMOVE, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['roles_admin', 'role_delete'])
+@access_required(roles=['roles_admin', 'roles_delete'])
 def remove_role_to_user(id_role, id_user):
 	"""Rimuove una regala a un utente."""
 	try:

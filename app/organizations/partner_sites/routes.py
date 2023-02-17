@@ -2,54 +2,57 @@ import json
 
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
 from app.functions import token_user_validate, access_required, status_true_false, not_empty
 from config import db
-from .forms import FormPartnerCreate, FormPartnerUpdate
-from .models import Partner
+from .forms import FormPartnerSiteCreate, FormPartnerSiteUpdate
+from .models import PartnerSite
 
-partner_bp = Blueprint(
-	'partner_bp', __name__,
+partner_site_bp = Blueprint(
+	'partner_site_bp', __name__,
 	template_folder='templates',
 	static_folder='static'
 )
 
 VIEW = "/view/"
-VIEW_FOR = "partner_bp.partner_view"
-VIEW_HTML = "partner_view.html"
+VIEW_FOR = "partner_site_bp.partner_site_view"
+VIEW_HTML = "partner_site_view.html"
 
-CREATE = "/create/"
-CREATE_FOR = "partner_bp.partner_create"
-CREATE_HTML = "partner_create.html"
+CREATE = "/create/<int:p_id>/"
+CREATE_FOR = "partner_site_bp.partner_site_create"
+CREATE_HTML = "partner_site_create.html"
 
-DETAIL = "/view/detail/<int:_id>"
-DETAIL_FOR = "partner_bp.partner_view_detail"
-DETAIL_HTML = "partner_view_detail.html"
+DETAIL = "/view/detail/<int:_id>/"
+DETAIL_FOR = "partner_site_bp.partner_site_view_detail"
+DETAIL_HTML = "partner_site_view_detail.html"
 
-UPDATE = "/update/<int:_id>"
-UPDATE_FOR = "partner_bp.partner_update"
-UPDATE_HTML = "partner_update.html"
+UPDATE = "/update/<int:_id>/"
+UPDATE_FOR = "partner_site_bp.partner_site_update"
+UPDATE_HTML = "partner_site_update.html"
 
 
-@partner_bp.route(VIEW, methods=["GET", "POST"])
+@partner_site_bp.route(VIEW, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['partners_admin', 'partners_read'])
-def partner_view():
+@access_required(roles=['partner_sites_admin', 'partner_sites_read'])
+def partner_site_view():
 	"""Visualizzo informazioni Partner."""
 	# Estraggo la lista dei partners
-	_list = Partner.query.all()
+	_list = PartnerSite.query.all()
 	_list = [r.to_dict() for r in _list]
 
 	db.session.close()
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, detail=DETAIL_FOR)
 
 
-@partner_bp.route(CREATE, methods=["GET", "POST"])
+@partner_site_bp.route(CREATE, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['partners_admin', 'partners_write'])
-def partner_create():
+@access_required(roles=['partner_sites_admin', 'partner_sites_write'])
+def partner_site_create(p_id):
 	"""Creazione Partner."""
-	form = FormPartnerCreate()
+	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL_FOR
+
+	form = FormPartnerSiteCreate()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
 		# print('TYPE:', type(form_data), 'NEW_PARTNER:', json.dumps(form_data, indent=2))
@@ -61,8 +64,8 @@ def partner_create():
 		if "partner" not in form_data.keys():
 			form_data['partner'] = 'False'
 
-		new_p = Partner(
-			organization=form_data["organization"].strip().replace('  ', ' '),
+		new_p = PartnerSite(
+			site=form_data["site"].strip().replace('  ', ' '),
 
 			client=status_true_false(form_data["client"]),
 			supplier=status_true_false(form_data["supplier"]),
@@ -76,6 +79,8 @@ def partner_create():
 			cap=not_empty(form_data["cap"]),
 			city=not_empty(form_data["city"]),
 
+			partner_id=form_data["partner_id"].split(' - ')[0],
+
 			vat_number=form_data["vat_number"],
 			fiscal_code=form_data["fiscal_code"],
 			sdi_code=not_empty(form_data["sdi_code"]),
@@ -83,8 +88,8 @@ def partner_create():
 			note=not_empty(form_data["note"])
 		)
 		try:
-			Partner.create(new_p)
-			flash("PARTNER creato correttamente.")
+			PartnerSite.create(new_p)
+			flash("SITO creato correttamente.")
 			return redirect(url_for(VIEW_FOR))
 		except IntegrityError as err:
 			db.session.rollback()
@@ -92,95 +97,95 @@ def partner_create():
 			flash(f"ERRORE: {str(err.orig)}")
 			return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
 	else:
-		return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
+		if p_id:
+			from ..partners.models import Partner
+			partner = Partner.query.get(p_id)
+			form.partner_id.data = f'{partner.id} - {partner.organization}'
+		return render_template(CREATE_HTML, form=form, view=VIEW_FOR, p_id=p_id, partner_detail=PARTNER_DETAIL_FOR)
 
 
-@partner_bp.route(DETAIL, methods=["GET", "POST"])
+@partner_site_bp.route(DETAIL, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['partners_admin', 'partners_read'])
-def partner_view_detail(_id):
+@access_required(roles=['partner_sites_admin', 'partner_sites_read'])
+def partner_site_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
+	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_contacts.routes import DETAIL_FOR as CONTACT_DETAIL, CREATE_FOR as CONTACT_CREATE_FOR
-	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL, CREATE_FOR as SITE_CREATE_FOR
 
 	# Interrogo il DB
-	partner = Partner.query.get(_id)
-	_partner = partner.to_dict()
+	site = PartnerSite.query.options(joinedload(PartnerSite.back_partner)).get(_id)
+	_site = site.to_dict()
+
+	p_id = _site['partner_id']
+	_site['partner_id'] = f'{site.back_partner.id} - {site.back_partner.organization}'
 
 	# Estraggo la storia delle modifiche per il record
-	history_list = partner.events
+	history_list = site.events
 	if history_list:
 		history_list = [history.to_dict() for history in history_list]
 	else:
 		history_list = []
 
 	# Estraggo la lista dei contatti
-	contacts_list = partner.contacts
+	contacts_list = site.contacts
 	if contacts_list:
 		contacts_list = [contact.to_dict() for contact in contacts_list]
 	else:
 		contacts_list = []
 
-	# Estraggo la lista dei siti
-	sites_list = partner.sites
-	if sites_list:
-		sites_list = [site.to_dict() for site in sites_list]
-	else:
-		sites_list = []
-
 	db.session.close()
 	return render_template(
-		DETAIL_HTML, form=_partner, view=VIEW_FOR, update=UPDATE_FOR,
+		DETAIL_HTML, form=_site, view=VIEW_FOR, update=UPDATE_FOR, partner_detail=PARTNER_DETAIL, p_id=p_id,
 		event_detail=EVENT_DETAIL, history_list=history_list, h_len=len(history_list),
 		contact_detail=CONTACT_DETAIL, contacts_list=contacts_list, c_len=len(contacts_list),
-		contact_create=CONTACT_CREATE_FOR,
-		site_create=SITE_CREATE_FOR, site_detail=SITE_DETAIL, sites_list=sites_list, s_len=len(sites_list)
+		contact_create=CONTACT_CREATE_FOR
 	)
 
 
-@partner_bp.route(UPDATE, methods=["GET", "POST"])
+@partner_site_bp.route(UPDATE, methods=["GET", "POST"])
 @token_user_validate
-@access_required(roles=['partners_admin', 'partners_write'])
-def partner_update(_id):
+@access_required(roles=['partner_sites_admin', 'partner_sites_write'])
+def partner_site_update(_id):
 	"""Aggiorna dati Utente."""
 	from app.event_db.routes import event_create
 
 	# recupero i dati
-	partner = Partner.query.get(_id)
-	form = FormPartnerUpdate(obj=partner)
+	site = PartnerSite.query.options(joinedload(PartnerSite.back_partner)).get(_id)
+	form = FormPartnerSiteUpdate(obj=site)
 
 	if request.method == 'POST' and form.validate():
-		new_data = FormPartnerUpdate(request.form).to_dict()
+		new_data = FormPartnerSiteUpdate(request.form).to_dict()
 
-		previous_data = partner.to_dict()
+		previous_data = site.to_dict()
 		previous_data.pop("updated_at")
 
 		try:
-			Partner.update(_id, new_data)
+			PartnerSite.update(_id, new_data)
 			flash("PARTNER aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
 			db.session.close()
 			flash(f"ERRORE: {str(err.orig)}")
 			_info = {
-				'created_at': partner.created_at,
-				'updated_at': partner.updated_at,
+				'created_at': site.created_at,
+				'updated_at': site.updated_at,
 			}
-			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=DETAIL_FOR)
+			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, detail=DETAIL_FOR)
 
 		_event = {
 			"username": session["user"]["username"],
-			"table": Partner.__tablename__,
+			"table": PartnerSite.__tablename__,
 			"Modification": f"Update PARTNER whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, partner_id=_id)
+		_event = event_create(_event, partner_site_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
+		form.partner_id.data = f'{site.back_partner.id} - {site.back_partner.organization}'
 		_info = {
-			'created_at': partner.created_at,
-			'updated_at': partner.updated_at,
+			'created_at': site.created_at,
+			'updated_at': site.updated_at,
 		}
 		db.session.close()
-		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=DETAIL_FOR)
+		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, detail=DETAIL_FOR)

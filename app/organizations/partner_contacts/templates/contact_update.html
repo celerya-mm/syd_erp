@@ -94,6 +94,19 @@
                     </div>
                 </div>
             </div>
+			<div class="row no-gutters justify-content-center rounded"
+                 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+                <div class="form-group">
+                    {{ form.partner_site_id.label(style="font-size: 1.2rem;") }}
+                    {{ form.partner_site_id(class="form-control", style="text-align: center;") }}
+                    {% if form.partner_site_id.errors %}
+                    {% for error in form.partner_site_id.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
             <div class="row no-gutters justify-content-center rounded"
                  style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
                 <div class="form-group">

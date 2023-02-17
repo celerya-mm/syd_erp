@@ -1,16 +1,15 @@
 from datetime import datetime
+
 from config import db
 from app.functions import mount_full_address, date_to_str
 
-from ..partner_sites.models import PartnerSite  # noqa
 
-
-class Partner(db.Model):
+class PartnerSite(db.Model):
 	# Table
-	__tablename__ = 'partners'
+	__tablename__ = 'partner_sites'
 	# Columns
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-	organization = db.Column(db.String(80), index=True, unique=True, nullable=False)
+	site = db.Column(db.String(80), index=True, unique=True, nullable=False)
 
 	client = db.Column(db.Boolean, unique=False, nullable=True)
 	supplier = db.Column(db.Boolean, unique=False, nullable=True)
@@ -29,14 +28,12 @@ class Partner(db.Model):
 	fiscal_code = db.Column(db.String(13), index=False, unique=False, nullable=True)
 	sdi_code = db.Column(db.String(7), index=False, unique=False, nullable=True)
 
-	contacts = db.relationship(
-		'PartnerContact', backref='partners', order_by='PartnerContact.last_name.asc()', lazy='dynamic')
+	partner_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=False)
 
-	sites = db.relationship(
-		'PartnerSite', backref='partners', lazy='dynamic')
-
-	events = db.relationship(
-		'EventDB', backref='partners', order_by='EventDB.id.desc()', lazy='dynamic')
+	back_partner = db.relationship('Partner', backref='partner_sites', viewonly=True)
+	contacts = db.relationship('PartnerContact', backref='partner_sites', order_by='PartnerContact.last_name.asc()',
+							   lazy='dynamic')
+	events = db.relationship('EventDB', backref='partner_sites', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
@@ -44,14 +41,14 @@ class Partner(db.Model):
 	updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
 	def __repr__(self):
-		return f'<PARTNER: [{self.id}] - {self.organization}>'
+		return f'<PARTNER_SITE: [{self.id}] - {self.site}>'
 
 	def __str__(self):
-		return f'<PARTNER: [{self.id}] - {self.organization}>'
+		return f'<PARTNER_SITE: [{self.id}] - {self.site}>'
 
-	def __init__(self, organization, client, supplier, partner, email, pec, phone, address, cap, city, vat_number,
+	def __init__(self, site, client, supplier, partner, email, pec, phone, partner_id, address, cap, city, vat_number,
 				 fiscal_code, sdi_code=None, events=None, note=None):
-		self.organization = organization
+		self.site = site
 
 		self.client = client
 		self.supplier = supplier
@@ -65,6 +62,8 @@ class Partner(db.Model):
 		self.cap = cap or None
 		self.city = city or None
 		self.full_address = mount_full_address(address, cap, city) or None
+
+		self.partner_id = partner_id
 
 		self.vat_number = vat_number
 		self.fiscal_code = fiscal_code
@@ -83,14 +82,14 @@ class Partner(db.Model):
 
 	def update(_id, data):  # noqa
 		"""Salva le modifiche a un record."""
-		Partner.query.filter_by(id=_id).update(data)
+		PartnerSite.query.filter_by(id=_id).update(data)
 		db.session.commit()
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
 		return {
 			'id': self.id,
-			'organization': self.organization,
+			'site': self.site,
 
 			'client': self.client,
 			'supplier': self.supplier,
@@ -104,6 +103,8 @@ class Partner(db.Model):
 			'cap': self.cap,
 			'city': self.city,
 			'full_address': mount_full_address(self.address, self.cap, self.city),
+
+			'partner_id': self.partner_id,
 
 			'vat_number': self.vat_number,
 			'fiscal_code': self.fiscal_code,

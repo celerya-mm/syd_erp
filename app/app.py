@@ -40,17 +40,21 @@ migrate.init_app(app, db)
 
 # importo i Blueprint
 with app.app_context():
-	from .account.routes import account_bp
-	from .event_db.routes import event_bp
-	from .roles.routes import role_bp
+	from app.event_db.routes import event_bp
+
+	from app.account.routes import account_bp
+	from app.roles.routes import role_bp
 
 	from app.organizations.partners.routes import partner_bp
-	from .organizations.contacts.routes import contact_bp
+	from app.organizations.partner_contacts.routes import partner_contact_bp
+	from app.organizations.partner_sites.routes import partner_site_bp
 
 	# registro i blueprints
-	app.register_blueprint(account_bp, url_prefix='/account')
 	app.register_blueprint(event_bp, url_prefix='/event')
+
+	app.register_blueprint(account_bp, url_prefix='/account')
 	app.register_blueprint(role_bp, url_prefix='/role')
 
 	app.register_blueprint(partner_bp, url_prefix='/partner')
-	app.register_blueprint(contact_bp, url_prefix='/partner/contact')
+	app.register_blueprint(partner_contact_bp, url_prefix='/partner/contact')
+	app.register_blueprint(partner_site_bp, url_prefix='/partner/site')
