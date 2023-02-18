@@ -1,11 +1,11 @@
 import json
 
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.functions import token_user_validate, access_required, status_true_false, not_empty
-from config import db
+from app.app import session, db
 from .forms import FormPartnerSiteCreate, FormPartnerSiteUpdate
 from .models import PartnerSite
 
@@ -36,20 +36,23 @@ UPDATE_HTML = "partner_site_update.html"
 @token_user_validate
 @access_required(roles=['partner_sites_admin', 'partner_sites_read'])
 def partner_site_view():
-	"""Visualizzo informazioni Partner."""
+	"""Visualizzo informazioni Sito."""
+	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL_FOR
+
 	# Estraggo la lista dei partners
 	_list = PartnerSite.query.all()
 	_list = [r.to_dict() for r in _list]
 
 	db.session.close()
-	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, detail=DETAIL_FOR)
+	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, detail=DETAIL_FOR,
+						   partner_detail=PARTNER_DETAIL_FOR)
 
 
 @partner_site_bp.route(CREATE, methods=["GET", "POST"])
 @token_user_validate
 @access_required(roles=['partner_sites_admin', 'partner_sites_write'])
 def partner_site_create(p_id):
-	"""Creazione Partner."""
+	"""Creazione Sito."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL_FOR
 
 	form = FormPartnerSiteCreate()
@@ -101,6 +104,7 @@ def partner_site_create(p_id):
 			from ..partners.models import Partner
 			partner = Partner.query.get(p_id)
 			form.partner_id.data = f'{partner.id} - {partner.organization}'
+			print("PARTNER:", form.partner_id.data)
 		return render_template(CREATE_HTML, form=form, view=VIEW_FOR, p_id=p_id, partner_detail=PARTNER_DETAIL_FOR)
 
 
@@ -112,6 +116,7 @@ def partner_site_view_detail(_id):
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_contacts.routes import DETAIL_FOR as CONTACT_DETAIL, CREATE_FOR as CONTACT_CREATE_FOR
+	from app.orders.items.routes import DETAIL_FOR as ITEM_DETAIL, CREATE_FOR as ITEM_CREATE_FOR
 
 	# Interrogo il DB
 	site = PartnerSite.query.options(joinedload(PartnerSite.back_partner)).get(_id)
@@ -134,12 +139,20 @@ def partner_site_view_detail(_id):
 	else:
 		contacts_list = []
 
+	# Estraggo la lista degli articoli
+	items_list = site.items
+	if items_list:
+		items_list = [item.to_dict() for item in items_list]
+	else:
+		items_list = []
+
 	db.session.close()
 	return render_template(
 		DETAIL_HTML, form=_site, view=VIEW_FOR, update=UPDATE_FOR, partner_detail=PARTNER_DETAIL, p_id=p_id,
 		event_detail=EVENT_DETAIL, history_list=history_list, h_len=len(history_list),
 		contact_detail=CONTACT_DETAIL, contacts_list=contacts_list, c_len=len(contacts_list),
-		contact_create=CONTACT_CREATE_FOR
+		contact_create=CONTACT_CREATE_FOR,
+		item_create=ITEM_CREATE_FOR, item_detail=ITEM_DETAIL, items_list=items_list, i_len=len(items_list)
 	)
 
 
@@ -147,7 +160,7 @@ def partner_site_view_detail(_id):
 @token_user_validate
 @access_required(roles=['partner_sites_admin', 'partner_sites_write'])
 def partner_site_update(_id):
-	"""Aggiorna dati Utente."""
+	"""Aggiorna dati Sito."""
 	from app.event_db.routes import event_create
 
 	# recupero i dati

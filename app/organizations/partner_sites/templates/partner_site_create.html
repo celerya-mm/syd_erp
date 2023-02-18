@@ -4,10 +4,10 @@
 <div class="container text-center mt-2">
 	<div class="row no-gutters justify-content-center">
 		<h5 class="card-title">
-			<a class="btn btn-update" href="{{ url_for(partner_detail, _id=p_id) }}" title="Annulla" type="button">
+			<a class="btn btn-update" href="{{ url_for(item_detail, _id=p_id) }}" title="Annulla" type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
 			</a>
-			Aggiungi un nuovo SITO sotto una ORGANIZZAZIONE:
+			Aggiungi un nuovo CONTATTO sotto una ORGANIZZAZIONE:
 		</h5>
 		<div class="col-md-12 shadow rounded" style="border: solid 2px #ED6666 !important;">
 			<form enctype="multipart/form-data" method="POST">

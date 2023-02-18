@@ -2,10 +2,10 @@ import json
 from datetime import datetime
 from uuid import uuid4
 
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
-from config import db
+from ..app import session, db
 from .forms import FormUserLogin, FormUserCreate, FormUserUpdate, FormUserPswChange
 from .functions import psw_hash
 from .models import User
@@ -46,11 +46,11 @@ def login():
 	form = FormUserLogin()
 	if form.validate_on_submit():
 		_user = User.query.filter_by(username=form.username.data, password=psw_hash(str(form.password.data))).first()
-		if _user not in [None, ""]:
+		if _user:
 			try:
-				record = _user.auth_tokens.first()
-				if record and record.expires_at > datetime.now():
-					token = record.token
+				_token = _user.auth_tokens.first()
+				if _token and _token.expires_at > datetime.now():
+					token = _token.token
 				else:
 					token = uuid4()
 					_auth_token = __save_auth_token(token, _user.id)
@@ -69,9 +69,9 @@ def login():
 				# print('SESSION:', json.dumps(session, indent=2))
 				db.session.close()
 
-				if session["user"]["psw_changed"] is not True:
+				if _user.psw_changed is not True:
 					flash("Al primo accesso è richiesto il cambio della password assegnata dall'amministrazione.")
-					return redirect(url_for(UPDATE_PSW_FOR, _id=session["user"]["id"]))
+					return redirect(url_for(UPDATE_PSW_FOR, _id=_user.id))
 				else:
 					return redirect(url_for(VIEW_FOR))
 			except Exception as err:
@@ -109,8 +109,10 @@ def user_view():
 		_list = [r.to_dict() for r in _list]
 
 		db.session.close()
-		return render_template(VIEW_HTML, admin=_admin, form=_list, create=CREATE_FOR, update=UPDATE_FOR,
-							   update_psw=UPDATE_PSW_FOR, detail=DETAIL_FOR)
+		return render_template(
+			VIEW_HTML, admin=_admin, form=_list, create=CREATE_FOR, update=UPDATE_FOR, update_psw=UPDATE_PSW_FOR,
+			detail=DETAIL_FOR
+		)
 	except Exception as err:
 		flash(f'ERROR: {err}')
 		return redirect(url_for('account_bp.login'))

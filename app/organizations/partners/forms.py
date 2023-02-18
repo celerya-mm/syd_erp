@@ -56,10 +56,10 @@ class FormPartnerCreate(FlaskForm):
 	submit = SubmitField("SAVE")
 
 	def __repr__(self):
-		return f'<PARTNER: {self.organization}>'
+		return f'<PARTNER_CREATED: {self.organization}>'
 
 	def __str__(self):
-		return f'<PARTNER: {self.organization}>'
+		return f'<PARTNER_CREATED: {self.organization}>'
 
 	def validate_organization(self, field):  # noqa
 		"""Verifica presenza organization nella tabella del DB."""
@@ -116,10 +116,10 @@ class FormPartnerUpdate(FlaskForm):
 	submit = SubmitField("SAVE")
 
 	def __repr__(self):
-		return f'<PARTNER: {self.organization}>'
+		return f'<PARTNER_UPDATED: {self.organization}>'
 
 	def __str__(self):
-		return f'<PARTNER: {self.organization}>'
+		return f'<PARTNER_UPDATED: {self.organization}>'
 
 	def to_dict(self):
 		"""Converte form in dict."""

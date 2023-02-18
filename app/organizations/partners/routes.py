@@ -1,10 +1,10 @@
 import json
 
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
+from app.app import session, db
 from app.functions import token_user_validate, access_required, status_true_false, not_empty
-from config import db
 from .forms import FormPartnerCreate, FormPartnerUpdate
 from .models import Partner
 
@@ -103,6 +103,7 @@ def partner_view_detail(_id):
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 	from app.organizations.partner_contacts.routes import DETAIL_FOR as CONTACT_DETAIL, CREATE_FOR as CONTACT_CREATE_FOR
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL, CREATE_FOR as SITE_CREATE_FOR
+	from app.orders.items.routes import DETAIL_FOR as ITEM_DETAIL, CREATE_FOR as ITEM_CREATE_FOR
 
 	# Interrogo il DB
 	partner = Partner.query.get(_id)
@@ -129,13 +130,21 @@ def partner_view_detail(_id):
 	else:
 		sites_list = []
 
+	# Estraggo la lista degli articoli
+	items_list = partner.items
+	if items_list:
+		items_list = [item.to_dict() for item in items_list]
+	else:
+		items_list = []
+
 	db.session.close()
 	return render_template(
 		DETAIL_HTML, form=_partner, view=VIEW_FOR, update=UPDATE_FOR,
 		event_detail=EVENT_DETAIL, history_list=history_list, h_len=len(history_list),
 		contact_detail=CONTACT_DETAIL, contacts_list=contacts_list, c_len=len(contacts_list),
 		contact_create=CONTACT_CREATE_FOR,
-		site_create=SITE_CREATE_FOR, site_detail=SITE_DETAIL, sites_list=sites_list, s_len=len(sites_list)
+		site_create=SITE_CREATE_FOR, site_detail=SITE_DETAIL, sites_list=sites_list, s_len=len(sites_list),
+		item_create=ITEM_CREATE_FOR, item_detail=ITEM_DETAIL, items_list=items_list, i_len=len(items_list)
 	)
 
 

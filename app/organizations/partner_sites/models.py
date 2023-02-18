@@ -3,6 +3,10 @@ from datetime import datetime
 from config import db
 from app.functions import mount_full_address, date_to_str
 
+# importazioni per creare relazioni in tabella
+from app.orders.items.models import Item  # noqa
+from app.event_db.models import EventDB  # noqa
+
 
 class PartnerSite(db.Model):
 	# Table
@@ -30,10 +34,17 @@ class PartnerSite(db.Model):
 
 	partner_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=False)
 
-	back_partner = db.relationship('Partner', backref='partner_sites', viewonly=True)
-	contacts = db.relationship('PartnerContact', backref='partner_sites', order_by='PartnerContact.last_name.asc()',
-							   lazy='dynamic')
-	events = db.relationship('EventDB', backref='partner_sites', order_by='EventDB.id.desc()', lazy='dynamic')
+	back_partner = db.relationship(
+		'Partner', backref='partner_sites', viewonly=True)
+
+	contacts = db.relationship(
+		'PartnerContact', backref='partner_sites', order_by='PartnerContact.last_name.asc()', lazy='dynamic')
+
+	items = db.relationship(
+		'Item', backref='partner_sites', lazy='dynamic')
+
+	events = db.relationship(
+		'EventDB', backref='partner_sites', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 

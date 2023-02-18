@@ -1,16 +1,15 @@
 import json
 
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from config import db
-
+from app.app import session, db
+from app.functions import token_user_validate, access_required, not_empty
 from .forms import FormPartnerContactCreate, FormPartnerContactUpdate
 from .models import PartnerContact
-from ..partners.models import Partner
 from ..partner_sites.models import PartnerSite
-from app.functions import token_user_validate, access_required, not_empty
+from ..partners.models import Partner
 
 partner_contact_bp = Blueprint(
 	'partner_contact_bp', __name__,
@@ -55,13 +54,14 @@ def contact_view():
 @access_required(roles=['partner_contacts_admin', 'partner_contacts_write'])
 def contact_create(p_id, s_id=None):
 	"""Creazione Contact."""
-	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL_FOR
+	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
+	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 
 	form = FormPartnerContactCreate()
 	if request.method == 'POST' and form.validate():
 		try:
 			form_data = json.loads(json.dumps(request.form))
-			print('NEW_CONTACT:', json.dumps(form_data, indent=2))
+			# print('NEW_CONTACT:', json.dumps(form_data, indent=2))
 
 			new_p = PartnerContact(
 				name=form_data['name'],
@@ -78,12 +78,18 @@ def contact_create(p_id, s_id=None):
 			)
 			PartnerContact.create(new_p)
 			flash("CONTACT creato correttamente.")
-			return redirect(url_for(PARTNER_DETAIL_FOR, _id=p_id))
+
+			if s_id not in [None, 0]:
+				return redirect(url_for(SITE_DETAIL, _id=s_id))
+			else:
+				return redirect(url_for(PARTNER_DETAIL, _id=p_id))
+
 		except IntegrityError as err:
 			db.session.rollback()
 			db.session.close()
 			flash(f"ERRORE: {str(err.orig)}")
-			return render_template(CREATE_HTML, form=form, partner_view=PARTNER_DETAIL_FOR, p_id=p_id)
+			return render_template(CREATE_HTML, form=form, partner_view=PARTNER_DETAIL, p_id=p_id,
+							   site_view=SITE_DETAIL, s_id=s_id)
 	else:
 		partner = Partner.query.get(p_id)
 		form.partner_id.data = f'{partner.id} - {partner.organization}'
@@ -95,7 +101,8 @@ def contact_create(p_id, s_id=None):
 			form.partner_site_id.data = f'{site.id} - {site.site}'
 			print('SITE:', form.partner_site_id.data)
 
-		return render_template(CREATE_HTML, form=form, partner_view=PARTNER_DETAIL_FOR, p_id=p_id)
+		return render_template(CREATE_HTML, form=form, partner_view=PARTNER_DETAIL, p_id=p_id,
+							   site_view=SITE_DETAIL, s_id=s_id)
 
 
 @partner_contact_bp.route(DETAIL, methods=["GET", "POST"])
@@ -108,8 +115,8 @@ def contact_view_detail(_id):
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 
 	# Interrogo il DB
-	contact = PartnerContact.query\
-		.options(joinedload(PartnerContact.partner))\
+	contact = PartnerContact.query \
+		.options(joinedload(PartnerContact.partner)) \
 		.options(joinedload(PartnerContact.partner_site)).get(_id)
 	_contact = contact.to_dict()
 
@@ -145,8 +152,8 @@ def contact_update(_id):
 	from app.event_db.routes import event_create
 
 	# recupero i dati
-	contact = PartnerContact.query\
-		.options(joinedload(PartnerContact.partner))\
+	contact = PartnerContact.query \
+		.options(joinedload(PartnerContact.partner)) \
 		.options(joinedload(PartnerContact.partner_site)).get(_id)
 	form = FormPartnerContactUpdate(obj=contact)
 
@@ -172,7 +179,7 @@ def contact_update(_id):
 		_event = {
 			"username": session["user"]["username"],
 			"table": PartnerContact.__tablename__,
-			"Modification": f"Update CONTCT whit id: {_id}",
+			"Modification": f"Update CONTACT whit id: {_id}",
 			"Previous_data": previous_data
 		}
 		_event = event_create(_event, partner_contact_id=_id)

@@ -169,6 +169,36 @@
 						</ul>
 					</li>
 					
+					<li class="nav-item dropdown" style="background-color: #2B4692 !important;" title="Orders">
+						<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+						   href="#Orders"
+						   id="DropdownMenuOrdini" role="button">
+							Orders
+						</a>
+						
+						<ul aria-labelledby="DropdownMenuPartners" class="dropdown-menu">
+							
+							<!--  Articoli-->
+							{%
+							if 'superuser' in session['user_roles']
+							or 'items_admin' in session['user_roles']
+							or 'items_read' in session['user_roles']
+							%}
+							<li class="nav-item">
+								<a class="nav-item nav-link {% if request.path == '/item/view/' %} active {% endif %}"
+								   href="{{ url_for('item_bp.item_view') }}" title="Utenti">
+									{% if request.path == '/item/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/person-fill-active.svg') }}">
+									{% else %}
+									<img alt="" src="{{ url_for('static', filename='icons/person-fill.svg') }}">
+									{% endif %}
+									Items
+								</a>
+							</li>
+							{% endif %}
+						</ul>
+					</li>
+					
 					<li class="nav-item dropdown" style="background-color: #2B4692 !important;">
 						<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
 						   id="navbarDropdownMenuLink" role="button">

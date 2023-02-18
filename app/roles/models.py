@@ -11,16 +11,16 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(50), index=True, unique=True, nullable=False)
 
-    user_roles = db.relationship('User', secondary='user_roles', backref='users_role', lazy='dynamic')
+    user_roles = db.relationship('User', secondary='user_roles', backref='u_roles', lazy='dynamic')
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<RUOLO: {}>'.format(self.name)
+        return f'<RUOLO: {self.name}>'
 
     def __str__(self):
-        return '<RUOLO: {}>'.format(self.name)
+        return f'<RUOLO: {self.name}>'
 
     def __init__(self, name):
         self.name = name

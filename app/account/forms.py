@@ -49,10 +49,10 @@ class FormUserCreate(FlaskForm):
     submit = SubmitField("SAVE")
 
     def __repr__(self):
-        return f'<USER SIGNUP with username: {self.username}>'
+        return f'<USER: {self.username}>'
 
     def __str__(self):
-        return f'<USER SIGNUP with username: {self.username}>'
+        return f'<USER: {self.username}>'
 
     def validate_username(self, field):  # noqa
         """Verifica presenza username nella tabella del DB."""
@@ -96,10 +96,10 @@ class FormUserUpdate(FlaskForm):
     submit = SubmitField("SAVE")
 
     def __repr__(self):
-        return f'<UPDATE - username: {self.username}>'
+        return f'<UPDATE_USER - username: {self.username}>'
 
     def __str__(self):
-        return f'<UPDATE - username: {self.username}>'
+        return f'<UPDATE_USER - username: {self.username}>'
 
     def to_dict(self):
         """Converte form in dict."""
@@ -117,7 +117,7 @@ class FormUserUpdate(FlaskForm):
             'full_address': mount_full_address(self.address.data, self.cap.data, self.city.data),
 
             'email': self.email.data.strip().replace(" ", ""),
-            'phone': self.phone.data.strip(),
+            'phone': not_empty(self.phone.data).strip(),
 
             'note': not_empty(self.note.data.strip()),
             'updated_at': datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")
@@ -131,10 +131,10 @@ class FormUserResetPsw(FlaskForm):
     submit = SubmitField("SAVE")
 
     def __repr__(self):
-        return f'<RESET PSW - email: {self.email}>'
+        return f'<RESET_USER_PSW - email: {self.email}>'
 
     def __str__(self):
-        return f'<RESET PSW - email: {self.email}>'
+        return f'<RESET_USER_PSW - email: {self.email}>'
 
     def to_dict(self):
         """Converte form in dict."""

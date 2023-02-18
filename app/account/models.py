@@ -1,6 +1,10 @@
-import hashlib
 from datetime import datetime
 from config import db
+
+# importazioni per creare relazioni in tabella
+from app.auth_token.models import AuthToken  # noqa
+from app.event_db.models import EventDB  # noqa
+from app.roles.models import Role  # noqa
 
 
 class User(db.Model):
@@ -27,9 +31,10 @@ class User(db.Model):
 	city = db.Column(db.String(55), index=False, unique=False, nullable=True)
 	full_address = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-	auth_tokens = db.relationship('AuthToken', backref='user_tokens', order_by='AuthToken.id.desc()', lazy='dynamic')
-	events = db.relationship('EventDB', backref='user_events', order_by='EventDB.id.desc()', lazy='dynamic')
-	roles = db.relationship('Role', secondary='user_roles', backref='roles_user', lazy='dynamic', viewonly=True)
+	auth_tokens = db.relationship('AuthToken', backref='users', order_by='AuthToken.id.desc()', lazy='dynamic')
+	events = db.relationship('EventDB', backref='users', order_by='EventDB.id.desc()', lazy='dynamic')
+
+	roles = db.relationship('Role', secondary='user_roles', backref='users', lazy='dynamic', viewonly=True)
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 

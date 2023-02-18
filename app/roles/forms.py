@@ -44,10 +44,10 @@ class FormRoleCreate(FlaskForm):
     submit = SubmitField("SAVE")
 
     def __repr__(self):
-        return f'<RULE: {self.name}>'
+        return f'<ROLE_CREATED: {self.name}>'
 
     def __str__(self):
-        return f'<RULE: {self.name}>'
+        return f'<ROLE_CREATED: {self.name}>'
 
     def validate_name(self, field):  # noqa
         """Verifica presenza name nella tabella del DB."""
@@ -62,10 +62,10 @@ class FormRoleUpdate(FlaskForm):
     submit = SubmitField("SAVE")
 
     def __repr__(self):
-        return f'<UPDATE_RULE - name: {self.name}>'
+        return f'<ROLE_UPDATED: {self.name}>'
 
     def __str__(self):
-        return f'<UPDATE_RULE - name: {self.name}>'
+        return f'<ROLE_UPDATED: {self.name}>'
 
     def to_dict(self):
         """Converte form in dict."""
@@ -82,10 +82,10 @@ class FormRoleAddUser(FlaskForm):
     submit = SubmitField("SAVE")
 
     def __repr__(self):
-        return f'<USER: {self.username}>'
+        return f'<ROLE_ADD_TO_USER: {self.username}>'
 
     def __str__(self):
-        return f'<USER: {self.username}>'
+        return f'<ROLE_ADD_TO_USER: {self.username}>'
 
     def to_dict(self):
         """Converte form in dict."""

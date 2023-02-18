@@ -10,6 +10,7 @@
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/list_blue.svg') }}"/>
 			</a>
 			Dati SITO [ {{ form.id }} ]
+			<!--	Modifica-->
 			{%
 				if 'superuser' in session['user_roles']
 				or 'partner_sites_admin' in session['user_roles']
@@ -21,7 +22,7 @@
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
 			</a>
 			{%  endif %}
-			
+			<!--	Crea Contatto-->
 			{%
 				if 'superuser' in session['user_roles']
 				or 'partner_contacts_admin' in session['user_roles']
@@ -31,6 +32,18 @@
 			   title="Aggiungi Contatto"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}"/>
+			</a>
+			{%  endif %}
+			<!--	Crea Articolo-->
+			{%
+				if 'superuser' in session['user_roles']
+				or 'items_admin' in session['user_roles']
+				or 'items_write' in session['user_roles']
+			%}
+			<a class="btn btn-update" href="{{ url_for(item_create, p_id=p_id, s_id=form.id) }}"
+			   title="Aggiungi Articolo"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/item_fill.svg') }}"/>
 			</a>
 			{%  endif %}
 		</h5>
@@ -252,6 +265,92 @@
 				</div>
 			</div>
 		</div>
+		<!--	Articoli collegati-->
+		{% if form.supplier == True %}
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="4">
+				<button aria-controls="collapse4"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse4"
+						data-bs-toggle="collapse"
+						type="button">
+					Elenco Articoli Fornitore [ {{ i_len }} ]
+				</button>
+			</h2>
+			<div aria-labelledby="heading3"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse4">
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="items" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" id="i1">ID</th>
+							<th class="title" id="i2">Codice</th>
+							<th class="title" id="i3">Codice F.</th>
+							<th class="title" id="i4">Descrizione</th>
+							<th class="title" id="i5">Prezzo</th>
+							<th class="title" id="i6">Sconto</th>
+							<th class="title" id="i7">F.</th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in items_list %}
+						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+									if 'superuser' in session['user_roles']
+									or 'items_admin' in session['user_roles']
+									or 'items_read' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(item_detail, _id=row.id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.id|e }}
+								</a>
+								{% else %}
+									{{ row.id|e }}
+								{% endif %}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_code|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_code_supplier|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_description|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_price|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_price_discount|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+									if 'superuser' in session['user_roles']
+									or 'partner_sites_admin' in session['user_roles']
+									or 'partner_sites_read' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(partner_detail, _id=row.supplier_id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.supplier_id|e }}
+								</a>
+								{% else %}
+									{{ row.supplier_id|e }}
+								{% endif %}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		{% endif %}
 		<!--	Modifiche Record-->
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="1">
@@ -320,7 +419,7 @@
 {% block scripts %}
 <script>
     $(document).ready(function () {
-        $('#events').DataTable({
+        $('#contacts').DataTable({
             responsive: {
                 breakpoints: [
                     { name: 'bigdesktop', width: 1920 },
@@ -338,7 +437,7 @@
     });
     
     $(document).ready(function () {
-        $('#contacts').DataTable({
+        $('#items').DataTable({
             responsive: {
                 breakpoints: [
                     { name: 'bigdesktop', width: 1920 },
@@ -355,5 +454,22 @@
         });
     });
 
+	$(document).ready(function () {
+        $('#events').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            },
+        });
+    });
 </script>
 {% endblock %}

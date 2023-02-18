@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Blueprint, flash, redirect, render_template, url_for
 from sqlalchemy.exc import IntegrityError
 
-from config import db
+from ..app import db
 from .models import EventDB
 
 from app.functions import token_user_validate, date_to_str
@@ -25,7 +25,7 @@ RESTORE = "/event/restore/<int:_id>/<int:id_record>/<table>/<view_for>/"
 RESTORE_FOR = "event_bp.event_restore"
 
 
-def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None):
+def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None, item_id=None):
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
@@ -34,6 +34,7 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 			partner_id=partner_id,
 			partner_contact_id=partner_contact_id,
 			partner_site_id=partner_site_id,
+			item_id=item_id,
 		)
 
 		EventDB.create(new_event)
@@ -58,14 +59,27 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 @token_user_validate
 def event_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
-	from ..account.models import User
-	from ..account.routes import DETAIL_FOR as USER_HISTORY_FOR
+	from app.account.models import User
+	from app.account.routes import DETAIL_FOR as USER_DETAIL
+
+	from app.organizations.partners.models import Partner
+	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
+
+	from app.organizations.partner_contacts.models import PartnerContact
+	from app.organizations.partner_contacts.routes import DETAIL_FOR as PARTNER_CONTACT_DETAIL
+
+	from app.organizations.partner_sites.models import PartnerSite
+	from app.organizations.partner_sites.routes import DETAIL_FOR as PARTNER_SITE_DETAIL
+
+	from app.orders.items.models import Item
+	from app.orders.items.routes import DETAIL_FOR as ITEM_DETAIL
 
 	# Interrogo il DB
 	event = EventDB.query.get(_id)
 	_event = event.to_dict()
 
 	# estraggo record collegato
+	# Utente
 	if event.user_id:
 		related = User.query.get(event.user_id)
 		related = related.to_dict()
@@ -73,7 +87,43 @@ def event_view_detail(_id):
 		table = User.__tablename__
 		id_related = related["id"]
 		type_related = "Utenti"
-		view_related = USER_HISTORY_FOR
+		view_related = USER_DETAIL
+	# Partner
+	elif event.partner_id:
+		related = Partner.query.get(event.partner_id)
+		related = related.to_dict()
+		field = "partner_id"
+		table = Partner.__tablename__
+		id_related = related["id"]
+		type_related = "Partner"
+		view_related = PARTNER_DETAIL
+	# Contatto Partner
+	elif event.partner_contact_id:
+		related = PartnerSite.query.get(event.partner_contact_id)
+		related = related.to_dict()
+		field = "partner_contact_id"
+		table = PartnerContact.__tablename__
+		id_related = related["id"]
+		type_related = "Partner_Contact"
+		view_related = PARTNER_CONTACT_DETAIL
+	# Sito Partner
+	elif event.partner_site_id:
+		related = PartnerSite.query.get(event.partner_site_id)
+		related = related.to_dict()
+		field = "partner_site_id"
+		table = PartnerSite.__tablename__
+		id_related = related["id"]
+		type_related = "Partner_Site"
+		view_related = PARTNER_SITE_DETAIL
+	# Articolo
+	elif event.item_id:
+		related = Item.query.get(event.item_id)
+		related = related.to_dict()
+		field = "item_id"
+		table = Item.__tablename__
+		id_related = related["id"]
+		type_related = "Item"
+		view_related = ITEM_DETAIL
 	else:
 		db.session.close()
 		msg = "Nessun record trovato"
@@ -96,9 +146,13 @@ def event_view_detail(_id):
 @event_bp.route(RESTORE, methods=["GET", "POST"])
 @token_user_validate
 def event_restore(_id, id_record, table, view_for):
-	from ..account.models import User
+	from app.account.models import User
+	from app.organizations.partners.models import Partner
+	from app.organizations.partner_contacts.models import PartnerContact
+	from app.organizations.partner_sites.models import PartnerSite
+	from app.orders.items.models import Item
 	try:
-		models = [User]
+		models = [User, Partner, PartnerContact, PartnerSite, Item]
 		model = next((m for m in models if m.__tablename__ == table), None)
 		# print("TABLE_DB:", model, "ID:", id_record)
 		if model:

@@ -77,10 +77,10 @@ class FormPartnerSiteCreate(FlaskForm):
 	submit = SubmitField("SAVE")
 
 	def __repr__(self):
-		return f'<PARTNER_SITE: {self.site}>'
+		return f'<PARTNER_SITE_CREATED: {self.site}>'
 
 	def __str__(self):
-		return f'<PARTNER_SITE: {self.site}>'
+		return f'<PARTNER_SITE_CREATED: {self.site}>'
 
 	def validate_site(self, field):  # noqa
 		"""Verifica presenza organization nella tabella del DB."""
@@ -140,10 +140,10 @@ class FormPartnerSiteUpdate(FlaskForm):
 	submit = SubmitField("SAVE")
 
 	def __repr__(self):
-		return f'<PARTNER_SITE: {self.site}>'
+		return f'<PARTNER_SITE_UPDATED: {self.site}>'
 
 	def __str__(self):
-		return f'<PARTNER_SITE: {self.site}>'
+		return f'<PARTNER_SITE_UPDATED: {self.site}>'
 
 	def to_dict(self):
 		"""Converte form in dict."""

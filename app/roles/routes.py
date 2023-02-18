@@ -3,19 +3,17 @@ import json
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
-from config import db
-
+from app.app import db
 from .forms import FormRoleCreate, FormRoleUpdate, FormRoleAddUser
+from .models import Role, UserRoles
 from ..account.models import User
 from ..functions import token_user_validate, access_required
-from .models import Role, UserRoles
 
 role_bp = Blueprint(
 	'role_bp', __name__,
 	template_folder='templates',
 	static_folder='static'
 )
-
 
 VIEW = "/view/"
 VIEW_FOR = "role_bp.role_view"

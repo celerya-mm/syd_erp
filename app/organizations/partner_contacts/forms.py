@@ -79,13 +79,13 @@ class FormPartnerContactCreate(FlaskForm):
 	submit = SubmitField("SIGNUP")
 
 	def __repr__(self):
-		return f'<CONTACT: {self.name} {self.last_name}>'
+		return f'<PARTNER_CONTACT: {self.name} {self.last_name}>'
 
 	def __str__(self):
-		return f'<CONTACT: {self.name} {self.last_name}>'
+		return f'<PARTNER_CONTACT: {self.name} {self.last_name}>'
 
 	def validate_full_name(self):  # noqa
-		"""Verifica presenza organization nella tabella del DB."""
+		"""Verifica presenza contatto nella tabella del DB."""
 		if f'{self.name.data} {self.last_name.data}' in list_partner_contacts()[0]:
 			raise ValidationError(f"Contatto già presente in tabella contacts: {self.name.data} {self.last_name.data}.")
 
@@ -113,10 +113,10 @@ class FormPartnerContactUpdate(FlaskForm):
 	submit = SubmitField("SIGNUP")
 
 	def __repr__(self):
-		return f'<CONTACT: {self.name} {self.last_name}>'
+		return f'<PARTNER_CONTACT_UPDATED: {self.name} {self.last_name}>'
 
 	def __str__(self):
-		return f'<CONTACT: {self.name} {self.last_name}>'
+		return f'<PARTNER_CONTACT_UPDATED: {self.name} {self.last_name}>'
 
 	def to_dict(self):
 		"""Converte form in dict."""

@@ -6,17 +6,19 @@
 		<div class="row no-gutters justify-content-center">
 			<div class="col-md-12 shadow rounded">
 				<h3 style="padding-top: 10px;">
-					Elenco Contati:</h3>
+					Elenco Articoli:</h3>
 				<div class="table-responsive" style="padding: 10px">
 					<table class="table table-striped" id="data" style="width:100%">
 						<thead>
 						<tr style="background-color: #2B4692; vertical-align: center;">
 							<th class="title" id="h1">ID</th>
-							<th class="title" id="h2">Nome Cognome</th>
-							<th class="title" id="h3">Email</th>
-							<th class="title" id="h4" data-sortable="false">Telefono</th>
-							<th class="title" id="h5">Partner</th>
-							<th class="title" id="h6">Ruolo</th>
+							<th class="title" id="h2">Codice</th>
+							<th class="title" id="h3">Codice F.</th>
+							<th class="title" id="h4">Descrizione</th>
+							<th class="title" id="h5">Prezzo</th>
+							<th class="title" id="h6">Sconto</th>
+							<th class="title" id="h7">F.</th>
+							<th class="title" id="h8">F.S.</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -29,19 +31,19 @@
 								</a>
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.full_name|e }}
+								{{ row.item_code|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_code_supplier|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{% if row.email %}
-								<a class="tab-link" href="mailto:{{ row.email }}" style=""
-								   title="Send email">
-									<img alt="" src="{{ url_for('static', filename='icons/at.svg') }}">
-								</a>
-								{% endif %}
-								{{ row.email|e }}
+								{{ row.item_description|e }}
 							</td>
-							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.phone|e }}
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_price|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_price_discount|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
@@ -49,16 +51,27 @@
 									or 'partners_admin' in session['user_roles']
 									or 'partners_read' in session['user_roles']
 								%}
-								<a class="tab-link" href="{{ url_for(partner_detail, _id=row.partner_id) }}" style=""
+								<a class="tab-link" href="{{ url_for(partner_detail, _id=row.supplier_id) }}" style=""
 								   title="Visualizza">
-									{{ row.partner_id|e }}
+									{{ row.supplier_id|e }}
 								</a>
 								{% else %}
-									{{ row.partner_id|e }}
+									{{ row.supplier_id|e }}
 								{% endif %}
 							</td>
-							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.role|e }}
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+									if 'superuser' in session['user_roles']
+									or 'partner_sites_admin' in session['user_roles']
+									or 'partner_sites_read' in session['user_roles']
+								%}
+								<a class="tab-link" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}" style=""
+								   title="Visualizza">
+									{{ row.supplier_site_id|e }}
+								</a>
+								{% else %}
+									{{ row.supplier_site_id|e }}
+								{% endif %}
 							</td>
 						</tr>
 						{% endfor %}

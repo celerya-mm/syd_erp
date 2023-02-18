@@ -40,7 +40,7 @@ def token_user_validate(func):
 				return func(*args, **kwargs)
 		else:
 			print("AUTHORIZATION_CHECK_FAIL_1")
-			msg = f'Login non effettuata'
+			msg = f'Per accedere devi prima effettuare la login.'
 			return redirect(url_for('account_bp.logout', msg=msg))
 
 	return wrap

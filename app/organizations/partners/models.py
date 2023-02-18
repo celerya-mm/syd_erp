@@ -2,7 +2,11 @@ from datetime import datetime
 from config import db
 from app.functions import mount_full_address, date_to_str
 
-from ..partner_sites.models import PartnerSite  # noqa
+# importazioni per creare relazioni in tabella
+from app.organizations.partner_contacts.models import PartnerContact  # noqa
+from app.organizations.partner_sites.models import PartnerSite  # noqa
+from app.orders.items.models import Item  # noqa
+from app.event_db.models import EventDB  # noqa
 
 
 class Partner(db.Model):
@@ -34,6 +38,9 @@ class Partner(db.Model):
 
 	sites = db.relationship(
 		'PartnerSite', backref='partners', lazy='dynamic')
+
+	items = db.relationship(
+		'Item', backref='partners', lazy='dynamic')
 
 	events = db.relationship(
 		'EventDB', backref='partners', order_by='EventDB.id.desc()', lazy='dynamic')
