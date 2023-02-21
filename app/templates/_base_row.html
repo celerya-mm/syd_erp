@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--suppress SpellCheckingInspection -->
+<html lang="en">
+
+<head>
+    <!-- Condiviso con tutte le views senza barra navigazione-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}{% endblock %}Celerya-ERP</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='Favicon.png') }}">
+
+    <!-- CSS only boostrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
+    <!-- FONT -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet">
+
+    <!-- link a file .css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css">
+</head>
+
+<body>
+{% block content %}
+{% endblock %}
+
+<!-- JavaScript Bundle with Popper for boostrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
+</script>
+</body>
+
+<footer class="footer">
+    <!-- Messaggio gestione errori std -->
+    <div class="container text-center mt-3 message">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <hr>
+    <br>
+    <th class="footer-text"> Celerya S.r.l. - © Copyright 2021 - Tutti i diritti riservati - I marchi
+        riportati appartengono ai legittimi proprietari.
+    </th>
+    <br><br>
+    <hr>
+</footer>
+
+</html>

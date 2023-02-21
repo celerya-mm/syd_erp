@@ -36,8 +36,8 @@ class User(db.Model):
 	plant_id = db.Column(db.Integer, db.ForeignKey('plants.id'), nullable=True)
 	plant_site_id = db.Column(db.Integer, db.ForeignKey('plant_sites.id'), nullable=True)
 
-	plant = db.relationship('Plant', backref='users_plant', viewonly=True)
-	plant_site = db.relationship('PlantSite', backref='users_plant_site', viewonly=True)
+	plant_user = db.relationship('Plant', backref='user_plant', viewonly=True)
+	plant_site_user = db.relationship('PlantSite', backref='user_plant_site', viewonly=True)
 
 	auth_tokens = db.relationship('AuthToken', backref='users', order_by='AuthToken.id.desc()', lazy='dynamic')
 	roles = db.relationship('Role', secondary='user_roles', backref='users', lazy='dynamic', viewonly=True)

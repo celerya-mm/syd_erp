@@ -63,19 +63,31 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-2 order-fifth">
-					<div class="form-group">
-						{{ form.item_quantity_min.label(style="font-size: 1.2rem;") }}
-						{{ form.item_quantity_min(class="form-control") }}
-						{% if form.item_quantity_min.errors %}
-						{% for error in form.item_quantity_min.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
+				<div class="col-md-1 order-fifth">
+						<div class="form-group">
+							{{ form.item_currency.label(style="font-size: 1.2rem;") }}
+							{{ form.item_currency(class="form-control") }}
+							{% if form.item_currency.errors %}
+							{% for error in form.item_currency.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
 					</div>
-				</div>
-				<div class="col-md-2 order-sixth">
+					<div class="col-md-1 order-sixth">
+						<div class="form-group">
+							{{ form.item_quantity_min.label(style="font-size: 1.2rem;") }}
+							{{ form.item_quantity_min(class="form-control") }}
+							{% if form.item_quantity_min.errors %}
+							{% for error in form.item_quantity_min.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				<div class="col-md-2 order-seventh">
 					<div class="form-group">
 						{{ form.item_quantity_um.label(style="font-size: 1.2rem;") }}
 						{{ form.item_quantity_um(class="form-control", style="text-align: center;") }}

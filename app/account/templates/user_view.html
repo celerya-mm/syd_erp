@@ -2,120 +2,121 @@
 
 {% block content %}
 <form enctype="multipart/form-data" method="POST">
-    <div class="container text-center mt-2">
-        <h5 class="card-title">
-            <a class="btn btn-update" type="button" title="Crea nuovo utente Amministratore"
-               href="{{ url_for(create) }}">
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
-            </a>
-            Bentornatə "{{admin.name}}"
-        </h5>
-        <a class="btn-update" type="button" title="Visualizza record"
-           href="{{ url_for(detail, _id=admin.id) }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/history_grey.svg') }}" alt=""/>
-        </a>
-        <a class="btn-update" type="button" title="Modifica utente"
-           href="{{ url_for(update, _id=admin.id) }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}" alt=""/>
-        </a>
-        <a class="btn-update" type="button" title="Cambia password utente"
-           href="{{ url_for(update_psw, _id=admin.id) }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/fingerprint_red.svg') }}" alt=""/>
-        </a>
-    </div>
-
-    <div class="container text-center mt-2">
-        <div class="row no-gutters justify-content-center">
-            <div class="col-md-3 order-first">
-                <div class="form-group">
-                    <h6> Username </h6>
-                    <p style="font-weight: bold; color: #5B5A5B">{{ admin.username }}</p>
-                </div>
-            </div>
-            <div class="col-md-3 order-second">
-                <div class="form-group">
-                    <h6> email </h6>
-                    <p style="font-weight: bold; color: #5B5A5B">{{ admin.email }}</p>
-                </div>
-            </div>
-            <div class="col-md-3 order-third">
-                <div class="form-group">
-                    <h6> Name </h6>
-                    <p style="font-weight: bold; color: #5B5A5B">{{ admin.name }}</p>
-                </div>
-            </div>
-            <div class="col-md-3 order-fourth">
-                <div class="form-group">
-                    <h6> Last Name </h6>
-                    <p style="font-weight: bold; color: #5B5A5B">{{ admin.last_name }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
-        <div class="row no-gutters justify-content-center">
-            <div class="col-md-12 shadow rounded">
-                <h3 style="padding-top: 10px;">Elenco Personale:</h3>
-                <div class="table-responsive" style="padding: 10px">
-                    <table id="data" class="table table-striped" style="width:100%">
-                        <thead>
-                        <tr style="background-color: #2B4692; vertical-align: center;">
-                            <th class="title" id="h1">ID</th>
+	<div class="container text-center mt-2">
+		<h5 class="card-title">
+			<a class="btn btn-update" href="{{ url_for(create) }}" title="Crea nuovo utente Amministratore"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}"/>
+			</a>
+			Bentornatə "{{admin.name}}"
+			<a class="btn-update" href="{{ url_for(detail, _id=admin.id) }}" title="Visualizza record"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/visibility.svg') }}"/>
+			</a>
+			<a class="btn-update" href="{{ url_for(update, _id=admin.id) }}" title="Modifica utente"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
+			</a>
+			<a class="btn-update" href="{{ url_for(update_psw, _id=admin.id) }}" title="Cambia password utente"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/fingerprint_red.svg') }}"/>
+			</a>
+		</h5>
+	
+	</div>
+	
+	<div class="container text-center mt-2">
+		<div class="row no-gutters justify-content-center">
+			<div class="col-md-3 order-first">
+				<div class="form-group">
+					<h6> Username </h6>
+					<p style="font-weight: bold; color: #5B5A5B">{{ admin.username }}</p>
+				</div>
+			</div>
+			<div class="col-md-3 order-second">
+				<div class="form-group">
+					<h6> email </h6>
+					<p style="font-weight: bold; color: #5B5A5B">{{ admin.email }}</p>
+				</div>
+			</div>
+			<div class="col-md-3 order-third">
+				<div class="form-group">
+					<h6> Name </h6>
+					<p style="font-weight: bold; color: #5B5A5B">{{ admin.name }}</p>
+				</div>
+			</div>
+			<div class="col-md-3 order-fourth">
+				<div class="form-group">
+					<h6> Last Name </h6>
+					<p style="font-weight: bold; color: #5B5A5B">{{ admin.last_name }}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container text-center mt-2 mx-auto" style="margin: 0px;">
+		<div class="row no-gutters justify-content-center">
+			<div class="col-md-12 shadow rounded">
+				<h3 style="padding-top: 10px;">Elenco Personale:</h3>
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="data" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" id="h1">ID</th>
 							<th class="title" id="h2">Stato</th>
-                            <th class="title" id="h3">Username</th>
-                            <th class="title" id="h4">email</th>
-                            <th class="title" id="h5">Nome Cognome</th>
-                            <th class="title" id="h7" data-sortable="false">Telefono</th>
-                            <th class="title" id="h8">Modificato</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for row in form %}
-                        <tr style="border: 0pz; vertical-align: center;">
-                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                <a class="tab-link" title="Visualizza" style=""
-                                   href="{{ url_for(detail, _id=row.id) }}">
-                                    {{ row.id|e }}
-                                </a>
-                            </td>
+							<th class="title" id="h3">Username</th>
+							<th class="title" id="h4">email</th>
+							<th class="title" id="h5">Nome Cognome</th>
+							<th class="title" data-sortable="false" id="h7">Telefono</th>
+							<th class="title" id="h8">Modificato</th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in form %}
+						<tr style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								<a class="tab-link" href="{{ url_for(detail, _id=row.id) }}" style=""
+								   title="Visualizza">
+									{{ row.id|e }}
+								</a>
+							</td>
 							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{% if row.active == True or row.active == SI %}
-                                <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
-                                {% else %}
-                                <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
-                                {% endif %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
+								{% else %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
+								{% endif %}
 								{{ row.active }}
-                            </td>
-                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.username|e }}
-                            </td>
-                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {% if row.email %}
-                                <a class="tab-link" title="Send email" style=""
-                                   href="mailto:{{ row.email }}">
-                                    <img src="{{ url_for('static', filename='icons/at.svg') }}" alt="">
-                                </a>
-                                {% endif %}
-                                {{ row.email|e }}
-                            </td>
-                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.full_name|e }}
-                            </td>
-                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.phone|e }}
-                            </td>
-                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.updated_at|e }}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <br>
-            </div>
-        </div>
-    </div>
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.username|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{% if row.email %}
+								<a class="tab-link" href="mailto:{{ row.email }}" style=""
+								   title="Send email">
+									<img alt="" src="{{ url_for('static', filename='icons/at.svg') }}">
+								</a>
+								{% endif %}
+								{{ row.email|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.full_name|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.phone|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.updated_at|e }}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<br>
+			</div>
+		</div>
+	</div>
 </form>
 {% endblock %}
 
@@ -139,6 +140,7 @@
             }
         });
     });
+
 
 
 

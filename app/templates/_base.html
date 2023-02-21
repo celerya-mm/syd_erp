@@ -165,7 +165,25 @@
 						   id="DropdownMenuOrdini" role="button">
 							Orders
 						</a>
-						<ul aria-labelledby="DropdownMenuPartners" class="dropdown-menu">
+						<ul aria-labelledby="DropdownMenuOrders" class="dropdown-menu">
+							<!--  Ordini-->
+							{%
+							if 'superuser' in session['user_roles']
+							or 'orders_admin' in session['user_roles']
+							or 'orders_read' in session['user_roles']
+							%}
+							<li class="nav-item">
+								<a class="nav-item nav-link {% if request.path == '/oda/view/' %} active {% endif %}"
+								   href="{{ url_for('oda_bp.oda_view') }}" title="Ordini">
+									{% if request.path == '/oda/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/shopping_cart_active.svg') }}">
+									{% else %}
+									<img alt="" src="{{ url_for('static', filename='icons/shopping_cart_white.svg') }}">
+									{% endif %}
+									Orders
+								</a>
+							</li>
+							{% endif %}
 							<!--  Articoli-->
 							{%
 							if 'superuser' in session['user_roles']
@@ -174,7 +192,7 @@
 							%}
 							<li class="nav-item">
 								<a class="nav-item nav-link {% if request.path == '/item/view/' %} active {% endif %}"
-								   href="{{ url_for('item_bp.item_view') }}" title="Utenti">
+								   href="{{ url_for('item_bp.item_view') }}" title="Articoli">
 									{% if request.path == '/item/view/' %}
 									<img alt="" src="{{ url_for('static', filename='icons/person-fill-active.svg') }}">
 									{% else %}

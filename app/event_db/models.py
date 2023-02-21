@@ -20,6 +20,7 @@ class EventDB(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='CASCADE'), nullable=True)
     plant_id = db.Column(db.Integer, db.ForeignKey('plants.id', ondelete='CASCADE'), nullable=True)
     plant_site_id = db.Column(db.Integer, db.ForeignKey('plant_sites.id', ondelete='CASCADE'), nullable=True)
+    oda_row_id = db.Column(db.Integer, db.ForeignKey('oda_rows.id', ondelete='CASCADE'), nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
 
@@ -30,7 +31,7 @@ class EventDB(db.Model):
         return f'<EVENTO_RECORD: [{self.event}]>'
 
     def __init__(self, event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None,
-                 item_id=None, order_id=None, plant_id=None, plant_site_id=None):
+                 item_id=None, order_id=None, plant_id=None, plant_site_id=None, oda_row_id=None):
         self.event = event
 
         self.user_id = user_id
@@ -41,6 +42,7 @@ class EventDB(db.Model):
         self.order_id = order_id
         self.plant_id = plant_id
         self.plant_site_id = plant_site_id
+        self.oda_row_id = oda_row_id
 
         self.created_at = datetime.now()
 
@@ -68,6 +70,7 @@ class EventDB(db.Model):
             'order_id': self.order_id,
             'plant_id': self.plant_id,
             'plant_site_id': self.plant_site_id,
+            'oda_row_id': self.oda_row_id,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

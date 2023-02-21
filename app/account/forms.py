@@ -32,7 +32,7 @@ def list_plant_sites():
 	_list = ["-"]
 	try:
 		records = PlantSite.query.all()
-		_dict = [x.to_dict() for x in records]
+		_dict = [x.to_dict() for x in records if x.active]
 		db.session.close()
 		for d in _dict:
 			_list.append(f"{str(d['id'])} - {d['organization']}")
@@ -50,7 +50,7 @@ def list_plants():
 	_list = ["-"]
 	try:
 		records = Plant.query.all()
-		_dict = [x.to_dict() for x in records]
+		_dict = [x.to_dict() for x in records if x.active]
 		db.session.close()
 		for d in _dict:
 			_list.append(f"{str(d['id'])} - {d['organization']}")
@@ -138,8 +138,8 @@ class FormUserUpdate(FlaskForm):
 
 	active = BooleanField("Attivo")
 
-	name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
-	last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
+	name = StringField('Nome', validators=[Optional()])
+	last_name = StringField('Cognome', validators=[Optional()])
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()])
@@ -188,12 +188,12 @@ class FormUserUpdate(FlaskForm):
 	def validate_username(self, field):  # noqa
 		"""Verifica presenza username nella tabella del DB."""
 		if field.data in list_user()[0]:
-			raise ValidationError("Username già utilizzato in tabella utenti.")
+			raise ValidationError("Username già utilizzato in tabella.")
 
 	def validate_email(self, field):  # noqa
 		"""Verifica presenza email nella tabella del DB."""
 		if field.data in list_user()[1]:
-			raise ValidationError("Email già utilizzata in tabella utenti.")
+			raise ValidationError("Email già utilizzata in tabella.")
 
 	def to_dict(self):
 		"""Converte form in dict."""
@@ -213,8 +213,8 @@ class FormUserUpdate(FlaskForm):
 			'email': self.email.data.strip().replace(" ", ""),
 			'phone': not_empty(self.phone.data).strip(),
 
-			'plant_id': self.plant_id.data.split(' - ')[0] if self.plant_id.data else None,
-			'plant_site_id': self.plant_site_id.data.split(' - ')[0] if self.plant_site_id.data else None,
+			'plant_id': self.plant_id.data.split(' - ')[0] if self.plant_id.data not in ['-', None] else None,
+			'plant_site_id': self.plant_site_id.data.split(' - ')[0] if self.plant_site_id.data not in ['-', None] else None,
 
 			'note': not_empty(self.note.data.strip()),
 			'updated_at': datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")

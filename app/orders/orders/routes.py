@@ -36,7 +36,7 @@ UPDATE_HTML = "oda_update.html"
 @oda_bp.route(VIEW, methods=["GET", "POST"])
 @token_user_validate
 @access_required(roles=['orders_admin', 'orders_read'])
-def item_view():
+def oda_view():
 	"""Visualizzo informazioni ODA."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
@@ -53,7 +53,7 @@ def item_view():
 @oda_bp.route(CREATE, methods=["GET", "POST"])
 @token_user_validate
 @access_required(roles=['orders_admin', 'orders_write'])
-def item_create(p_id, s_id=None):
+def oda_create(p_id, s_id=None):
 	"""Creazione ODA."""
 	from app.organizations.plant.models import Plant
 	from app.organizations.plant_site.models import PlantSite
@@ -129,7 +129,7 @@ def item_create(p_id, s_id=None):
 @oda_bp.route(DETAIL, methods=["GET", "POST"])
 @token_user_validate
 @access_required(roles=['orders_admin', 'orders_read'])
-def item_view_detail(_id):
+def oda_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 
@@ -190,7 +190,7 @@ def item_view_detail(_id):
 @oda_bp.route(UPDATE, methods=["GET", "POST"])
 @token_user_validate
 @access_required(roles=['orders_admin', 'orders_write'])
-def item_update(_id):
+def oda_update(_id):
 	"""Aggiorna dati ODA."""
 	from app.event_db.routes import event_create
 

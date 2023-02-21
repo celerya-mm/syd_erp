@@ -26,7 +26,7 @@ RESTORE_FOR = "event_bp.event_restore"
 
 
 def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None, item_id=None,
-				 order_id=None, plant_id=None, plant_site_id=None):
+				 order_id=None, plant_id=None, plant_site_id=None, oda_row_id=None):
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
@@ -39,6 +39,7 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 			order_id=order_id,
 			plant_id=plant_id,
 			plant_site_id=plant_site_id,
+			oda_row_id=oda_row_id,
 		)
 
 		EventDB.create(new_event)
@@ -86,6 +87,9 @@ def event_view_detail(_id):
 
 	from app.orders.orders.models import Oda
 	from app.orders.orders.routes import DETAIL_FOR as ORDER_DETAIL
+
+	from app.orders.order_rows.models import OdaRow
+	from app.orders.order_rows.routes import DETAIL_FOR as ORDER_ROW_DETAIL
 
 	# Interrogo il DB
 	event = EventDB.query.get(_id)
@@ -164,6 +168,15 @@ def event_view_detail(_id):
 		id_related = related["id"]
 		type_related = "Order"
 		view_related = ORDER_DETAIL
+	# Ordine
+	elif event.order_row_id:
+		related = OdaRow.query.get(event.order_row_id)
+		related = related.to_dict()
+		field = "order_row_id"
+		table = OdaRow.__tablename__
+		id_related = related["id"]
+		type_related = "Order_Row"
+		view_related = ORDER_ROW_DETAIL
 	else:
 		db.session.close()
 		msg = "Nessun record trovato"

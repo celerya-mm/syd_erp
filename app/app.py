@@ -54,6 +54,7 @@ with app.app_context():
 	from app.roles.routes import role_bp
 
 	from app.orders.orders.routes import oda_bp
+	from app.orders.order_rows.routes import oda_rows_bp
 	from app.orders.items.routes import item_bp
 
 	from app.organizations.partner_contacts.routes import partner_contact_bp
@@ -70,6 +71,7 @@ with app.app_context():
 	app.register_blueprint(role_bp, url_prefix='/role')
 
 	app.register_blueprint(oda_bp, url_prefix='/oda')
+	app.register_blueprint(oda_rows_bp, url_prefix='/oda_row')
 	app.register_blueprint(item_bp, url_prefix='/item')
 
 	app.register_blueprint(partner_contact_bp, url_prefix='/partner/contact')

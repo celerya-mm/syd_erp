@@ -1,0 +1,156 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="container text-center mt-2">
+	<div class="row no-gutters justify-content-center ">
+		<h5 class="card-title">
+			<a class="btn btn-update" href="{{ url_for(history, _id=id) }}" title="Annulla"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
+			</a>
+			Modifica l'Ordine [ {{ id }} ]:
+		</h5>
+		<form class="shadow rounded" enctype="multipart/form-data" method="POST"
+			  style="border: solid 2px #ED6666 !important;">
+			{{ form.csrf_token }}
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-2 order-first">
+					<div class="form-group">
+						{{ form.item_code.label(style="font-size: 1.2rem;") }}
+						{{ form.item_code(class="form-control emphasis") }}
+						{% if form.item_code.errors %}
+						{% for error in form.item_code.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-2 order-second">
+					<div class="form-group">
+						{{ form.item_code_supplier.label(style="font-size: 1.2rem;") }}
+						{{ form.item_code_supplier(class="form-control emphasis") }}
+						{% if form.item_code_supplier.errors %}
+						{% for error in form.item_code_supplier.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-2 order-third">
+					<div class="form-group">
+						{{ form.item_price.label(style="font-size: 1.2rem;") }}
+						{{ form.item_price(class="form-control emphasis") }}
+						{% if form.item_price.errors %}
+						{% for error in form.item_price.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-2 order-fourth">
+					<div class="form-group">
+						{{ form.item_price_discount.label(style="font-size: 1.2rem;") }}
+						{{ form.item_price_discount(class="form-control") }}
+						{% if form.item_price_discount.errors %}
+						{% for error in form.item_price_discount.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-2 order-fifth">
+					<div class="form-group">
+						{{ form.item_quantity_min.label(style="font-size: 1.2rem;") }}
+						{{ form.item_quantity_min(class="form-control") }}
+						{% if form.item_quantity_min.errors %}
+						{% for error in form.item_quantity_min.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-2 order-sixth">
+					<div class="form-group">
+						{{ form.item_quantity_um.label(style="font-size: 1.2rem;") }}
+						{{ form.item_quantity_um(class="form-control", style="text-align: center;") }}
+						{% if form.item_quantity_um.errors %}
+						{% for error in form.item_quantity_um.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="form-group">
+					{{ form.item_description.label(style="font-size: 1.2rem;") }}
+					{{ form.item_description(class="form-control emphasis") }}
+					{% if form.item_description.errors %}
+					{% for error in form.item_description.errors %}
+					<span class="text-danger">{{ error }}</span>
+					<br>
+					{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-6 order-first">
+					<div class="form-group">
+						{{ form.supplier_id.label(style="font-size: 1.2rem;") }}
+						{{ form.supplier_id(class="form-control emphasis", style="text-align: center;") }}
+						{% if form.supplier_id.errors %}
+						{% for error in form.supplier_id.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-6 order-second">
+					<div class="form-group">
+						{{ form.supplier_site_id.label(style="font-size: 1.2rem;") }}
+						{{ form.supplier_site_id(class="form-control", style="text-align: center;") }}
+						{% if form.supplier_site_id.errors %}
+						{% for error in form.supplier_site_id.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="form-group">
+					{{ form.note.label(style="font-size: 1.2rem;") }}
+					{{ form.note(class="form-control") }}
+					{% if form.note.errors %}
+					{% for error in form.note.errors %}
+					<span class="text-danger">{{ error }}</span>
+					<br>
+					{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<button class="btn btn-update" id="button" title="Salva" type="submit" value="x">
+				<img alt="" class="icon-simple"
+					 src="{{ url_for('static', filename='icons/save.svg') }}"/>
+			</button>
+			<div>
+				<p class="info">Data Creazione: {{ info.created_at }}</p>
+				<p class="info">Ultima Modifica: {{ info.updated_at }}</p>
+			</div>
+		</form>
+	</div>
+</div>
+
+{% endblock %}

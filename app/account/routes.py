@@ -178,17 +178,18 @@ def user_view_detail(_id):
 
 	# Interrogo il DB
 	user = User.query \
-		.options(joinedload(User.plant)) \
-		.options(joinedload(User.plant_site)) \
+		.options(joinedload(User.plant_user)) \
+		.options(joinedload(User.plant_site_user)) \
 		.get(_id)
+
 	_user = user.to_dict()
 
-	_user["plant_id"] = f'{user.plant.id} - {user.plant.organization}' if user.plant else None
-	p_id = user.plant.id if user.plant else None
+	_user["plant_id"] = f'{user.plant_user.id} - {user.plant_user.organization}' if user.plant_user else None
+	p_id = user.plant_user.id if user.plant_user else None
 
-	_user["plant_site_id"] = f'{user.plant_site.id} - {user.plant_site.organization}' if user.plant_site else None
-	_user["plant_site_active"] = user.plant_site.active if user.plant_site else None
-	s_id = user.plant_site.id if user.plant_site else None
+	_user["plant_site_id"] = f'{user.plant_site_user.id} - {user.plant_site_user.organization}' if user.plant_site_user else None
+	_user["plant_site_active"] = user.plant_site_user.active if user.plant_site_user else None
+	s_id = user.plant_site_user.id if user.plant_site_user else None
 
 	# Estraggo la storia delle modifiche per l'utente
 	history_list = user.events
@@ -223,9 +224,13 @@ def user_update(_id):
 
 	# recupero i dati
 	user = User.query \
-		.options(joinedload(User.plant)) \
-		.options(joinedload(User.plant_site)) \
+		.options(joinedload(User.plant_user)) \
+		.options(joinedload(User.plant_site_user)) \
 		.get(_id)
+
+	print(user.plant_user)
+	print(user.plant_site_user)
+
 	form = FormUserUpdate.update(obj=user)
 
 	if request.method == 'POST' and form.validate():
@@ -258,9 +263,11 @@ def user_update(_id):
 		_event = event_create(_event, user_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
-		form.plant_id.data = f'{user.plant.id} - {user.plant.organization}' if user.plant else None
-		form.plant_site_id.data = f'{user.plant_site.id} - {user.plant_site.organization}' \
-			if user.plant_site else None
+		if user.plant_user:
+			form.plant_id.data = f'{user.plant_user.id} - {user.plant_user.organization}'
+
+		if user.plant_site_user:
+			form.plant_site_id.data = f'{user.plant_site_user.id} - {user.plant_site_user.organization}'
 
 		session['user_id'] = _id
 

@@ -9,14 +9,14 @@
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/list_blue.svg') }}"/>
 			</a>
-			Dettaglio ARTICOLO [ {{ form.id }} ]
+			Dettaglio ORDINE [ {{ form.id }} ]
 			{%
 			if 'superuser' in session['user_roles']
-			or 'items_admin' in session['user_roles']
-			or 'items_write' in session['user_roles']
+			or 'orders_admin' in session['user_roles']
+			or 'orders_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
-			   title="Modifica Articolo"
+			   title="Modifica Ordine"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
 			</a>
