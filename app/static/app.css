@@ -255,15 +255,24 @@ label {
 }
 
 .message {
-    color: #ED6666;
+	margin: 0px !important;
+	background-color: #ED6666;
+    color: white;
     font-family: 'Jost', sans-serif;
+    font-weight: bold !important;
     font-size: 0.8rem;
+    line-height: 0.9rem;
+    max-width: 1920px;
 }
 
 .nav-item {
     color: #ffffff;
     font-family: 'Jost', sans-serif;
     font-size: 1.2rem;
+}
+
+.nav-link {
+	color: white;
 }
 
 .navbar-bg-white {

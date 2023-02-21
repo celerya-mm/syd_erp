@@ -20,6 +20,7 @@ class Item(db.Model):
 
 	item_price = db.Column(db.Float, index=False, unique=False, nullable=False)
 	item_price_discount = db.Column(db.Float, index=False, unique=False, nullable=True)  # considerato in %
+	item_currency = db.Column(db.String(3), index=False, unique=False, nullable=True)
 
 	item_quantity_min = db.Column(db.Integer, index=False, unique=False, nullable=True)  # min unità di acquisto
 	item_quantity_um = db.Column(db.String(25), index=False, unique=False, nullable=True)
@@ -43,8 +44,8 @@ class Item(db.Model):
 	def __str__(self):
 		return f'<ITEM_CLASS: [{self.item_code}] - {self.item_description}>'
 
-	def __init__(self, item_code, item_code_supplier, item_description, item_price, item_price_discount, item_quantity_min,
-				 item_quantity_um, supplier_id, supplier_site_id, note):
+	def __init__(self, item_code, item_code_supplier, item_description, item_price, item_price_discount, item_currency,
+				 item_quantity_min, item_quantity_um, supplier_id, supplier_site_id, note):
 
 		self.item_code = item_code
 		self.item_code_supplier = item_code_supplier
@@ -52,6 +53,7 @@ class Item(db.Model):
 
 		self.item_price = item_price
 		self.item_price_discount = item_price_discount
+		self.item_currency = item_currency
 
 		self.item_quantity_min = item_quantity_min
 		self.item_quantity_um = item_quantity_um
@@ -88,6 +90,7 @@ class Item(db.Model):
 
 			'item_price': self.item_price,
 			'item_price_discount': self.item_price_discount,
+			'item_currency': self.item_currency,
 
 			'item_quantity_min': self.item_quantity_min,
 			'item_quantity_um': self.item_quantity_um,

@@ -4,15 +4,18 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, BooleanField, SelectField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
-from config import db
+from app.app import db, session
 from .models import PartnerSite
-from app.functions import mount_full_address, not_empty, status_true_false
+from app.functions import mount_full_address, not_empty, status_true_false, site_type
 
 
 def list_partner_sites():
 	try:
 		records = PartnerSite.query.all()
-		_list = [x.to_dict() for x in records]
+		if 'partner_site_id' in session.keys():
+			_list = [x.to_dict() for x in records if x.id != session['partner_site_id']]
+		else:
+			_list = [x.to_dict() for x in records]
 
 		_partner = [d["site"] for d in _list]
 		_email = [d["email"] for d in _list]
@@ -45,13 +48,16 @@ def list_partners():
 	return _list
 
 
-class FormPartnerSiteCreate(FlaskForm):
+class FormPartnerSite(FlaskForm):
 	"""Form per creare un Partner."""
 	site = StringField('Rag. Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=80)])
 
-	client = BooleanField('Cliente', false_values=(False, 0))
-	supplier = BooleanField('Fornitore', false_values=(False, 0))
-	partner = BooleanField('Partner', false_values=(False, 0))
+	active = BooleanField('Stato', false_values=(False, 0))
+	site_type = SelectField("Seleziona Tipo", validators=[DataRequired("Campo obbligatorio!")], choices=site_type)
+
+	client = BooleanField('C', false_values=(False, 0))
+	supplier = BooleanField('F', false_values=(False, 0))
+	partner = BooleanField('P', false_values=(False, 0))
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	pec = EmailField('pec', validators=[Email(), Length(max=80), Optional()])
@@ -61,8 +67,7 @@ class FormPartnerSiteCreate(FlaskForm):
 	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
 	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
 
-	partner_id = SelectField(
-		"Seleziona Organizzazione", choices=list_partners(), validators=[DataRequired("Campo obbligatorio!")])
+	partner_id = SelectField("Seleziona Organizzazione", validators=[DataRequired("Campo obbligatorio!")])
 
 	vat_number = StringField(
 		'P. IVA', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=13)], default='IT'
@@ -77,83 +82,67 @@ class FormPartnerSiteCreate(FlaskForm):
 	submit = SubmitField("SAVE")
 
 	def __repr__(self):
-		return f'<PARTNER_SITE_CREATED: {self.site}>'
+		return f'<PARTNER_SITE: {self.site}>'
 
 	def __str__(self):
-		return f'<PARTNER_SITE_CREATED: {self.site}>'
+		return f'<PARTNER_SITE: {self.site}>'
 
 	def validate_site(self, field):  # noqa
 		"""Verifica presenza organization nella tabella del DB."""
 		if field.data.strip() in list_partner_sites()[0]:
 			raise ValidationError("Sito già presente in tabella partner_sites.")
 
-	def validate_email(self, field):  # noqa
-		"""Verifica email già assegnata a un sito nella tabella del DB."""
-		if field.data.strip() in list_partner_sites()[1]:
-			raise ValidationError("Email già assegnata in tabella partner_sites.")
+	@classmethod
+	def new(cls):
+		# Instantiate the form
+		form = cls()
+		# Update the choices
+		form.partner_id.choices = list_partners()
+		return form
 
-	def validate_pec(self, field):  # noqa
-		"""Verifica pec già assegnata a un sito nella tabella del DB."""
-		if field.data.strip() in list_partner_sites()[2]:
-			raise ValidationError("Pec già assegnata in tabella partner_sites.")
+	@classmethod
+	def update(cls, obj):
+		# Instantiate the form
+		form = cls()
+		form.site.data = obj.site
 
-	def validate_vat_number(self, field):  # noqa
-		"""Verifica P.IVA già assegnata a un sito nella tabella del DB."""
-		if field.data.strip() in list_partner_sites()[3]:
-			raise ValidationError("P.IVA già assegnata in tabella partner_sites.")
+		form.active.data = obj.active
+		form.site_type.data = obj.site_type
 
-	def validate_sdi_code(self, field):  # noqa
-		"""Verifica SDI già assegnata a un sito nella tabella del DB."""
-		if field.data.strip() in list_partners()[4]:
-			raise ValidationError("SDI Code già assegnato in tabella partner_sites.")
+		form.client.data = obj.client
+		form.supplier.data = obj.supplier
+		form.partner.data = obj.partner
 
+		form.email.data = obj.email
+		form.pec.data = obj.pec
+		form.phone.data = obj.phone
 
-class FormPartnerSiteUpdate(FlaskForm):
-	"""Form per creare un Partner."""
-	site = StringField('Rag. Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=80)])
+		form.address.data = obj.address
+		form.cap.data = obj.cap
+		form.city.data = obj.city
 
-	client = BooleanField('Cliente')
-	supplier = BooleanField('Fornitore')
-	partner = BooleanField('Partner')
+		# Update the choices
+		form.partner_id.choices = list_partners()
 
-	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	pec = EmailField('pec', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
+		form.vat_number.data = obj.vat_number
+		form.fiscal_code.data = obj.fiscal_code
+		form.sdi_code.data = obj.sdi_code
 
-	address = StringField('Indirizzo', validators=[Length(min=3, max=150), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
-
-	partner_id = SelectField(
-		"Seleziona Partner", choices=list_partners(), validators=[DataRequired("Campo obbligatorio!")])
-
-	vat_number = StringField(
-		'P. IVA', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=13)], default='IT'
-	)
-	fiscal_code = StringField(
-		'C.F.', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=13)], default='IT'
-	)
-	sdi_code = StringField('SDI', validators=[Optional(), Length(min=7, max=7)])
-
-	note = StringField('Note', validators=[Length(max=255), Optional()])
-
-	submit = SubmitField("SAVE")
-
-	def __repr__(self):
-		return f'<PARTNER_SITE_UPDATED: {self.site}>'
-
-	def __str__(self):
-		return f'<PARTNER_SITE_UPDATED: {self.site}>'
+		form.note.data = obj.note
+		return form
 
 	def to_dict(self):
 		"""Converte form in dict."""
 
 		return {
-			'site': self.site.data.strip(),
+			'site': self.site.data.strip().replace('  ', ' '),
 
-			'client': status_true_false(self.client.data),
-			'supplier': status_true_false(self.supplier.data),
-			'partner': status_true_false(self.partner.data),
+			'active': status_true_false(self.active.data) if self.active.data else False,
+			'site_type': self.site_type.data,
+
+			'client': status_true_false(self.client.data) if self.client.data else False,
+			'supplier': status_true_false(self.supplier.data) if self.supplier.data else False,
+			'partner': status_true_false(self.partner.data) if self.partner.data else False,
 
 			'email': self.email.data.strip().replace(" ", ""),
 			'pec': self.pec.data.strip().replace(" ", ""),

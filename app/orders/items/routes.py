@@ -59,7 +59,7 @@ def item_create(p_id, s_id=None):
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 
-	form = FormItem()
+	form = FormItem.new()
 	if request.method == 'POST' and form.validate():
 		try:
 			form_data = json.loads(json.dumps(request.form))
@@ -73,6 +73,7 @@ def item_create(p_id, s_id=None):
 
 				item_price=form_data['item_price'],
 				item_price_discount=not_empty(form_data['item_price_discount']),
+				item_currency=form_data['item_currency'],
 
 				item_quantity_min=not_empty(form_data["item_quantity_min"]),
 				item_quantity_um=not_empty(form_data["item_quantity_um"]),
@@ -83,9 +84,6 @@ def item_create(p_id, s_id=None):
 				note=not_empty(form_data["note"])
 			)
 			Item.create(new_p)
-
-			# rimuovo chiave in sessione
-			session.pop('supplier_id')
 
 			flash("ITEM creato correttamente.")
 
@@ -104,16 +102,13 @@ def item_create(p_id, s_id=None):
 		# setto il nuovo codice_articolo
 		last_id = Item.query.order_by(Item.id.desc()).first()
 		if last_id is None:
-			form.item_code.data = 'art_0001'
+			form.item_code.data = 'itm_0001'
 		else:
-			form.item_code.data = f'art_{str(int(last_id.id) + 1).zfill(4)}'
+			form.item_code.data = f'itm_{str(int(last_id.id) + 1).zfill(4)}'
 
 		partner = Partner.query.get(p_id)
 		form.supplier_id.data = f'{partner.id} - {partner.organization}'
 		# print('PARTNER:', form.partner_id.data)
-
-		# imposto variabile in sessione per filtrare i siti
-		# supplier_id(partner.id)
 
 		if s_id not in [None, 0]:
 			site = PartnerSite.query.get(s_id)
@@ -174,7 +169,7 @@ def item_update(_id):
 	item = Item.query \
 		.options(joinedload(Item.supplier)) \
 		.options(joinedload(Item.supplier_site)).get(_id)
-	form = FormItem(obj=item)
+	form = FormItem.update(obj=item)
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormItem(request.form).to_dict()
@@ -201,7 +196,7 @@ def item_update(_id):
 			"Modification": f"Update ITEM whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, partner_contact_id=_id)
+		_event = event_create(_event, item_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.supplier_id.data = f'{item.supplier.id} - {item.supplier.organization}'

@@ -25,7 +25,8 @@ RESTORE = "/event/restore/<int:_id>/<int:id_record>/<table>/<view_for>/"
 RESTORE_FOR = "event_bp.event_restore"
 
 
-def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None, item_id=None):
+def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None, item_id=None,
+				 order_id=None, plant_id=None, plant_site_id=None):
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
@@ -35,6 +36,9 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 			partner_contact_id=partner_contact_id,
 			partner_site_id=partner_site_id,
 			item_id=item_id,
+			order_id=order_id,
+			plant_id=plant_id,
+			plant_site_id=plant_site_id,
 		)
 
 		EventDB.create(new_event)
@@ -62,6 +66,12 @@ def event_view_detail(_id):
 	from app.account.models import User
 	from app.account.routes import DETAIL_FOR as USER_DETAIL
 
+	from app.organizations.plant.models import Plant
+	from app.organizations.plant.routes import DETAIL_FOR as PLANT_DETAIL
+
+	from app.organizations.plant_site.models import PlantSite
+	from app.organizations.plant_site.routes import DETAIL_FOR as PLANT_SITE_DETAIL
+
 	from app.organizations.partners.models import Partner
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 
@@ -73,6 +83,9 @@ def event_view_detail(_id):
 
 	from app.orders.items.models import Item
 	from app.orders.items.routes import DETAIL_FOR as ITEM_DETAIL
+
+	from app.orders.orders.models import Oda
+	from app.orders.orders.routes import DETAIL_FOR as ORDER_DETAIL
 
 	# Interrogo il DB
 	event = EventDB.query.get(_id)
@@ -88,6 +101,24 @@ def event_view_detail(_id):
 		id_related = related["id"]
 		type_related = "Utenti"
 		view_related = USER_DETAIL
+	# Plant
+	elif event.plant_id:
+		related = Plant.query.get(event.plant_id)
+		related = related.to_dict()
+		field = "plant_id"
+		table = Plant.__tablename__
+		id_related = related["id"]
+		type_related = "Plant"
+		view_related = PLANT_DETAIL
+	# Plant
+	elif event.plant_site_id:
+		related = PlantSite.query.get(event.plant_site_id)
+		related = related.to_dict()
+		field = "plant_site_id"
+		table = PlantSite.__tablename__
+		id_related = related["id"]
+		type_related = "Plant_Site"
+		view_related = PLANT_SITE_DETAIL
 	# Partner
 	elif event.partner_id:
 		related = Partner.query.get(event.partner_id)
@@ -124,6 +155,15 @@ def event_view_detail(_id):
 		id_related = related["id"]
 		type_related = "Item"
 		view_related = ITEM_DETAIL
+	# Ordine
+	elif event.order_id:
+		related = Oda.query.get(event.order_id)
+		related = related.to_dict()
+		field = "order_id"
+		table = Oda.__tablename__
+		id_related = related["id"]
+		type_related = "Order"
+		view_related = ORDER_DETAIL
 	else:
 		db.session.close()
 		msg = "Nessun record trovato"
@@ -147,44 +187,50 @@ def event_view_detail(_id):
 @token_user_validate
 def event_restore(_id, id_record, table, view_for):
 	from app.account.models import User
+	from app.organizations.plant.models import Plant
+	from app.organizations.plant_site.models import PlantSite
 	from app.organizations.partners.models import Partner
 	from app.organizations.partner_contacts.models import PartnerContact
 	from app.organizations.partner_sites.models import PartnerSite
 	from app.orders.items.models import Item
 	try:
-		models = [User, Partner, PartnerContact, PartnerSite, Item]
+		models = [User, Plant, PlantSite, Partner, PartnerContact, PartnerSite, Item]
 		model = next((m for m in models if m.__tablename__ == table), None)
 		# print("TABLE_DB:", model, "ID:", id_record)
 		if model:
 			data = EventDB.query.get(_id)
 			data = data.to_dict()
-			data = data["event"]["Previous_data"]
-			# print("UPDATE_DATA:", json.dumps(data, indent=2), "TYPE:", type(data))
-			updated_at = data["created_at"]
-			data["updated_at"] = date_to_str(datetime.now(), "%Y-%m-%d %H:%M:%S.%f")
-			data.pop("id")
+			if "Previous_data" in data["event"].keys():
+				data = data["event"]["Previous_data"]
+				# print("UPDATE_DATA:", json.dumps(data, indent=2), "TYPE:", type(data))
+				updated_at = data["created_at"]
+				data["updated_at"] = date_to_str(datetime.now(), "%Y-%m-%d %H:%M:%S.%f")
+				data.pop("id")
 
-			# converto boolean
-			for k, v in data.items():
-				if v == "SI" or v == "si":
-					data[k] = True
-				elif v == "NO" or v == "no":
-					data[k] = False
-				else:
-					pass
-
-			try:
-				record = model.query.get(id_record)
-				# print("DATA_FROM_DB:", json.dumps(record.to_dict(), indent=2), "TYPE:", type(data))
+				# converto boolean
 				for k, v in data.items():
-					setattr(record, k, v)
-				db.session.commit()
-				flash(f"Record ripristinato correttamente alla situazione precedente il: {updated_at}.")
-				return redirect(url_for(view_for, _id=id_record))
-			except IntegrityError as err:
-				db.session.rollback()
-				db.session.close()
-				flash(f"ERRORE: {str(err.orig)}")
+					if v == "SI" or v == "si":
+						data[k] = True
+					elif v == "NO" or v == "no":
+						data[k] = False
+					else:
+						pass
+
+				try:
+					record = model.query.get(id_record)
+					# print("DATA_FROM_DB:", json.dumps(record.to_dict(), indent=2), "TYPE:", type(data))
+					for k, v in data.items():
+						setattr(record, k, v)
+					db.session.commit()
+					flash(f"Record ripristinato correttamente alla situazione precedente il: {updated_at}.")
+					return redirect(url_for(view_for, _id=id_record))
+				except IntegrityError as err:
+					db.session.rollback()
+					db.session.close()
+					flash(f"ERRORE: {str(err.orig)}")
+					return redirect(url_for(view_for, _id=id_record))
+			else:
+				flash('Nessun dato da ripristinare.')
 				return redirect(url_for(view_for, _id=id_record))
 		else:
 			return redirect(url_for(view_for, _id=id_record))

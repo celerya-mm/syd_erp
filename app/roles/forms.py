@@ -35,7 +35,7 @@ def list_Users():
         return _list
 
 
-class FormRoleCreate(FlaskForm):
+class FormRole(FlaskForm):
     """Form dati signup account Utente."""
     name = StringField(
         'name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=50)], default=""
@@ -44,28 +44,15 @@ class FormRoleCreate(FlaskForm):
     submit = SubmitField("SAVE")
 
     def __repr__(self):
-        return f'<ROLE_CREATED: {self.name}>'
+        return f'<ROLE: {self.name}>'
 
     def __str__(self):
-        return f'<ROLE_CREATED: {self.name}>'
+        return f'<ROLE: {self.name}>'
 
     def validate_name(self, field):  # noqa
         """Verifica presenza name nella tabella del DB."""
         if field.data in list_roles():
             raise ValidationError("Nome regola già utilizzato.")
-
-
-class FormRoleUpdate(FlaskForm):
-    """Form di modifica dati account escluso password ed e-mail"""
-    name = StringField('Nome', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=50)])
-
-    submit = SubmitField("SAVE")
-
-    def __repr__(self):
-        return f'<ROLE_UPDATED: {self.name}>'
-
-    def __str__(self):
-        return f'<ROLE_UPDATED: {self.name}>'
 
     def to_dict(self):
         """Converte form in dict."""

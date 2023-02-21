@@ -16,6 +16,9 @@ class Partner(db.Model):
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	organization = db.Column(db.String(80), index=True, unique=True, nullable=False)
 
+	active = db.Column(db.Boolean, unique=False, nullable=True)
+	site_type = db.Column(db.String(80), index=False, unique=False, nullable=True)
+
 	client = db.Column(db.Boolean, unique=False, nullable=True)
 	supplier = db.Column(db.Boolean, unique=False, nullable=True)
 	partner = db.Column(db.Boolean, unique=False, nullable=True)
@@ -33,17 +36,15 @@ class Partner(db.Model):
 	fiscal_code = db.Column(db.String(13), index=False, unique=False, nullable=True)
 	sdi_code = db.Column(db.String(7), index=False, unique=False, nullable=True)
 
+	payment_condition = db.Column(db.String(25), index=False, unique=False, nullable=True)
+	iban = db.Column(db.String(27), index=False, unique=False, nullable=True)
+	swift = db.Column(db.String(12), index=False, unique=False, nullable=True)
+
 	contacts = db.relationship(
 		'PartnerContact', backref='partners', order_by='PartnerContact.last_name.asc()', lazy='dynamic')
-
-	sites = db.relationship(
-		'PartnerSite', backref='partners', lazy='dynamic')
-
-	items = db.relationship(
-		'Item', backref='partners', lazy='dynamic')
-
-	events = db.relationship(
-		'EventDB', backref='partners', order_by='EventDB.id.desc()', lazy='dynamic')
+	sites = db.relationship('PartnerSite', backref='partners', lazy='dynamic')
+	items = db.relationship('Item', backref='partners', lazy='dynamic')
+	events = db.relationship('EventDB', backref='partners', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
@@ -56,9 +57,13 @@ class Partner(db.Model):
 	def __str__(self):
 		return f'<PARTNER: [{self.id}] - {self.organization}>'
 
-	def __init__(self, organization, client, supplier, partner, email, pec, phone, address, cap, city, vat_number,
-				 fiscal_code, sdi_code=None, events=None, note=None):
+	def __init__(self, organization, active, site_type, client, supplier, partner, email, pec, phone, address, cap,
+				 city, vat_number, fiscal_code, sdi_code=None, payment_condition=None, iban=None, swift=None,
+				 events=None, note=None):
 		self.organization = organization
+
+		self.active = active
+		self.site_type = site_type
 
 		self.client = client
 		self.supplier = supplier
@@ -76,6 +81,10 @@ class Partner(db.Model):
 		self.vat_number = vat_number
 		self.fiscal_code = fiscal_code
 		self.sdi_code = sdi_code or None
+
+		self.payment_condition = payment_condition or None
+		self.iban = iban or None
+		self.swift = swift or None
 
 		self.events = events or []
 
@@ -99,6 +108,9 @@ class Partner(db.Model):
 			'id': self.id,
 			'organization': self.organization,
 
+			'active': self.active,
+			'site_type': self.site_type,
+
 			'client': self.client,
 			'supplier': self.supplier,
 			'partner': self.partner,
@@ -115,6 +127,10 @@ class Partner(db.Model):
 			'vat_number': self.vat_number,
 			'fiscal_code': self.fiscal_code,
 			'sdi_code': self.sdi_code,
+
+			'payment_condition': self.payment_condition,
+			'iban': self.iban,
+			'swift': self.swift,
 
 			'note': self.note,
 			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),

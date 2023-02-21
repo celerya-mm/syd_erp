@@ -12,59 +12,59 @@
 			Dati PARTNER [ {{ form.id }} ]
 			<!--	Modifica-->
 			{%
-				if 'superuser' in session['user_roles']
-				or 'partners_admin' in session['user_roles']
-				or 'partners_write' in session['user_roles']
+			if 'superuser' in session['user_roles']
+			or 'partners_admin' in session['user_roles']
+			or 'partners_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
 			   title="Modifica Partner"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
 			</a>
-			{%  endif %}
+			{% endif %}
 			<!--	Crea Contatto-->
 			{%
-				if 'superuser' in session['user_roles']
-				or 'partner_contacts_admin' in session['user_roles']
-				or 'partner_contacts_admin' in session['user_roles']
+			if 'superuser' in session['user_roles']
+			or 'partner_contacts_admin' in session['user_roles']
+			or 'partner_contacts_admin' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(contact_create, p_id=form.id, s_id=0) }}"
 			   title="Aggiungi Contatto"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}"/>
 			</a>
-			{%  endif %}
+			{% endif %}
 			<!--	Crea Sito-->
 			{%
-				if 'superuser' in session['user_roles']
-				or 'partner_sites_admin' in session['user_roles']
-				or 'partner_sites_write' in session['user_roles']
+			if 'superuser' in session['user_roles']
+			or 'partner_sites_admin' in session['user_roles']
+			or 'partner_sites_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(site_create, p_id=form.id) }}"
 			   title="Aggiungi Sito"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/building-fill.svg') }}"/>
 			</a>
-			{%  endif %}
+			{% endif %}
 			<!--	Crea Articolo-->
 			{%
-				if 'superuser' in session['user_roles']
-				or 'items_admin' in session['user_roles']
-				or 'items_write' in session['user_roles']
+			if 'superuser' in session['user_roles']
+			or 'items_admin' in session['user_roles']
+			or 'items_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(item_create, p_id=form.id, s_id=0) }}"
 			   title="Aggiungi Articolo"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/item_fill.svg') }}"/>
 			</a>
-			{%  endif %}
+			{% endif %}
 		</h5>
 	</div>
 	
 	<div class="container text-center mt-2">
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding: 10px;">
-			<div class="col-md-9 order-first">
+			<div class="col-md-11 order-first">
 				<div class="form-group">
 					<h6> Ragione Sociale </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
@@ -74,7 +74,28 @@
 			</div>
 			<div class="col-md-1 order-first">
 				<div class="form-group">
-					<h6> Cliente </h6>
+					<h6> Attivo </h6>
+					{% if form.active == True %}
+					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
+					{% else %}
+					<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding: 10px;">
+			<div class="col-md-9 order-first">
+				<div class="form-group">
+					<h6> Tipo Sede </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.site_type }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-1 order-first">
+				<div class="form-group">
+					<h6> C </h6>
 					{% if form.client == True %}
 					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
 					{% else %}
@@ -84,7 +105,7 @@
 			</div>
 			<div class="col-md-1 order-second">
 				<div class="form-group">
-					<h6> Fornitore </h6>
+					<h6> F </h6>
 					{% if form.supplier == True %}
 					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
 					{% else %}
@@ -94,7 +115,7 @@
 			</div>
 			<div class="col-md-1 order-third">
 				<div class="form-group">
-					<h6> Partner </h6>
+					<h6> P </h6>
 					{% if form.partner == True %}
 					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
 					{% else %}
@@ -176,6 +197,33 @@
 				</div>
 			</div>
 		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding: 10px;">
+			<div class="col-md-3 order-first">
+				<div class="form-group">
+					<h6> Cond. Pagamento </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.payment_condition }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-6 order-second">
+				<div class="form-group">
+					<h6> IBAN </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.iban }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-3 order-second">
+				<div class="form-group">
+					<h6> SWIFT </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.swift }}
+					</p>
+				</div>
+			</div>
+		</div>
 		<div class="row no-gutters rounded"
 			 style="background-color: #DEDEDE; padding: 10px;">
 			<h6> Indirizzo </h6>
@@ -195,6 +243,7 @@
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
 	<div class="accordion" id="accordion">
 		<!--	Contatti collegati-->
+		{% if c_len != 0 %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="2">
 				<button aria-controls="collapse2"
@@ -217,7 +266,7 @@
 							<th class="title" id="c1">ID</th>
 							<th class="title" id="c2">Nome e Cognome</th>
 							<th class="title" id="c3">Email</th>
-							<th class="title" id="c4" data-sortable="False">Telefono</th>
+							<th class="title" data-sortable="False" id="c4">Telefono</th>
 							<th class="title" id="c5">Ruolo</th>
 						</tr>
 						</thead>
@@ -226,9 +275,9 @@
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'partner_contacts_admin' in session['user_roles']
-									or 'partner_contacts_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'partner_contacts_admin' in session['user_roles']
+								or 'partner_contacts_read' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(contact_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -236,7 +285,7 @@
 									{{ row.id|e }}
 								</a>
 								{% else %}
-									{{ row.id|e }}
+								{{ row.id|e }}
 								{% endif %}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
@@ -264,7 +313,9 @@
 				</div>
 			</div>
 		</div>
+		{% endif %}
 		<!--	Siti collegati-->
+		{% if s_len != 0 %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="3">
 				<button aria-controls="collapse3"
@@ -287,7 +338,7 @@
 							<th class="title" id="s1">ID</th>
 							<th class="title" id="s2">Rag. Soc.</th>
 							<th class="title" id="s3">Email</th>
-							<th class="title" id="s4" data-sortable="False">Telefono</th>
+							<th class="title" data-sortable="False" id="s4">Telefono</th>
 							<th class="title" id="s5">Ruolo</th>
 						</tr>
 						</thead>
@@ -296,9 +347,9 @@
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'partner_sites_admin' in session['user_roles']
-									or 'partner_sites_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'partner_sites_admin' in session['user_roles']
+								or 'partner_sites_read' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(site_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -306,7 +357,7 @@
 									{{ row.id|e }}
 								</a>
 								{% else %}
-									{{ row.id|e }}
+								{{ row.id|e }}
 								{% endif %}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
@@ -334,6 +385,7 @@
 				</div>
 			</div>
 		</div>
+		{% endif %}
 		<!--	Articoli collegati-->
 		{% if i_len != 0 %}
 		<div class="accordion-item">
@@ -356,8 +408,8 @@
 						<thead>
 						<tr style="background-color: #2B4692; vertical-align: center;">
 							<th class="title" id="i1">ID</th>
-							<th class="title" id="i2">Codice</th>
-							<th class="title" id="i3">Codice F.</th>
+							<th class="title" id="i2">Cod.</th>
+							<th class="title" id="i3">Cod. F.</th>
 							<th class="title" id="i4">Descrizione</th>
 							<th class="title" id="i5">Prezzo</th>
 							<th class="title" id="i6">Sconto</th>
@@ -369,9 +421,9 @@
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'items_admin' in session['user_roles']
-									or 'items_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'items_admin' in session['user_roles']
+								or 'items_read' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(item_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -379,7 +431,7 @@
 									{{ row.id|e }}
 								</a>
 								{% else %}
-									{{ row.id|e }}
+								{{ row.id|e }}
 								{% endif %}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
@@ -399,9 +451,9 @@
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'partner_sites_admin' in session['user_roles']
-									or 'partner_sites_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'partner_sites_admin' in session['user_roles']
+								or 'partner_sites_read' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}"
 								   title="Visualizza Record"
@@ -409,7 +461,7 @@
 									{{ row.supplier_site_id|e }}
 								</a>
 								{% else %}
-									{{ row.supplier_site_id|e }}
+								{{ row.supplier_site_id|e }}
 								{% endif %}
 							</td>
 						</tr>
@@ -421,6 +473,7 @@
 		</div>
 		{% endif %}
 		<!--	Modifiche Record-->
+		{% if h_len != 0 %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="1">
 				<button aria-controls="collapseOne"
@@ -450,9 +503,9 @@
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'partners_admin' in session['user_roles']
-									or 'partners_write' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'partners_admin' in session['user_roles']
+								or 'partners_write' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(event_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -460,7 +513,7 @@
 									{{ row.id|e }}
 								</a>
 								{% else %}
-									{{ row.id|e }}
+								{{ row.id|e }}
 								{% endif %}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.5rem;">
@@ -476,7 +529,7 @@
 				</div>
 			</div>
 		</div>
-		
+		{% endif %}
 	</div>
 </div>
 <br>

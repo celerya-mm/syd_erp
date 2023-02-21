@@ -1,11 +1,9 @@
-import json
-
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required, status_true_false, not_empty
-from .forms import FormPartnerCreate, FormPartnerUpdate
+from app.functions import token_user_validate, access_required
+from .forms import FormPartner
 from .models import Partner
 
 partner_bp = Blueprint(
@@ -49,38 +47,38 @@ def partner_view():
 @access_required(roles=['partners_admin', 'partners_write'])
 def partner_create():
 	"""Creazione Partner."""
-	form = FormPartnerCreate()
+	form = FormPartner()
 	if form.validate_on_submit():
-		form_data = json.loads(json.dumps(request.form))
-		# print('TYPE:', type(form_data), 'NEW_PARTNER:', json.dumps(form_data, indent=2))
-
-		if "client" not in form_data.keys():
-			form_data['client'] = 'False'
-		if "supplier" not in form_data.keys():
-			form_data['supplier'] = 'False'
-		if "partner" not in form_data.keys():
-			form_data['partner'] = 'False'
+		form_data = FormPartner(request.form).to_dict()
+		# print('TYPE:', type(form_data), 'NEW_PARTNER:', json.dumps(form_data, indent=2))y
 
 		new_p = Partner(
 			organization=form_data["organization"].strip().replace('  ', ' '),
 
-			client=status_true_false(form_data["client"]),
-			supplier=status_true_false(form_data["supplier"]),
-			partner=status_true_false(form_data["partner"]),
+			active=True,
+			site_type=form_data["site_type"],
+
+			client=form_data["client"],
+			supplier=form_data["supplier"],
+			partner=form_data["partner"],
 
 			email=form_data["email"].strip().replace(' ', ''),
 			pec=form_data["pec"].strip().replace(' ', ''),
-			phone=not_empty(form_data["phone"]),
+			phone=form_data["phone"],
 
-			address=not_empty(form_data["address"]),
-			cap=not_empty(form_data["cap"]),
-			city=not_empty(form_data["city"]),
+			address=form_data["address"],
+			cap=form_data["cap"],
+			city=form_data["city"],
 
 			vat_number=form_data["vat_number"],
 			fiscal_code=form_data["fiscal_code"],
-			sdi_code=not_empty(form_data["sdi_code"]),
+			sdi_code=form_data["sdi_code"],
 
-			note=not_empty(form_data["note"])
+			payment_condition=form_data["payment_condition"],
+			iban=form_data["iban"],
+			swift=form_data["swift"],
+
+			note=form_data["note"]
 		)
 		try:
 			Partner.create(new_p)
@@ -157,16 +155,17 @@ def partner_update(_id):
 
 	# recupero i dati
 	partner = Partner.query.get(_id)
-	form = FormPartnerUpdate(obj=partner)
+	form = FormPartner(obj=partner)
 
 	if request.method == 'POST' and form.validate():
-		new_data = FormPartnerUpdate(request.form).to_dict()
+		new_data = FormPartner(request.form).to_dict()
 
 		previous_data = partner.to_dict()
 		previous_data.pop("updated_at")
 
 		try:
 			Partner.update(_id, new_data)
+			session.pop('partner_id')
 			flash("PARTNER aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -187,6 +186,7 @@ def partner_update(_id):
 		_event = event_create(_event, partner_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
+		session['partner_id'] = _id
 		_info = {
 			'created_at': partner.created_at,
 			'updated_at': partner.updated_at,

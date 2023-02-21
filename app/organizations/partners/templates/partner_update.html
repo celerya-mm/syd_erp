@@ -15,7 +15,7 @@
 			{{ form.csrf_token }}
 			<div class="row no-gutters justify-content-center rounded"
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="col-md-12 order-first">
+				<div class="col-md-11 order-first">
 					<div class="form-group">
 						{{ form.organization.label(style="font-size: 1.2rem;") }}
 						{{ form.organization(class="form-control emphasis") }}
@@ -27,22 +27,40 @@
 						{% endif %}
 					</div>
 				</div>
+				<div class="col-md-1 order-second">
+					<div class="form-group">
+						{{ form.active.label(style="font-size: 1.2rem;") }}
+						{{ form.active(class="checkbox") }}
+					</div>
+				</div>
 			</div>
 			<div class="row no-gutters justify-content-center rounded"
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="col-md-3 order-second">
+				<div class="col-md-9 order-second">
+					<div class="form-group">
+						{{ form.site_type.label(style="font-size: 1.2rem;") }}
+						{{ form.site_type(class="form-control emphasis", style="text-align: center;") }}
+						{% if form.site_type.errors %}
+						{% for error in form.site_type.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-1 order-second">
 					<div class="form-group">
 						{{ form.client.label(style="font-size: 1.2rem;") }}
 						{{ form.client(class="checkbox") }}
 					</div>
 				</div>
-				<div class="col-md-3 order-third">
+				<div class="col-md-1 order-third">
 					<div class="form-group">
 						{{ form.supplier.label(style="font-size: 1.2rem;") }}
 						{{ form.supplier(class="checkbox") }}
 					</div>
 				</div>
-				<div class="col-md-3 order-fourth">
+				<div class="col-md-1 order-fourth">
 					<div class="form-group">
 						{{ form.partner.label(style="font-size: 1.2rem;") }}
 						{{ form.partner(class="checkbox") }}
@@ -162,6 +180,45 @@
 						{{ form.fiscal_code(class="form-control emphasis") }}
 						{% if form.fiscal_code.errors %}
 						{% for error in form.fiscal_code.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-3 order-first">
+					<div class="form-group">
+						{{ form.payment_condition.label(style="font-size: 1.2rem;") }}
+						{{ form.payment_condition(class="form-control", style="text-align: center;") }}
+						{% if form.payment_condition.errors %}
+						{% for error in form.payment_condition.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-6 order-second">
+					<div class="form-group">
+						{{ form.iban.label(style="font-size: 1.2rem;") }}
+						{{ form.iban(class="form-control") }}
+						{% if form.iban.errors %}
+						{% for error in form.iban.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-3 order-third">
+					<div class="form-group">
+						{{ form.swift.label(style="font-size: 1.2rem;") }}
+						{{ form.swift(class="form-control") }}
+						{% if form.swift.errors %}
+						{% for error in form.swift.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}

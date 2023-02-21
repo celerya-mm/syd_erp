@@ -4,6 +4,7 @@ from config import db
 from app.functions import date_to_str, mount_full_name
 
 # importazioni per creare relazioni in tabella
+# from app.organizations.partners.models import Partner  # noqa
 from app.organizations.partner_sites.models import PartnerSite  # noqa
 from app.event_db.models import EventDB  # noqa
 

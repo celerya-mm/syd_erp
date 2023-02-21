@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
 from app.app import db
-from .forms import FormRoleCreate, FormRoleUpdate, FormRoleAddUser
+from .forms import FormRole, FormRoleAddUser
 from .models import Role, UserRoles
 from ..account.models import User
 from ..functions import token_user_validate, access_required
@@ -58,7 +58,7 @@ def role_view():
 @access_required(roles=['roles_admin', 'roles_write'])
 def role_create():
 	"""Creazione Utente Consorzio."""
-	form = FormRoleCreate()
+	form = FormRole()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
 		new_role = Role(
@@ -108,10 +108,10 @@ def role_update(_id):
 	"""Aggiorna dati Record."""
 	# recupero i dati
 	role = Role.query.get(_id)
-	form = FormRoleUpdate(obj=role)
+	form = FormRole(obj=role)
 
 	if request.method == 'POST' and form.validate():
-		new_data = FormRoleUpdate(request.form).to_dict()
+		new_data = FormRole(request.form).to_dict()
 		try:
 			Role.update(_id, new_data)
 			flash("REGOLA aggiornata correttamente.")

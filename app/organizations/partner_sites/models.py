@@ -4,6 +4,8 @@ from config import db
 from app.functions import mount_full_address, date_to_str
 
 # importazioni per creare relazioni in tabella
+# from app.organizations.partners.models import Partner  # noqa
+# from app.organizations.partner_contacts.models import PartnerContact  # noqa
 from app.orders.items.models import Item  # noqa
 from app.event_db.models import EventDB  # noqa
 
@@ -15,12 +17,15 @@ class PartnerSite(db.Model):
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	site = db.Column(db.String(80), index=True, unique=True, nullable=False)
 
+	active = db.Column(db.Boolean, unique=False, nullable=True)
+	site_type = db.Column(db.String(80), index=False, unique=False, nullable=True)
+
 	client = db.Column(db.Boolean, unique=False, nullable=True)
 	supplier = db.Column(db.Boolean, unique=False, nullable=True)
 	partner = db.Column(db.Boolean, unique=False, nullable=True)
 
-	email = db.Column(db.String(80), index=False, unique=True, nullable=False)
-	pec = db.Column(db.String(80), index=False, unique=True, nullable=False)
+	email = db.Column(db.String(80), index=False, unique=False, nullable=False)
+	pec = db.Column(db.String(80), index=False, unique=False, nullable=False)
 	phone = db.Column(db.String(25), index=False, unique=False, nullable=False)
 
 	address = db.Column(db.String(150), index=False, unique=False, nullable=True)
@@ -34,17 +39,11 @@ class PartnerSite(db.Model):
 
 	partner_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=False)
 
-	back_partner = db.relationship(
-		'Partner', backref='partner_sites', viewonly=True)
-
+	back_partner = db.relationship('Partner', backref='partner_sites', viewonly=True)
 	contacts = db.relationship(
 		'PartnerContact', backref='partner_sites', order_by='PartnerContact.last_name.asc()', lazy='dynamic')
-
-	items = db.relationship(
-		'Item', backref='partner_sites', lazy='dynamic')
-
-	events = db.relationship(
-		'EventDB', backref='partner_sites', order_by='EventDB.id.desc()', lazy='dynamic')
+	items = db.relationship('Item', backref='partner_sites', lazy='dynamic')
+	events = db.relationship('EventDB', backref='partner_sites', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
@@ -57,9 +56,12 @@ class PartnerSite(db.Model):
 	def __str__(self):
 		return f'<PARTNER_SITE: [{self.id}] - {self.site}>'
 
-	def __init__(self, site, client, supplier, partner, email, pec, phone, partner_id, address, cap, city, vat_number,
-				 fiscal_code, sdi_code=None, events=None, note=None):
+	def __init__(self, site, active, site_type, client, supplier, partner, email, pec, phone, partner_id, address, cap,
+				 city, vat_number, fiscal_code, sdi_code=None, events=None, note=None):
 		self.site = site
+
+		self.active = active
+		self.site_type = site_type
 
 		self.client = client
 		self.supplier = supplier
@@ -101,6 +103,9 @@ class PartnerSite(db.Model):
 		return {
 			'id': self.id,
 			'site': self.site,
+
+			'active': self.active,
+			'site_type': self.site_type,
 
 			'client': self.client,
 			'supplier': self.supplier,

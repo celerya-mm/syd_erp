@@ -4,6 +4,7 @@ from uuid import uuid4
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
 from ..app import session, db
 from .forms import FormUserLogin, FormUserCreate, FormUserUpdate, FormUserPswChange
@@ -123,21 +124,30 @@ def user_view():
 @access_required(roles=['users_admin', 'users_write'])
 def user_create():
 	"""Creazione Utente personale."""
-	form = FormUserCreate()
+	form = FormUserCreate.new()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
 		new_user = User(
 			username=form_data["username"].replace(" ", ""),
+
 			password=psw_hash(form_data["new_password_1"].replace(" ", "")),
 			psw_changed=False,
+
 			active=status_true_false(form_data["active"]),
+
 			name=form_data["name"].strip(),
 			last_name=form_data["last_name"].strip(),
+
 			email=form_data["email"].strip(),
 			phone=form_data["phone"].strip(),
+
 			address=form_data["address"].strip(),
 			cap=form_data["cap"].strip(),
 			city=form_data["city"].strip(),
+
+			plant_id=form_data["plant_id"].split(' - ')[0],
+			plant_site_id=form_data["plant_site_id"].split(' - ')[0] if form_data["plant_site_id"] else None,
+
 			note=form_data["note"].strip()
 		)
 		try:
@@ -159,14 +169,26 @@ def user_create():
 def user_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
+	from app.organizations.plant.routes import DETAIL_FOR as PLANT_DETAIL
+	from app.organizations.plant_site.routes import DETAIL_FOR as SITE_DETAIL
 	from app.roles.routes import DETAIL_FOR as ROLE_DETAIL
 
 	# Estraggo l' ID dell'utente corrente
 	session["id_user"] = _id
 
 	# Interrogo il DB
-	user = User.query.get(_id)
+	user = User.query \
+		.options(joinedload(User.plant)) \
+		.options(joinedload(User.plant_site)) \
+		.get(_id)
 	_user = user.to_dict()
+
+	_user["plant_id"] = f'{user.plant.id} - {user.plant.organization}' if user.plant else None
+	p_id = user.plant.id if user.plant else None
+
+	_user["plant_site_id"] = f'{user.plant_site.id} - {user.plant_site.organization}' if user.plant_site else None
+	_user["plant_site_active"] = user.plant_site.active if user.plant_site else None
+	s_id = user.plant_site.id if user.plant_site else None
 
 	# Estraggo la storia delle modifiche per l'utente
 	history_list = user.events
@@ -186,7 +208,9 @@ def user_view_detail(_id):
 	return render_template(
 		DETAIL_HTML, form=_user, view=VIEW_FOR, update=UPDATE_FOR, update_psw=UPDATE_PSW_FOR,
 		history_list=history_list, h_len=len(history_list), event_detail=EVENT_DETAIL,
-		roles_list=roles_list, r_len=len(roles_list), role_detail=ROLE_DETAIL
+		roles_list=roles_list, r_len=len(roles_list), role_detail=ROLE_DETAIL,
+		plant_detail=PLANT_DETAIL, p_id=p_id,
+		site_detail=SITE_DETAIL, s_id=s_id
 	)
 
 
@@ -198,8 +222,11 @@ def user_update(_id):
 	from app.event_db.routes import event_create
 
 	# recupero i dati
-	user = User.query.get(_id)
-	form = FormUserUpdate(obj=user)
+	user = User.query \
+		.options(joinedload(User.plant)) \
+		.options(joinedload(User.plant_site)) \
+		.get(_id)
+	form = FormUserUpdate.update(obj=user)
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormUserUpdate(request.form).to_dict()
@@ -210,6 +237,7 @@ def user_update(_id):
 
 		try:
 			User.update(_id, new_data)
+			session.pop('user_id')
 			flash("UTENTE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -230,6 +258,12 @@ def user_update(_id):
 		_event = event_create(_event, user_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
+		form.plant_id.data = f'{user.plant.id} - {user.plant.organization}' if user.plant else None
+		form.plant_site_id.data = f'{user.plant_site.id} - {user.plant_site.organization}' \
+			if user.plant_site else None
+
+		session['user_id'] = _id
+
 		_info = {
 			'created_at': user.created_at,
 			'updated_at': user.updated_at,

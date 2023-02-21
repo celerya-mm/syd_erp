@@ -29,15 +29,15 @@
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="col-md-2 order-first">
 				<div class="form-group">
-					<h6> Cod. Articolo </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+					<h6> Cod. ITM </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
 						{{ form.item_code }}
 					</p>
 				</div>
 			</div>
 			<div class="col-md-2 order-second">
 				<div class="form-group">
-					<h6> Cod. Fornitore </h6>
+					<h6> Cod. F. </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
 						{{ form.item_code_supplier }}
 					</p>
@@ -46,7 +46,7 @@
 			<div class="col-md-2 order-third">
 				<div class="form-group">
 					<h6> Prezzo </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
 						{{ form.item_price }}
 					</p>
 				</div>
@@ -55,13 +55,23 @@
 				<div class="form-group">
 					<div class="form-group">
 						<h6> Sconto </h6>
-						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						<p class="form-control emphasis" style="font-weight: bold; color: white">
 							{{ form.item_price_discount }}
 						</p>
 					</div>
 				</div>
 			</div>
-			<div class="col-md-2 order-fifth">
+			<div class="col-md-1 order-fifth">
+				<div class="form-group">
+					<div class="form-group">
+						<h6> Valuta </h6>
+						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+							{{ form.item_currency }}
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-2 order-sixth">
 				<div class="form-group">
 					<div class="form-group">
 						<h6> Q. Minima </h6>
@@ -71,7 +81,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-2 order-sixth">
+			<div class="col-md-2 order-seventh">
 				<div class="form-group">
 					<div class="form-group">
 						<h6> U.M. </h6>
@@ -86,9 +96,9 @@
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="form-group">
 				<div class="form-group">
-					<h6> U.M. </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.item_quantity_um }}
+					<h6> Descrizione </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.item_description }}
 					</p>
 				</div>
 			</div>

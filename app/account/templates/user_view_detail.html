@@ -96,6 +96,22 @@
 				{{ form.full_address }}
 			</p>
 		</div>
+		<div class="row no-gutters rounded"
+			 style="background-color: #DEDEDE; padding: 10px;">
+			<h6> Sede Legale </h6>
+			<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+				{{ form.plant_id }}
+			</p>
+		</div>
+		{% if form.plant_site_id and form.plant_site_active%}
+		<div class="row no-gutters rounded"
+			 style="background-color: #DEDEDE; padding: 10px;">
+			<h6> Sede Operativa </h6>
+			<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+				{{ form.plant_site_id }}
+			</p>
+		</div>
+		{% endif %}
 		<div class="form-group rounded"
 			 style="background-color: #DEDEDE; padding: 10px;">
 			<h6> Note </h6>
@@ -107,7 +123,62 @@
 </form>
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
 	<div class="accordion" id="accordion">
+		<!--	Ruoli-->
+		{% if r_len != 0 %}
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="2">
+				<button aria-controls="collapse2"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse2"
+						data-bs-toggle="collapse"
+						type="button">
+					Elenco Ruoli assegnati [ {{ r_len }} ]
+				</button>
+			</h2>
+			<div aria-labelledby="heading2"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse2">
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="roles" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" id="r1">ID</th>
+							<th class="title" id="r2">Ruolo</th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in roles_list %}
+						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+									if 'superuser' in session['user_roles']
+									or 'roles_admin' in session['user_roles']
+									or 'roles_read' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(role_detail, _id=row.id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.id|e }}
+								</a>
+								{% else %}
+									{{ row.id|e }}
+								{% endif %}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 1rem;">
+								{{ row.name|e }}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		{% endif %}
 		<!--	Modifiche record-->
+		{% if h_len != 0 %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="1">
 				<button aria-controls="collapseOne" aria-expanded="true"
@@ -161,58 +232,7 @@
 				</div>
 			</div>
 		</div>
-		<!--	Ruoli-->
-		<div class="accordion-item">
-			<h2 class="accordion-header" id="2">
-				<button aria-controls="collapse2"
-						aria-expanded="true"
-						class="accordion-button"
-						data-bs-target="#collapse2"
-						data-bs-toggle="collapse"
-						type="button">
-					Elenco Ruoli assegnati [ {{ r_len }} ]
-				</button>
-			</h2>
-			<div aria-labelledby="heading2"
-				 class="accordion-collapse collapse"
-				 data-bs-parent="#accordion"
-				 id="collapse2">
-				<div class="table-responsive" style="padding: 10px">
-					<table class="table table-striped" id="roles" style="width:100%">
-						<thead>
-						<tr style="background-color: #2B4692; vertical-align: center;">
-							<th class="title" id="r1">ID</th>
-							<th class="title" id="r2">Ruolo</th>
-						</tr>
-						</thead>
-						<tbody>
-						{% for row in roles_list %}
-						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
-							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{%
-									if 'superuser' in session['user_roles']
-									or 'roles_admin' in session['user_roles']
-									or 'roles_read' in session['user_roles']
-								%}
-								<a class="btn-table" href="{{ url_for(role_detail, _id=row.id) }}"
-								   title="Visualizza Record"
-								   type="button">
-									{{ row.id|e }}
-								</a>
-								{% else %}
-									{{ row.id|e }}
-								{% endif %}
-							</td>
-							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 1rem;">
-								{{ row.name|e }}
-							</td>
-						</tr>
-						{% endfor %}
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
+		{% endif %}
 	</div>
 </div>
 <br>

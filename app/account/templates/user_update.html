@@ -127,6 +127,32 @@
 			<div class="row no-gutters justify-content-center rounded"
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 				<div class="form-group">
+					{{ form.plant_id.label(style="font-size: 1.2rem;") }}
+					{{ form.plant_id(class="form-control emphasis", style="text-align: center;") }}
+					{% if form.plant_id.errors %}
+					{% for error in form.plant_id.errors %}
+					<span class="text-danger">{{ error }}</span>
+					<br>
+					{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="form-group">
+					{{ form.plant_site_id.label(style="font-size: 1.2rem;") }}
+					{{ form.plant_site_id(class="form-control", style="text-align: center;") }}
+					{% if form.plant_site_id.errors %}
+					{% for error in form.plant_site_id.errors %}
+					<span class="text-danger">{{ error }}</span>
+					<br>
+					{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="form-group">
 					{{ form.note.label(style="font-size: 1.2rem;") }}
 					{{ form.note(class="form-control") }}
 					{% if form.note.errors %}

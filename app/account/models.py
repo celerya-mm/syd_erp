@@ -3,8 +3,10 @@ from config import db
 
 # importazioni per creare relazioni in tabella
 from app.auth_token.models import AuthToken  # noqa
-from app.event_db.models import EventDB  # noqa
+from app.organizations.plant.models import Plant  # noqa
+from app.organizations.plant_site.models import PlantSite  # noqa
 from app.roles.models import Role  # noqa
+from app.event_db.models import EventDB  # noqa
 
 
 class User(db.Model):
@@ -31,10 +33,15 @@ class User(db.Model):
 	city = db.Column(db.String(55), index=False, unique=False, nullable=True)
 	full_address = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-	auth_tokens = db.relationship('AuthToken', backref='users', order_by='AuthToken.id.desc()', lazy='dynamic')
-	events = db.relationship('EventDB', backref='users', order_by='EventDB.id.desc()', lazy='dynamic')
+	plant_id = db.Column(db.Integer, db.ForeignKey('plants.id'), nullable=True)
+	plant_site_id = db.Column(db.Integer, db.ForeignKey('plant_sites.id'), nullable=True)
 
+	plant = db.relationship('Plant', backref='users_plant', viewonly=True)
+	plant_site = db.relationship('PlantSite', backref='users_plant_site', viewonly=True)
+
+	auth_tokens = db.relationship('AuthToken', backref='users', order_by='AuthToken.id.desc()', lazy='dynamic')
 	roles = db.relationship('Role', secondary='user_roles', backref='users', lazy='dynamic', viewonly=True)
+	events = db.relationship('EventDB', backref='users', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
@@ -48,7 +55,8 @@ class User(db.Model):
 		return f'<USER: [{self.id}] - {self.username}>'
 
 	def __init__(self, username, password=None, psw_changed=False, active=None, name=None, last_name=None, phone=None,
-				 email=None, address=None, cap=None, city=None, auth_tokens=None, events=None, note=None):
+				 email=None, address=None, cap=None, city=None, plant_id=None, plant_site_id=None, auth_tokens=None,
+				 events=None, note=None):
 		from app.functions import mount_full_address, mount_full_name
 
 		self.username = username
@@ -70,6 +78,9 @@ class User(db.Model):
 		self.city = city
 		self.full_address = mount_full_address(address, cap, city)
 
+		self.plant_id = plant_id
+		self.plant_site_id = plant_site_id
+
 		self.auth_tokens = auth_tokens or []
 
 		self.events = events or []
@@ -90,7 +101,8 @@ class User(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
-		from app.functions import date_to_str, mount_full_address, mount_full_name
+		from app.functions import date_to_str
+
 		return {
 			'id': self.id,
 			'username': self.username,
@@ -103,12 +115,15 @@ class User(db.Model):
 
 			'name': self.name,
 			'last_name': self.last_name,
-			'full_name': mount_full_name(self.name, self.last_name),
+			'full_name': self.full_name,
 
 			'address': self.address,
 			'cap': self.cap,
 			'city': self.city,
-			'full_address': mount_full_address(self.address, self.cap, self.city),
+			'full_address': self.full_address,
+
+			'plant_id': self.plant_id,
+			'plant_site_id': self.plant_site_id,
 
 			'note': self.note,
 			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),

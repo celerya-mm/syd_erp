@@ -4,9 +4,9 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from app.functions import token_user_validate, access_required, status_true_false, not_empty
+from app.functions import token_user_validate, access_required
 from app.app import session, db
-from .forms import FormPartnerSiteCreate, FormPartnerSiteUpdate
+from .forms import FormPartnerSite
 from .models import PartnerSite
 
 partner_site_bp = Blueprint(
@@ -55,40 +55,36 @@ def partner_site_create(p_id):
 	"""Creazione Sito."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL_FOR
 
-	form = FormPartnerSiteCreate()
+	form = FormPartnerSite.new()
 	if form.validate_on_submit():
-		form_data = json.loads(json.dumps(request.form))
+		form_data = FormPartnerSite(request.form).to_dict()
 		# print('TYPE:', type(form_data), 'NEW_PARTNER:', json.dumps(form_data, indent=2))
 
-		if "client" not in form_data.keys():
-			form_data['client'] = 'False'
-		if "supplier" not in form_data.keys():
-			form_data['supplier'] = 'False'
-		if "partner" not in form_data.keys():
-			form_data['partner'] = 'False'
-
 		new_p = PartnerSite(
-			site=form_data["site"].strip().replace('  ', ' '),
+			site=form_data["site"],
 
-			client=status_true_false(form_data["client"]),
-			supplier=status_true_false(form_data["supplier"]),
-			partner=status_true_false(form_data["partner"]),
+			active=form_data["active"],
+			site_type=form_data["site_type"],
 
-			email=form_data["email"].strip().replace(' ', ''),
-			pec=form_data["pec"].strip().replace(' ', ''),
-			phone=not_empty(form_data["phone"]),
+			client=form_data["client"],
+			supplier=form_data["supplier"],
+			partner=form_data["partner"],
 
-			address=not_empty(form_data["address"]),
-			cap=not_empty(form_data["cap"]),
-			city=not_empty(form_data["city"]),
+			email=form_data["email"],
+			pec=form_data["pec"],
+			phone=form_data["phone"],
 
-			partner_id=form_data["partner_id"].split(' - ')[0],
+			address=form_data["address"],
+			cap=form_data["cap"],
+			city=form_data["city"],
+
+			partner_id=form_data["partner_id"],
 
 			vat_number=form_data["vat_number"],
 			fiscal_code=form_data["fiscal_code"],
-			sdi_code=not_empty(form_data["sdi_code"]),
+			sdi_code=form_data["sdi_code"],
 
-			note=not_empty(form_data["note"])
+			note=form_data["note"]
 		)
 		try:
 			PartnerSite.create(new_p)
@@ -124,6 +120,7 @@ def partner_site_view_detail(_id):
 
 	p_id = _site['partner_id']
 	_site['partner_id'] = f'{site.back_partner.id} - {site.back_partner.organization}'
+	# print('PARTNER_SITE:', json.dumps(_site, indent=2))
 
 	# Estraggo la storia delle modifiche per il record
 	history_list = site.events
@@ -165,17 +162,18 @@ def partner_site_update(_id):
 
 	# recupero i dati
 	site = PartnerSite.query.options(joinedload(PartnerSite.back_partner)).get(_id)
-	form = FormPartnerSiteUpdate(obj=site)
+	form = FormPartnerSite.update(obj=site)
 
 	if request.method == 'POST' and form.validate():
-		new_data = FormPartnerSiteUpdate(request.form).to_dict()
+		new_data = FormPartnerSite(request.form).to_dict()
 
 		previous_data = site.to_dict()
 		previous_data.pop("updated_at")
 
 		try:
 			PartnerSite.update(_id, new_data)
-			flash("PARTNER aggiornato correttamente.")
+			session.pop('partner_site_id')
+			flash("SITO - PARTNER aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
 			db.session.close()
@@ -196,6 +194,7 @@ def partner_site_update(_id):
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.partner_id.data = f'{site.back_partner.id} - {site.back_partner.organization}'
+		session['partner_site_id'] = _id
 		_info = {
 			'created_at': site.created_at,
 			'updated_at': site.updated_at,

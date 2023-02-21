@@ -57,7 +57,7 @@ def contact_create(p_id, s_id=None):
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 
-	form = FormPartnerContactCreate()
+	form = FormPartnerContactCreate.new()
 	if request.method == 'POST' and form.validate():
 		try:
 			form_data = json.loads(json.dumps(request.form))
@@ -130,11 +130,8 @@ def contact_view_detail(_id):
 	_contact["partner_id"] = f'{contact.partner.id} - {contact.partner.organization}'
 	p_id = contact.partner.id
 
-	if contact.partner_site:
-		_contact["site_id"] = f'{contact.partner_site.id} - {contact.partner_site.site}'
-		s_id = contact.partner_site.id
-	else:
-		s_id = None
+	_contact["site_id"] = f'{contact.partner_site.id} - {contact.partner_site.site}' if contact.partner_site else None
+	s_id = contact.partner_site.id if contact.partner_site else None
 
 	db.session.close()
 	return render_template(
@@ -154,8 +151,9 @@ def contact_update(_id):
 	# recupero i dati
 	contact = PartnerContact.query \
 		.options(joinedload(PartnerContact.partner)) \
-		.options(joinedload(PartnerContact.partner_site)).get(_id)
-	form = FormPartnerContactUpdate(obj=contact)
+		.options(joinedload(PartnerContact.partner_site)) \
+		.get(_id)
+	form = FormPartnerContactUpdate.update(obj=contact)
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormPartnerContactUpdate(request.form).to_dict()
@@ -186,8 +184,8 @@ def contact_update(_id):
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.partner_id.data = f'{contact.partner.id} - {contact.partner.organization}'
-		if contact.partner_site:
-			form.partner_site_id.data = f'{contact.partner_site.id} - {contact.partner_site.site}'
+		form.partner_site_id.data = f'{contact.partner_site.id} - {contact.partner_site.site}' if contact.partner_site \
+									else None
 
 		_info = {
 			'created_at': contact.created_at,

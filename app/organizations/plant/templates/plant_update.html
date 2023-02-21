@@ -1,0 +1,194 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="container text-center mt-2">
+	<div class="row no-gutters justify-content-center ">
+		<h5 class="card-title">
+			<a class="btn btn-update" href="{{ url_for(history, _id=id) }}" title="Annulla"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
+			</a>
+			Modifica la SEDE [ {{ id }} ]:
+		</h5>
+		<form class="shadow rounded" enctype="multipart/form-data" method="POST"
+			  style="border: solid 2px #ED6666 !important;">
+			{{ form.csrf_token }}
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-10 order-first">
+					<div class="form-group">
+						{{ form.organization.label(style="font-size: 1.2rem;") }}
+						{{ form.organization(class="form-control emphasis") }}
+						{% if form.organization.errors %}
+						{% for error in form.organization.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-2 order-second">
+					<div class="form-group">
+						{{ form.active.label(style="font-size: 1.2rem;") }}
+						{{ form.active(class="checkbox") }}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-6 order-first">
+					<div class="form-group">
+						{{ form.email.label(style="font-size: 1.2rem;") }}
+						{{ form.email(class="form-control emphasis") }}
+						{% if form.email.errors %}
+						{% for error in form.email.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-6 order-second">
+					<div class="form-group">
+						{{ form.pec.label(style="font-size: 1.2rem;") }}
+						{{ form.pec(class="form-control") }}
+						{% if form.pec.errors %}
+						{% for error in form.pec.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-6 order-first">
+					<div class="form-group">
+						{{ form.address.label(style="font-size: 1.2rem;") }}
+						{{ form.address(class="form-control") }}
+						{% if form.address.errors %}
+						{% for error in form.address.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-2 order-second">
+					<div class="form-group">
+						{{ form.cap.label(style="font-size: 1.2rem;") }}
+						{{ form.cap(class="form-control") }}
+						{% if form.cap.errors %}
+						{% for error in form.cap.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-4 order-third">
+					<div class="form-group">
+						{{ form.city.label(style="font-size: 1.2rem;") }}
+						{{ form.city(class="form-control") }}
+						{% if form.city.errors %}
+						{% for error in form.city.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-5 order-first">
+					<div class="form-group">
+						{{ form.site_type.label(style="font-size: 1.2rem;") }}
+						{{ form.site_type(class="form-control emphasis", style="text-align: center;") }}
+						{% if form.site_type.errors %}
+						{% for error in form.site_type.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-5 order-second">
+					<div class="form-group">
+						{{ form.phone.label(style="font-size: 1.2rem;") }}
+						{{ form.phone(class="form-control") }}
+						{% if form.phone.errors %}
+						{% for error in form.phone.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-2 order-third">
+					<div class="form-group">
+						{{ form.sdi_code.label(style="font-size: 1.2rem;") }}
+						{{ form.sdi_code(class="form-control") }}
+						{% if form.sdi_code.errors %}
+						{% for error in form.sdi_code.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-6 order-first">
+					<div class="form-group">
+						{{ form.vat_number.label(style="font-size: 1.2rem;") }}
+						{{ form.vat_number(class="form-control emphasis") }}
+						{% if form.vat_number.errors %}
+						{% for error in form.vat_number.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-6 order-second">
+					<div class="form-group">
+						{{ form.fiscal_code.label(style="font-size: 1.2rem;") }}
+						{{ form.fiscal_code(class="form-control emphasis") }}
+						{% if form.fiscal_code.errors %}
+						{% for error in form.fiscal_code.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="form-group">
+					{{ form.note.label(style="font-size: 1.2rem;") }}
+					{{ form.note(class="form-control") }}
+					{% if form.note.errors %}
+					{% for error in form.note.errors %}
+					<span class="text-danger">{{ error }}</span>
+					<br>
+					{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<button class="btn btn-update" id="button" title="Salva" type="submit" value="x">
+				<img alt="" class="icon-simple"
+					 src="{{ url_for('static', filename='icons/save.svg') }}"/>
+			</button>
+			<div>
+				<p class="info">Data Creazione: {{ info.created_at }}</p>
+				<p class="info">Ultima Modifica: {{ info.updated_at }}</p>
+			</div>
+		</form>
+	</div>
+</div>
+
+{% endblock %}

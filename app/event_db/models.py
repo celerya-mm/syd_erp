@@ -14,10 +14,12 @@ class EventDB(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
     partner_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=True)
-
     partner_contact_id = db.Column(db.Integer, db.ForeignKey('partner_contacts.id', ondelete='CASCADE'), nullable=True)
     partner_site_id = db.Column(db.Integer, db.ForeignKey('partner_sites.id', ondelete='CASCADE'), nullable=True)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id', ondelete='CASCADE'), nullable=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='CASCADE'), nullable=True)
+    plant_id = db.Column(db.Integer, db.ForeignKey('plants.id', ondelete='CASCADE'), nullable=True)
+    plant_site_id = db.Column(db.Integer, db.ForeignKey('plant_sites.id', ondelete='CASCADE'), nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
 
@@ -28,7 +30,7 @@ class EventDB(db.Model):
         return f'<EVENTO_RECORD: [{self.event}]>'
 
     def __init__(self, event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None,
-                 item_id=None):
+                 item_id=None, order_id=None, plant_id=None, plant_site_id=None):
         self.event = event
 
         self.user_id = user_id
@@ -36,6 +38,9 @@ class EventDB(db.Model):
         self.partner_contact_id = partner_contact_id
         self.partner_site_id = partner_site_id
         self.item_id = item_id
+        self.order_id = order_id
+        self.plant_id = plant_id
+        self.plant_site_id = plant_site_id
 
         self.created_at = datetime.now()
 
@@ -60,6 +65,9 @@ class EventDB(db.Model):
             'partner_contact_id': self.partner_contact_id,
             'partner_site_id': self.partner_site_id,
             'item_id': self.item_id,
+            'order_id': self.order_id,
+            'plant_id': self.plant_id,
+            'plant_site_id': self.plant_site_id,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

@@ -12,47 +12,47 @@
 			Dati SITO [ {{ form.id }} ]
 			<!--	Modifica-->
 			{%
-				if 'superuser' in session['user_roles']
-				or 'partner_sites_admin' in session['user_roles']
-				or 'partner_sites_write' in session['user_roles']
+			if 'superuser' in session['user_roles']
+			or 'partner_sites_admin' in session['user_roles']
+			or 'partner_sites_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
 			   title="Modifica Sito"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
 			</a>
-			{%  endif %}
+			{% endif %}
 			<!--	Crea Contatto-->
 			{%
-				if 'superuser' in session['user_roles']
-				or 'partner_contacts_admin' in session['user_roles']
-				or 'partner_contacts_write' in session['user_roles']
+			if 'superuser' in session['user_roles']
+			or 'partner_contacts_admin' in session['user_roles']
+			or 'partner_contacts_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(contact_create, p_id=p_id, s_id=form.id) }}"
 			   title="Aggiungi Contatto"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}"/>
 			</a>
-			{%  endif %}
+			{% endif %}
 			<!--	Crea Articolo-->
 			{%
-				if 'superuser' in session['user_roles']
-				or 'items_admin' in session['user_roles']
-				or 'items_write' in session['user_roles']
+			if 'superuser' in session['user_roles']
+			or 'items_admin' in session['user_roles']
+			or 'items_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(item_create, p_id=p_id, s_id=form.id) }}"
 			   title="Aggiungi Articolo"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/item_fill.svg') }}"/>
 			</a>
-			{%  endif %}
+			{% endif %}
 		</h5>
 	</div>
 	
 	<div class="container text-center mt-2">
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding: 10px;">
-			<div class="col-md-9 order-first">
+			<div class="col-md-10 order-first">
 				<div class="form-group">
 					<h6> Ragione Sociale </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
@@ -60,9 +60,30 @@
 					</p>
 				</div>
 			</div>
+			<div class="col-md-2 order-first">
+				<div class="form-group">
+					<h6> Stato </h6>
+					{% if form.active == True %}
+					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
+					{% else %}
+					<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding: 10px;">
+			<div class="col-md-9 order-first">
+				<div class="form-group">
+					<h6> Tipo Sede </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.site_type }}
+					</p>
+				</div>
+			</div>
 			<div class="col-md-1 order-first">
 				<div class="form-group">
-					<h6> Cliente </h6>
+					<h6> C </h6>
 					{% if form.client == True %}
 					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
 					{% else %}
@@ -72,7 +93,7 @@
 			</div>
 			<div class="col-md-1 order-second">
 				<div class="form-group">
-					<h6> Fornitore </h6>
+					<h6> F </h6>
 					{% if form.supplier == True %}
 					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
 					{% else %}
@@ -82,7 +103,7 @@
 			</div>
 			<div class="col-md-1 order-third">
 				<div class="form-group">
-					<h6> Partner </h6>
+					<h6> P </h6>
 					{% if form.partner == True %}
 					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
 					{% else %}
@@ -95,9 +116,9 @@
 			 style="background-color: #DEDEDE; padding: 10px;">
 			<div class="col-md-10 order-first">
 				<div class="form-group">
-					<a title="Vai all'azienda" href="{{ url_for(partner_detail, _id=p_id) }}">
-                        Azienda
-                    </a>
+					<a href="{{ url_for(partner_detail, _id=p_id) }}" title="Vai all'azienda">
+						Azienda
+					</a>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
 						{{ form.partner_id }}
 					</p>
@@ -196,6 +217,7 @@
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
 	<div class="accordion" id="accordion">
 		<!--	Contatti collegati-->
+		{% if c_len != 0 %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="2">
 				<button aria-controls="collapse2"
@@ -227,9 +249,9 @@
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'partner_contacts_admin' in session['user_roles']
-									or 'partner_contacts_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'partner_contacts_admin' in session['user_roles']
+								or 'partner_contacts_read' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(contact_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -237,7 +259,7 @@
 									{{ row.id|e }}
 								</a>
 								{% else %}
-									{{ row.id|e }}
+								{{ row.id|e }}
 								{% endif %}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
@@ -265,8 +287,9 @@
 				</div>
 			</div>
 		</div>
+		{% endif %}
 		<!--	Articoli collegati-->
-		{% if form.supplier == True %}
+		{% if i_len != 0 %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="4">
 				<button aria-controls="collapse4"
@@ -287,8 +310,8 @@
 						<thead>
 						<tr style="background-color: #2B4692; vertical-align: center;">
 							<th class="title" id="i1">ID</th>
-							<th class="title" id="i2">Codice</th>
-							<th class="title" id="i3">Codice F.</th>
+							<th class="title" id="i2">Cod.</th>
+							<th class="title" id="i3">Cod. F.</th>
 							<th class="title" id="i4">Descrizione</th>
 							<th class="title" id="i5">Prezzo</th>
 							<th class="title" id="i6">Sconto</th>
@@ -300,9 +323,9 @@
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'items_admin' in session['user_roles']
-									or 'items_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'items_admin' in session['user_roles']
+								or 'items_read' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(item_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -310,7 +333,7 @@
 									{{ row.id|e }}
 								</a>
 								{% else %}
-									{{ row.id|e }}
+								{{ row.id|e }}
 								{% endif %}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
@@ -330,9 +353,9 @@
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'partner_sites_admin' in session['user_roles']
-									or 'partner_sites_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'partner_sites_admin' in session['user_roles']
+								or 'partner_sites_read' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(partner_detail, _id=row.supplier_id) }}"
 								   title="Visualizza Record"
@@ -340,7 +363,7 @@
 									{{ row.supplier_id|e }}
 								</a>
 								{% else %}
-									{{ row.supplier_id|e }}
+								{{ row.supplier_id|e }}
 								{% endif %}
 							</td>
 						</tr>
@@ -352,6 +375,7 @@
 		</div>
 		{% endif %}
 		<!--	Modifiche Record-->
+		{% if h_len != 0 %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="1">
 				<button aria-controls="collapseOne"
@@ -381,9 +405,9 @@
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'partner_sites_admin' in session['user_roles']
-									or 'partner_sites_write' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'partner_sites_admin' in session['user_roles']
+								or 'partner_sites_write' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(event_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -391,7 +415,7 @@
 									{{ row.id|e }}
 								</a>
 								{% else %}
-									{{ row.id|e }}
+								{{ row.id|e }}
 								{% endif %}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.5rem;">
@@ -407,6 +431,7 @@
 				</div>
 			</div>
 		</div>
+		{% endif %}
 	</div>
 </div>
 <br>
@@ -471,5 +496,6 @@
             },
         });
     });
+
 </script>
 {% endblock %}

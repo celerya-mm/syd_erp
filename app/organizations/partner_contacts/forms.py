@@ -71,8 +71,8 @@ class FormPartnerContactCreate(FlaskForm):
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
 
-	partner_id = SelectField("Seleziona Partner", choices=list_partners())
-	partner_site_id = SelectField("Seleziona Sito", choices=list_partner_sites())
+	partner_id = SelectField("Seleziona Partner")
+	partner_site_id = SelectField("Seleziona Sito")
 
 	note = StringField('Note', validators=[Length(max=255), Optional()])
 
@@ -83,6 +83,15 @@ class FormPartnerContactCreate(FlaskForm):
 
 	def __str__(self):
 		return f'<PARTNER_CONTACT: {self.name} {self.last_name}>'
+
+	@classmethod
+	def new(cls):
+		# Instantiate the form
+		form = cls()
+		# Update the choices
+		form.partner_id.choices = list_partners()
+		form.partner_site_id.choices = list_partner_sites()
+		return form
 
 	def validate_full_name(self):  # noqa
 		"""Verifica presenza contatto nella tabella del DB."""
@@ -105,8 +114,8 @@ class FormPartnerContactUpdate(FlaskForm):
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
 
-	partner_id = SelectField("Seleziona Partner", choices=list_partners())
-	partner_site_id = SelectField("Seleziona Sito", choices=list_partner_sites())
+	partner_id = SelectField("Seleziona Partner")
+	partner_site_id = SelectField("Seleziona Sito")
 
 	note = StringField('Note', validators=[Length(max=255), Optional()])
 
@@ -117,6 +126,25 @@ class FormPartnerContactUpdate(FlaskForm):
 
 	def __str__(self):
 		return f'<PARTNER_CONTACT_UPDATED: {self.name} {self.last_name}>'
+
+	@classmethod
+	def update(cls, obj):
+		# Instantiate the form
+		form = cls()
+		form.name.data = obj.name
+		form.last_name.data = obj.last_name
+
+		form.role.data = obj.role
+
+		form.email.data = obj.email
+		form.phone.data = obj.phone
+
+		# Update the choices
+		form.partner_id.choices = list_partners()
+		form.partner_site_id.choices = list_partner_sites()
+
+		form.note.data = obj.note
+		return form
 
 	def to_dict(self):
 		"""Converte form in dict."""

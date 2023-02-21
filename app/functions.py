@@ -178,3 +178,21 @@ def status_si_no(_str):
 		return "SI"
 	else:
 		return "NO"
+
+
+list_currency = ['€', '$', 'unit']
+site_type = ['Sede Legale', 'Sede Legale e Operativa', 'Sede Operativa', 'Sede Secondaria']
+list_payments = [
+	'Rimessa diretta ricevimento Fattura',
+	'BB + 30gg DFFM',
+	'BB + 60gg DFFM',
+	'BB + 90gg DFFM',
+	'Come da Offerta'
+]
+list_order_types = [
+	'Emesso',
+	'Ricevuto OK',
+	'Ricevuto NC (note)',
+	'Pagato/Chiuso'
+]
+
