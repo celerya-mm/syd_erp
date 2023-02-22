@@ -40,7 +40,7 @@ class User(db.Model):
 	plant_site_user = db.relationship('PlantSite', backref='user_plant_site', viewonly=True)
 
 	auth_tokens = db.relationship('AuthToken', backref='users', order_by='AuthToken.id.desc()', lazy='dynamic')
-	roles = db.relationship('Role', secondary='user_roles', backref='users', lazy='dynamic', viewonly=True)
+	roles = db.relationship('Role', secondary='user_roles', backref='users', viewonly=True, lazy='dynamic')
 	events = db.relationship('EventDB', backref='users', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, IntegerField, DecimalField
+from wtforms import StringField, SubmitField, SelectField, IntegerField, DecimalField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional
 
 from app.app import db
@@ -51,19 +51,19 @@ class FormItem(FlaskForm):
 	item_code = StringField('Cod. ITM', validators=[DataRequired("Campo obbligatorio!"), Length(min=8, max=8)])
 	item_code_supplier = StringField('Cod. F.', validators=[Length(max=50), Optional()])
 
-	item_description = StringField('Descrizione', validators=[DataRequired("Campo obbligatorio!"), Length(max=255)])
+	item_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"), Length(max=500)])
 
 	item_price = DecimalField('Prezzo', validators=[DataRequired("Campo obbligatorio!")], places=2)
 	item_price_discount = DecimalField('Sconto %', validators=[Optional()], places=2)
 	item_currency = SelectField('Valuta', choices=list_currency)
 
-	item_quantity_min = IntegerField('Q. minima', validators=[Optional()])
+	item_quantity_min = DecimalField('Q. min.', validators=[Optional()])
 	item_quantity_um = SelectField('U.M.', choices=list_um, validators=[Optional()])
 
 	supplier_id = SelectField("Seleziona Fornitore")
 	supplier_site_id = SelectField("Seleziona Sito Fornitore")
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
 
 	submit = SubmitField("SAVE")
 
@@ -109,6 +109,11 @@ class FormItem(FlaskForm):
 		"""Converte form in dict."""
 		from app.functions import not_empty
 
+		if self.supplier_site_id.data and self.supplier_site_id.data not in ['', '-']:
+			supplier_site_id = self.supplier_site_id.data.split(' - ')[0]
+		else:
+			supplier_site_id = None
+
 		return {
 			'item_code': self.item_code.data,
 			'item_code_supplier': not_empty(self.item_code_supplier.data.strip().replace('  ', ' ')),
@@ -123,7 +128,7 @@ class FormItem(FlaskForm):
 			'item_quantity_um': not_empty(self.item_quantity_um.data),
 
 			'supplier_id': self.supplier_id.data.split(' - ')[0],
-			'supplier_site_id': self.supplier_site_id.data.split(' - ')[0] if self.supplier_site_id.data else None,
+			'supplier_site_id': supplier_site_id,
 
 			'note': not_empty(self.note.data.strip()),
 			'updated_at': datetime.now()

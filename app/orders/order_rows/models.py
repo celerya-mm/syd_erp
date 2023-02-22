@@ -13,17 +13,21 @@ class OdaRow(db.Model):
 	# Columns
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-	item_code = db.Column(db.String(8), index=True, unique=True, nullable=False)
+	item_code = db.Column(
+		db.String(8), db.ForeignKey('items.item_code', ondelete='CASCADE'), index=True, unique=False, nullable=False)
 	item_code_supplier = db.Column(db.String(25), index=True, unique=False, nullable=True)
-
-	item_description = db.Column(db.String(255), index=True, unique=False, nullable=False)
+	item_description = db.Column(db.String(500), index=True, unique=False, nullable=False)
 
 	item_price = db.Column(db.Float, index=False, unique=False, nullable=False)
 	item_price_discount = db.Column(db.Float, index=False, unique=False, nullable=True)  # considerato in %
 	item_currency = db.Column(db.String(3), index=False, unique=False, nullable=True)
 
-	item_quantity = db.Column(db.Integer, index=False, unique=False, nullable=True)
+	item_quantity = db.Column(db.Float, index=False, unique=False, nullable=True)
 	item_quantity_um = db.Column(db.String(25), index=False, unique=False, nullable=True)
+
+	item_amount = db.Column(db.Float, index=False, unique=False, nullable=False)
+
+	oda_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='CASCADE'), nullable=False)
 
 	supplier_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=False)
 	supplier_site_id = db.Column(db.Integer, db.ForeignKey('partner_sites.id', ondelete='CASCADE'), nullable=True)
@@ -39,32 +43,10 @@ class OdaRow(db.Model):
 	updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
 	def __repr__(self):
-		return f'<ITEM_CLASS: [{self.item_code}] - {self.item_description}>'
+		return f'<ORDER_ROW_CLASS: [{self.item_code}] - {self.item_description}>'
 
 	def __str__(self):
-		return f'<ITEM_CLASS: [{self.item_code}] - {self.item_description}>'
-
-	def __init__(self, item_code, item_code_supplier, item_description, item_price, item_price_discount, item_currency,
-				 item_quantity, item_quantity_um, supplier_id, supplier_site_id, note):
-
-		self.item_code = item_code
-		self.item_code_supplier = item_code_supplier
-		self.item_description = item_description
-
-		self.item_price = item_price
-		self.item_price_discount = item_price_discount
-		self.item_currency = item_currency
-
-		self.item_quantity = item_quantity
-		self.item_quantity_um = item_quantity_um
-
-		self.supplier_id = supplier_id
-
-		self.supplier_site_id = supplier_site_id
-
-		self.note = note or None
-		self.created_at = datetime.now()
-		self.updated_at = datetime.now()
+		return f'<ORDER_ROW_CLASS: [{self.item_code}] - {self.item_description}>'
 
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""
@@ -91,6 +73,9 @@ class OdaRow(db.Model):
 
 			'item_quantity': self.item_quantity,
 			'item_quantity_um': self.item_quantity_um,
+
+			'item_amount': self.item_amount,
+			'oda_id': self.oda_id,
 
 			'supplier_id': self.supplier_id,
 			'supplier_site_id': self.supplier_site_id or None,

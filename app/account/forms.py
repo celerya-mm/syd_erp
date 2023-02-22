@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField, SelectField, BooleanField
+from wtforms import PasswordField, StringField, SubmitField, EmailField, SelectField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
 from app.app import db, session
@@ -92,7 +92,7 @@ class FormUserCreate(FlaskForm):
 	plant_id = SelectField("Sede Legale", validators=[DataRequired("Campo obbligatorio!")])
 	plant_site_id = SelectField("Sede Operativa", validators=[Optional()])
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
 
 	submit = SubmitField("SAVE")
 

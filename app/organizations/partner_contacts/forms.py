@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, EmailField, SelectField
+from wtforms import StringField, SubmitField, EmailField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 from config import db
@@ -74,7 +74,7 @@ class FormPartnerContactCreate(FlaskForm):
 	partner_id = SelectField("Seleziona Partner")
 	partner_site_id = SelectField("Seleziona Sito")
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
 
 	submit = SubmitField("SIGNUP")
 

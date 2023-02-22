@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, EmailField, BooleanField, SelectField
+from wtforms import StringField, SubmitField, EmailField, BooleanField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 from app.app import db, session
@@ -69,7 +69,7 @@ class FormPlantSite(FlaskForm):
 	)
 	sdi_code = StringField('SDI', validators=[Optional(), Length(min=7, max=7)])
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
 
 	submit = SubmitField("SAVE")
 

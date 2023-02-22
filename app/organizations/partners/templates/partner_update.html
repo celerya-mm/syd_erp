@@ -36,12 +36,36 @@
 			</div>
 			<div class="row no-gutters justify-content-center rounded"
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="col-md-9 order-second">
+				<div class="col-md-3 order-second">
 					<div class="form-group">
 						{{ form.site_type.label(style="font-size: 1.2rem;") }}
 						{{ form.site_type(class="form-control emphasis", style="text-align: center;") }}
 						{% if form.site_type.errors %}
 						{% for error in form.site_type.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-3 order-second">
+					<div class="form-group">
+						{{ form.vat_number.label(style="font-size: 1.2rem;") }}
+						{{ form.vat_number(class="form-control emphasis") }}
+						{% if form.vat_number.errors %}
+						{% for error in form.vat_number.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-3 order-third">
+					<div class="form-group">
+						{{ form.fiscal_code.label(style="font-size: 1.2rem;") }}
+						{{ form.fiscal_code(class="form-control emphasis") }}
+						{% if form.fiscal_code.errors %}
+						{% for error in form.fiscal_code.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
@@ -153,33 +177,6 @@
 						{{ form.sdi_code(class="form-control") }}
 						{% if form.sdi_code.errors %}
 						{% for error in form.sdi_code.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-			</div>
-			<div class="row no-gutters justify-content-center rounded"
-				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="col-md-6 order-first">
-					<div class="form-group">
-						{{ form.vat_number.label(style="font-size: 1.2rem;") }}
-						{{ form.vat_number(class="form-control emphasis") }}
-						{% if form.vat_number.errors %}
-						{% for error in form.vat_number.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-				<div class="col-md-6 order-second">
-					<div class="form-group">
-						{{ form.fiscal_code.label(style="font-size: 1.2rem;") }}
-						{{ form.fiscal_code(class="form-control emphasis") }}
-						{% if form.fiscal_code.errors %}
-						{% for error in form.fiscal_code.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}

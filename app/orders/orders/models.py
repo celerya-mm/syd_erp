@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from config import db
-from app.functions import date_to_str
+from app.functions import date_to_str, not_empty
 
 # importazioni per creare relazioni in tabella
 from app.event_db.models import EventDB  # noqa
@@ -17,7 +17,7 @@ class Oda(db.Model):
 
 	oda_number = db.Column(db.String(8), index=True, unique=True, nullable=False)
 	oda_date = db.Column(db.DateTime, index=False, unique=False, nullable=False)
-	oda_description = db.Column(db.String(80), index=False, unique=False, nullable=False)
+	oda_description = db.Column(db.String(255), index=False, unique=False, nullable=False)
 	oda_delivery_date = db.Column(db.DateTime, index=False, unique=False, nullable=False)
 	oda_amount = db.Column(db.Float, index=False, unique=False, nullable=True)
 	oda_currency = db.Column(db.String(3), index=False, unique=False, nullable=False)
@@ -31,13 +31,16 @@ class Oda(db.Model):
 
 	supplier_offer = db.Column(db.String(20), index=True, unique=True, nullable=True)
 	supplier_offer_date = db.Column(db.DateTime, index=False, unique=False, nullable=True)
-	supplier_invoice = db.Column(db.String(20), index=True, unique=True, nullable=True)
+	supplier_invoice = db.Column(db.String(50), index=True, unique=True, nullable=True)
 	supplier_invoice_date = db.Column(db.DateTime, index=False, unique=False, nullable=True)
 
 	supplier_id = db.Column(db.Integer, db.ForeignKey('partners.id'), nullable=False)
 	supplier_site_id = db.Column(db.Integer, db.ForeignKey('partner_sites.id'), nullable=True)
+
 	supplier = db.relationship('Partner', backref='s_orders', viewonly=True)
 	supplier_site = db.relationship('PartnerSite', backref='ss_orders', viewonly=True)
+
+	oda_rows = db.relationship('OdaRow', backref='orders', lazy='dynamic')
 
 	events = db.relationship('EventDB', backref='orders', order_by='EventDB.id.desc()', lazy='dynamic')
 
@@ -96,9 +99,9 @@ class Oda(db.Model):
 			'id': self.id,
 
 			'oda_number': self.oda_number,
-			'oda_date': self.oda_date,
+			'oda_date': date_to_str(self.oda_date),
 			'oda_description': self.oda_description,
-			'oda_delivery_date': self.oda_delivery_date,
+			'oda_delivery_date': date_to_str(self.oda_delivery_date),
 			'oda_amount': self.oda_amount,
 			'oda_currency': self.oda_currency,
 			'oda_payment': self.oda_payment,
@@ -107,10 +110,10 @@ class Oda(db.Model):
 			'plant_id': self.plant_id,
 			'plant_site_id': self.plant_site_id or None,
 
-			'supplier_offer': self.supplier_offer,
-			'supplier_offer_date': self.supplier_offer_date,
-			'supplier_invoice': self.supplier_invoice,
-			'supplier_invoice_date': self.supplier_invoice_date,
+			'supplier_offer': not_empty(self.supplier_offer),
+			'supplier_offer_date': date_to_str(self.supplier_offer_date),
+			'supplier_invoice': not_empty(self.supplier_invoice),
+			'supplier_invoice_date': date_to_str(self.supplier_invoice_date),
 
 			'supplier_id': self.supplier_id,
 			'supplier_site_id': self.supplier_site_id or None,

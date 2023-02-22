@@ -71,10 +71,10 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-2 order-sixth">
+			<div class="col-md-1 order-sixth">
 				<div class="form-group">
 					<div class="form-group">
-						<h6> Q. Minima </h6>
+						<h6> Q. Min. </h6>
 						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
 							{{ form.item_quantity_min }}
 						</p>
@@ -107,7 +107,9 @@
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="col-md-6 order-first">
 				<div class="form-group">
-					<h6> Fornitore </h6>
+					<a href="{{ url_for(partner_detail, _id=p_id) }}" title="Vai all'azienda">
+						Fornitore
+					</a>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
 						{{ form.supplier_id }}
 					</p>
@@ -219,15 +221,5 @@
             },
         });
     });
-
-
-
-
-
-
-
-
-
-
 </script>
 {% endblock %}

@@ -63,7 +63,7 @@ def item_create(p_id, s_id=None):
 	if request.method == 'POST' and form.validate():
 		try:
 			form_data = json.loads(json.dumps(request.form))
-			print('NEW_CONTACT:', json.dumps(form_data, indent=2))
+			# print('NEW_ITEM:', json.dumps(form_data, indent=2))
 
 			new_p = Item(
 				item_code=form_data['item_code'],

@@ -22,43 +22,59 @@
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
 			</a>
 			{% endif %}
-			<!--	Crea Contatto-->
-			{%
-			if 'superuser' in session['user_roles']
-			or 'partner_contacts_admin' in session['user_roles']
-			or 'partner_contacts_admin' in session['user_roles']
-			%}
-			<a class="btn btn-update" href="{{ url_for(contact_create, p_id=form.id, s_id=0) }}"
-			   title="Aggiungi Contatto"
-			   type="button">
-				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}"/>
-			</a>
-			{% endif %}
-			<!--	Crea Sito-->
-			{%
-			if 'superuser' in session['user_roles']
-			or 'partner_sites_admin' in session['user_roles']
-			or 'partner_sites_write' in session['user_roles']
-			%}
-			<a class="btn btn-update" href="{{ url_for(site_create, p_id=form.id) }}"
-			   title="Aggiungi Sito"
-			   type="button">
-				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/building-fill.svg') }}"/>
-			</a>
-			{% endif %}
-			<!--	Crea Articolo-->
-			{%
-			if 'superuser' in session['user_roles']
-			or 'items_admin' in session['user_roles']
-			or 'items_write' in session['user_roles']
-			%}
-			<a class="btn btn-update" href="{{ url_for(item_create, p_id=form.id, s_id=0) }}"
-			   title="Aggiungi Articolo"
-			   type="button">
-				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/item_fill.svg') }}"/>
-			</a>
-			{% endif %}
 		</h5>
+		<!--	Crea Contatto-->
+		{%
+		if 'superuser' in session['user_roles']
+		or 'partner_contacts_admin' in session['user_roles']
+		or 'partner_contacts_admin' in session['user_roles']
+		%}
+		<a class="btn btn-update" href="{{ url_for(contact_create, p_id=form.id, s_id=0) }}"
+		   title="Aggiungi Contatto"
+		   type="button">
+			<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}"/>
+		</a>
+		{% endif %}
+		<!--	Crea Sito-->
+		{%
+		if 'superuser' in session['user_roles']
+		or 'partner_sites_admin' in session['user_roles']
+		or 'partner_sites_write' in session['user_roles']
+		%}
+		<a class="btn btn-update" href="{{ url_for(site_create, p_id=form.id) }}"
+		   title="Aggiungi Sito"
+		   type="button">
+			<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/building-fill.svg') }}"/>
+		</a>
+		{% endif %}
+		<!--	Crea Ordine-->
+		{% if form.supplier %}
+		{%
+		if 'superuser' in session['user_roles']
+		or 'orders_admin' in session['user_roles']
+		or 'orders_write' in session['user_roles']
+		%}
+		<a class="btn btn-update" href="{{ url_for(oda_create, p_id=form.id, s_id=0) }}"
+		   title="Crea Ordine Fornitore"
+		   type="button">
+			<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/shopping_cart.svg') }}"/>
+		</a>
+		{% endif %}
+		{% endif %}
+		<!--	Crea Articolo-->
+		{% if form.supplier %}
+		{%
+		if 'superuser' in session['user_roles']
+		or 'items_admin' in session['user_roles']
+		or 'items_write' in session['user_roles']
+		%}
+		<a class="btn btn-update" href="{{ url_for(item_create, p_id=form.id, s_id=0) }}"
+		   title="Aggiungi Articolo"
+		   type="button">
+			<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/item_fill.svg') }}"/>
+		</a>
+		{% endif %}
+		{% endif %}
 	</div>
 	
 	<div class="container text-center mt-2">
@@ -124,124 +140,143 @@
 				</div>
 			</div>
 		</div>
-		<div class="row no-gutters justify-content-center rounded"
-			 style="background-color: #DEDEDE; padding: 10px;">
-			<div class="col-md-6 order-first">
-				<div class="form-group">
-					<h6>
-						{% if form.email %}
-						<a class="tab-link" href="mailto:{{ form.email }}" style=""
-						   title="open email">
-							<img alt="" src="{{ url_for('static', filename='icons/at.svg') }}">
-						</a>
-						{% endif %}
-						email
-					</h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.email }}
-					</p>
-				</div>
-			</div>
-			<div class="col-md-6 order-second">
-				<div class="form-group">
-					<h6>
-						{% if form.pec %}
-						<a class="tab-link" href="mailto:{{ form.pec }}" style=""
-						   title="open email">
-							<img alt="" src="{{ url_for('static', filename='icons/at.svg') }}">
-						</a>
-						{% endif %}
-						pec
-					</h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.pec }}
-					</p>
-				</div>
-			</div>
-		</div>
-		<div class="row no-gutters justify-content-center rounded"
-			 style="background-color: #DEDEDE; padding: 10px;">
-			<div class="col-md-6 order-first">
-				<div class="form-group">
-					<h6> Telefono </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.phone }}
-					</p>
-				</div>
-			</div>
-			<div class="col-md-6 order-second">
-				<div class="form-group">
-					<h6> SDI CODE </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.sdi_code }}
-					</p>
-				</div>
-			</div>
-		</div>
-		<div class="row no-gutters justify-content-center rounded"
-			 style="background-color: #DEDEDE; padding: 10px;">
-			<div class="col-md-6 order-first">
-				<div class="form-group">
-					<h6> P.IVA </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.vat_number }}
-					</p>
-				</div>
-			</div>
-			<div class="col-md-6 order-second">
-				<div class="form-group">
-					<h6> C.F. </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.fiscal_code }}
-					</p>
-				</div>
-			</div>
-		</div>
-		<div class="row no-gutters justify-content-center rounded"
-			 style="background-color: #DEDEDE; padding: 10px;">
-			<div class="col-md-3 order-first">
-				<div class="form-group">
-					<h6> Cond. Pagamento </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.payment_condition }}
-					</p>
-				</div>
-			</div>
-			<div class="col-md-6 order-second">
-				<div class="form-group">
-					<h6> IBAN </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.iban }}
-					</p>
-				</div>
-			</div>
-			<div class="col-md-3 order-second">
-				<div class="form-group">
-					<h6> SWIFT </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.swift }}
-					</p>
-				</div>
-			</div>
-		</div>
-		<div class="row no-gutters rounded"
-			 style="background-color: #DEDEDE; padding: 10px;">
-			<h6> Indirizzo </h6>
-			<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-				{{ form.full_address }}
-			</p>
-		</div>
-		<div class="form-group rounded"
-			 style="background-color: #DEDEDE; padding: 10px;">
-			<h6> Note </h6>
-			<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-				{{ form.note }}
-			</p>
-		</div>
 	</div>
 </form>
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
 	<div class="accordion" id="accordion">
+		<!--	Dettaglio-->
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="0">
+				<button aria-controls="collapse0"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse0"
+						data-bs-toggle="collapse"
+						type="button">
+					Dettaglio
+				</button>
+			</h2>
+			<div aria-labelledby="heading0"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse0">
+				<form>
+					<div class="container text-center mt-2">
+						<div class="row no-gutters justify-content-center rounded"
+							 style="background-color: #DEDEDE; padding: 10px;">
+							<div class="col-md-4 order-first">
+								<div class="form-group">
+									<h6>
+										{% if form.email %}
+										<a class="tab-link" href="mailto:{{ form.email }}" style=""
+										   title="open email">
+											<img alt="" src="{{ url_for('static', filename='icons/at.svg') }}">
+										</a>
+										{% endif %}
+										email
+									</h6>
+									<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+										{{ form.email }}
+									</p>
+								</div>
+							</div>
+							<div class="col-md-4 order-second">
+								<div class="form-group">
+									<h6>
+										{% if form.pec %}
+										<a class="tab-link" href="mailto:{{ form.pec }}" style=""
+										   title="open email">
+											<img alt="" src="{{ url_for('static', filename='icons/at.svg') }}">
+										</a>
+										{% endif %}
+										pec
+									</h6>
+									<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+										{{ form.pec }}
+									</p>
+								</div>
+							</div>
+							<div class="col-md-4 order-third">
+								<div class="form-group">
+									<h6> Telefono </h6>
+									<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+										{{ form.phone }}
+									</p>
+								</div>
+							</div>
+						</div>
+						<div class="row no-gutters justify-content-center rounded"
+							 style="background-color: #DEDEDE; padding: 10px;">
+							<div class="col-md-4 order-first">
+								<div class="form-group">
+									<h6> P.IVA </h6>
+									<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+										{{ form.vat_number }}
+									</p>
+								</div>
+							</div>
+							<div class="col-md-4 order-second">
+								<div class="form-group">
+									<h6> C.F. </h6>
+									<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+										{{ form.fiscal_code }}
+									</p>
+								</div>
+							</div>
+							<div class="col-md-4 order-third">
+								<div class="form-group">
+									<h6> SDI CODE </h6>
+									<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+										{{ form.sdi_code }}
+									</p>
+								</div>
+							</div>
+						</div>
+						<div class="row no-gutters justify-content-center rounded"
+							 style="background-color: #DEDEDE; padding: 10px;">
+							<div class="col-md-3 order-first">
+								<div class="form-group">
+									<h6> Cond. Pagamento </h6>
+									<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+										{{ form.payment_condition }}
+									</p>
+								</div>
+							</div>
+							<div class="col-md-6 order-second">
+								<div class="form-group">
+									<h6> IBAN </h6>
+									<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+										{{ form.iban }}
+									</p>
+								</div>
+							</div>
+							<div class="col-md-3 order-second">
+								<div class="form-group">
+									<h6> SWIFT </h6>
+									<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+										{{ form.swift }}
+									</p>
+								</div>
+							</div>
+						</div>
+						<div class="row no-gutters rounded"
+							 style="background-color: #DEDEDE; padding: 10px;">
+							<h6> Indirizzo </h6>
+							<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+								{{ form.full_address }}
+							</p>
+						</div>
+						<div class="form-group rounded"
+							 style="background-color: #DEDEDE; padding: 10px;">
+							<h6> Note </h6>
+							<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+								{{ form.note }}
+							</p>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
 		<!--	Contatti collegati-->
 		{% if c_len != 0 %}
 		<div class="accordion-item">
@@ -252,7 +287,7 @@
 						data-bs-target="#collapse2"
 						data-bs-toggle="collapse"
 						type="button">
-					Elenco Contatti [ {{ c_len }} ]
+					Contatti [ {{ c_len }} ]
 				</button>
 			</h2>
 			<div aria-labelledby="heading1"
@@ -324,7 +359,7 @@
 						data-bs-target="#collapse3"
 						data-bs-toggle="collapse"
 						type="button">
-					Elenco Siti [ {{ s_len }} ]
+					Altre Sedi [ {{ s_len }} ]
 				</button>
 			</h2>
 			<div aria-labelledby="heading3"
@@ -386,6 +421,109 @@
 			</div>
 		</div>
 		{% endif %}
+		<!--	Ordini collegati-->
+		{% if o_len != 0 %}
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="5">
+				<button aria-controls="collapse5"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse5"
+						data-bs-toggle="collapse"
+						type="button">
+					Ordini Fornitore [ {{ o_len }} ]
+				</button>
+			</h2>
+			<div aria-labelledby="heading3"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse5">
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="orders" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" id="o1">ID</th>
+							<th class="title" id="o2">oda</th>
+							<th class="title" id="o3">Data</th>
+							<th class="title" id="o4">Consegna</th>
+							<th class="title" id="o5">Descrizione</th>
+							<th class="title" id="o6">Totale</th>
+							<th class="title" id="o7">Stato</th>
+							<th class="title" id="o9">F.S.</th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in oda_list %}
+						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'orders_admin' in session['user_roles']
+								or 'orders_read' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(oda_detail, _id=row.id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.id|e }}
+								</a>
+								{% else %}
+								{{ row.id|e }}
+								{% endif %}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.oda_number|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.oda_date|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.oda_delivery_date|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.oda_description|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.oda_amount|e }}
+							</td>
+							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{% if row.oda_status == "Pagato/Chiuso" %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
+								{% elif row.oda_status == "Ricevuto NC (note)" %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
+								{% elif row.oda_status == "Ricevuto OK" %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_pending.svg') }}">
+								{% else %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_emitted.svg') }}">
+								{% endif %}
+								{{ row.oda_status }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'partner_sites_admin' in session['user_roles']
+								or 'partner_sites_read' in session['user_roles']
+								%}
+								{% if row.supplier_site_id %}
+									<a class="btn-table" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}"
+									   title="Visualizza Record"
+									   type="button">
+										{{ row.supplier_site_id|e }}
+									</a>
+									{% else %}
+									{{ row.supplier_site_id|e }}
+									{% endif %}
+								{% else %}
+								{{ row.supplier_site_id|e }}
+								{% endif %}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		{% endif %}
 		<!--	Articoli collegati-->
 		{% if i_len != 0 %}
 		<div class="accordion-item">
@@ -396,7 +534,7 @@
 						data-bs-target="#collapse4"
 						data-bs-toggle="collapse"
 						type="button">
-					Elenco Articoli Fornitore [ {{ i_len }} ]
+					Articoli Fornitore [ {{ i_len }} ]
 				</button>
 			</h2>
 			<div aria-labelledby="heading3"
@@ -455,11 +593,15 @@
 								or 'partner_sites_admin' in session['user_roles']
 								or 'partner_sites_read' in session['user_roles']
 								%}
-								<a class="btn-table" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}"
-								   title="Visualizza Record"
-								   type="button">
+									{% if row.supplier_site_id %}
+										<a class="btn-table" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}"
+										   title="Visualizza Record"
+										   type="button">
+											{{ row.supplier_site_id|e }}
+										</a>
+									{% else %}
 									{{ row.supplier_site_id|e }}
-								</a>
+									{% endif %}
 								{% else %}
 								{{ row.supplier_site_id|e }}
 								{% endif %}
@@ -482,7 +624,7 @@
 						data-bs-target="#collapse1"
 						data-bs-toggle="collapse"
 						type="button">
-					Elenco Modifiche al Record [ {{ h_len }} ]
+					Modifiche al Record [ {{ h_len }} ]
 				</button>
 			</h2>
 			<div aria-labelledby="heading1"
@@ -561,6 +703,24 @@
     
     $(document).ready(function () {
         $('#sites').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            },
+        });
+    });
+    
+    $(document).ready(function () {
+        $('#orders').DataTable({
             responsive: {
                 breakpoints: [
                     { name: 'bigdesktop', width: 1920 },

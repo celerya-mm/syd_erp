@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, DateField, DecimalField
+from wtforms import StringField, SubmitField, SelectField, DateField, DecimalField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional
 
 from app.app import db
@@ -69,7 +69,7 @@ class FormOda(FlaskForm):
 	"""Form per creare un Articolo."""
 	oda_number = StringField('ODA', validators=[DataRequired("Campo obbligatorio!"), Length(min=8, max=8)])
 	oda_date = DateField('Data', validators=[DataRequired("Campo obbligatorio!")])
-	oda_description = StringField('Descrizione', validators=[DataRequired("Campo obbligatorio!"), Length(max=80)])
+	oda_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"), Length(max=255)])
 	oda_delivery_date = DateField('Data Consegna', validators=[DataRequired("Campo obbligatorio!")])
 	oda_currency = SelectField(
 		'Valuta', choices=list_currency, default='€', validators=[DataRequired("Campo obbligatorio!")])
@@ -83,13 +83,13 @@ class FormOda(FlaskForm):
 
 	supplier_offer = StringField('Offerta', validators=[Optional(), Length(max=20)])
 	supplier_offer_date = DateField('Data Offerta', validators=[Optional()])
-	supplier_invoice = StringField('Fattura', validators=[Optional(), Length(max=20)])
+	supplier_invoice = StringField('Fattura', validators=[Optional(), Length(max=50)])
 	supplier_invoice_date = DateField('Data Fattura', validators=[Optional()])
 
 	supplier_id = SelectField("Seleziona Fornitore")
 	supplier_site_id = SelectField("Seleziona Sito Fornitore")
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
 
 	submit = SubmitField("SAVE")
 
@@ -164,7 +164,7 @@ class FormOda(FlaskForm):
 
 			'supplier_offer': not_empty(self.supplier_offer.data.strip().replace(' ', '')),
 			'supplier_offer_date': date_to_str(self.supplier_offer_date.data),
-			'supplier_invoice': not_empty(self.supplier_invoice.data.strip().replace(' ', '')),
+			'supplier_invoice': not_empty(self.supplier_invoice.data.strip().replace('  ', ' ')),
 			'supplier_invoice_date': date_to_str(self.supplier_invoice_date.data),
 
 			'supplier_id': self.supplier_id.data.split(' - ')[0],

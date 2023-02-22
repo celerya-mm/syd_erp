@@ -3,7 +3,7 @@
 {% block content %}
 <form enctype="multipart/form-data" method="POST">
 	{{ form.csrf_token }}
-	<div class="container text-center mt-2">
+	<div class="container text-center mt-2 justify-content-center">
 		<h5 class="card-title">
 			<a class="btn btn-update" href="{{ url_for(view) }}" title="Vai a lista records"
 			   type="button">
@@ -21,111 +21,271 @@
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
 			</a>
 			{% endif %}
+			
+			{%
+			if 'superuser' in session['user_roles']
+			or 'oda_rows_admin' in session['user_roles']
+			or 'oda_rows_write' in session['user_roles']
+			%}
+			<a class="btn btn-update" href="{{ url_for(oda_row_create, o_id=form.id, p_id=p_id, s_id=0) }}"
+			   title="Aggiungi riga Ordine"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/shopping_cart_add.svg') }}"/>
+			</a>
+			{% endif %}
 		</h5>
 	</div>
 	
 	<div class="container text-center mt-2">
+		<div class="row no-gutters justify-content-center">
+			<div class="col-md-2 order-first">
+				<h6> Totale Ordine: </h6>
+				<p class="form-control emphasis" style="font-weight: bold; color: white;">
+					{{ form.oda_amount }}
+				</p>
+			</div>
+		</div>
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="col-md-2 order-first">
 				<div class="form-group">
-					<h6> Cod. ITM </h6>
+					<h6> ODA </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.item_code }}
+						{{ form.oda_number }}
 					</p>
 				</div>
 			</div>
 			<div class="col-md-2 order-second">
 				<div class="form-group">
-					<h6> Cod. F. </h6>
+					<h6> Data </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.item_code_supplier }}
+						{{ form.oda_date }}
 					</p>
 				</div>
 			</div>
-			<div class="col-md-2 order-third">
-				<div class="form-group">
-					<h6> Prezzo </h6>
-					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.item_price }}
-					</p>
-				</div>
-			</div>
-			<div class="col-md-2 order-fourth">
-				<div class="form-group">
-					<div class="form-group">
-						<h6> Sconto </h6>
-						<p class="form-control emphasis" style="font-weight: bold; color: white">
-							{{ form.item_price_discount }}
-						</p>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-2 order-fifth">
-				<div class="form-group">
-					<div class="form-group">
-						<h6> Q. Minima </h6>
-						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-							{{ form.item_quantity_min }}
-						</p>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-2 order-sixth">
-				<div class="form-group">
-					<div class="form-group">
-						<h6> U.M. </h6>
-						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-							{{ form.item_quantity_um }}
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row no-gutters justify-content-center rounded"
-			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="form-group">
+			<div class="col-md-8 order-third">
 				<div class="form-group">
 					<h6> Descrizione </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.item_description }}
+						{{ form.oda_description }}
 					</p>
 				</div>
 			</div>
 		</div>
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="col-md-6 order-first">
+			<div class="col-md-3 order-first">
 				<div class="form-group">
-					<h6> Fornitore </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.supplier_id }}
+					<h6> Consegna </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.oda_delivery_date }}
 					</p>
 				</div>
 			</div>
-			<div class="col-md-6 order-second">
+			<div class="col-md-1 order-second">
 				<div class="form-group">
-					<h6> Sito Fornitore </h6>
+					<h6> Valuta </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.supplier_site_id }}
+						{{ form.oda_currency }}
 					</p>
 				</div>
 			</div>
-		</div>
-		<div class="row no-gutters justify-content-center rounded"
-			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="form-group">
-				<h6> Note </h6>
-				<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-					{{ form.note }}
-				</p>
+			<div class="col-md-5 order-third">
+				<div class="form-group">
+					<h6> Pagamento </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.oda_payment }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-3 order-fourth">
+				<div class="form-group">
+					<h6> Stato </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.oda_status }}
+					</p>
+				</div>
 			</div>
 		</div>
 	</div>
 </form>
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
 	<div class="accordion" id="accordion">
+		<!--	Dettaglio-->
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="0">
+				<button aria-controls="collapse0"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse0"
+						data-bs-toggle="collapse"
+						type="button">
+					Dettaglio
+				</button>
+			</h2>
+			<div aria-labelledby="heading0"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse0">
+				<div class="table-responsive" style="padding: 10px">
+					<form>
+						<div class="container text-center mt-2">
+							<div class="row no-gutters justify-content-center rounded"
+								 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+								<div class="col-md-3 order-first">
+									<div class="form-group">
+										<h6> Offerta </h6>
+										<p class="form-control emphasis" style="font-weight: bold; color: white">
+											{{ form.supplier_offer }}
+										</p>
+									</div>
+								</div>
+								<div class="col-md-3 order-second">
+									<div class="form-group">
+										<h6> Data Off. </h6>
+										<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+											{{ form.supplier_offer_date }}
+										</p>
+									</div>
+								</div>
+								<div class="col-md-3 order-third">
+									<div class="form-group">
+										<h6> Fattura </h6>
+										<p class="form-control emphasis" style="font-weight: bold; color: white">
+											{{ form.supplier_invoice }}
+										</p>
+									</div>
+								</div>
+								<div class="col-md-3 order-fourth">
+									<div class="form-group">
+										<h6> Data Fat. </h6>
+										<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+											{{ form.supplier_invoice_date }}
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="row no-gutters justify-content-center rounded"
+								 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+								<div class="col-md-6 order-first">
+									<div class="form-group">
+										<a href="{{ url_for(partner_detail, _id=p_id) }}" title="Vai all'azienda">
+											Fornitore
+										</a>
+										<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+											{{ form.supplier_id }}
+										</p>
+									</div>
+								</div>
+								<div class="col-md-6 order-second">
+									<div class="form-group">
+										{% if form.supplier_site_id %}
+										<a href="{{ url_for(partner_site_detail, _id=s_id) }}" title="Vai all'azienda">
+											Sito Fornitore
+										</a>
+										{% else %}
+										<h6> Sito Fornitore </h6>
+										{% endif %}
+										<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+											{{ form.supplier_site_id }}
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="row no-gutters justify-content-center rounded"
+								 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+								<div class="form-group">
+									<h6> Note </h6>
+									<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+										{{ form.note }}
+									</p>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!--	Righe ordine-->
+		{% if r_len %}
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="2">
+				<button aria-controls="collapse2"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse2"
+						data-bs-toggle="collapse"
+						type="button">
+					Righe ordine [ {{ r_len }} ]
+				</button>
+			</h2>
+			<div aria-labelledby="heading1"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse2">
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="rows" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" id="r1">ID</th>
+							<th class="title" id="r2">Codice</th>
+							<th class="title" id="r3">Codice F.</th>
+							<th class="title" id="r4">Descrizione</th>
+							<th class="title" id="r5">Prezzo</th>
+							<th class="title" id="r6">Sconto</th>
+							<th class="title" id="r7">Q.</th>
+							<th class="title" id="r8">Tot</th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in rows_list %}
+						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'oda_rows_admin' in session['user_roles']
+								or 'oda_rows_write' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(row_detail, _id=row.id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.id|e }}
+								</a>
+								{% else %}
+								{{ row.id|e }}
+								{% endif %}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_code|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_code_supplier|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.7rem;">
+								{{ row.item_description|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_price|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_price_discount|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_quantity|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.item_amount|e }}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		{% endif %}
 		<!--	Modifiche Record-->
+		{% if h_len %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="1">
 				<button aria-controls="collapseOne"
@@ -181,6 +341,7 @@
 				</div>
 			</div>
 		</div>
+		{% endif %}
 	</div>
 </div>
 <br>
@@ -192,6 +353,24 @@
 
 {% block scripts %}
 <script>
+    $(document).ready(function () {
+        $('#rows').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            },
+        });
+    });
+    
     $(document).ready(function () {
         $('#events').DataTable({
             responsive: {
@@ -209,15 +388,6 @@
             },
         });
     });
-
-
-
-
-
-
-
-
-
 
 </script>
 {% endblock %}

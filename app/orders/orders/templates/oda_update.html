@@ -17,70 +17,28 @@
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 				<div class="col-md-2 order-first">
 					<div class="form-group">
-						{{ form.item_code.label(style="font-size: 1.2rem;") }}
-						{{ form.item_code(class="form-control emphasis") }}
-						{% if form.item_code.errors %}
-						{% for error in form.item_code.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
+						{{ form.oda_number.label(style="font-size: 1.2rem;") }}
+						{{ form.oda_number(class="form-control emphasis") }}
 					</div>
 				</div>
 				<div class="col-md-2 order-second">
 					<div class="form-group">
-						{{ form.item_code_supplier.label(style="font-size: 1.2rem;") }}
-						{{ form.item_code_supplier(class="form-control emphasis") }}
-						{% if form.item_code_supplier.errors %}
-						{% for error in form.item_code_supplier.errors %}
+						{{ form.oda_date.label(style="font-size: 1.2rem;") }}
+						{{ form.oda_date(class="form-control emphasis") }}
+						{% if form.oda_date.errors %}
+						{% for error in form.oda_date.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-2 order-third">
+				<div class="col-md-8 order-third">
 					<div class="form-group">
-						{{ form.item_price.label(style="font-size: 1.2rem;") }}
-						{{ form.item_price(class="form-control emphasis") }}
-						{% if form.item_price.errors %}
-						{% for error in form.item_price.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-				<div class="col-md-2 order-fourth">
-					<div class="form-group">
-						{{ form.item_price_discount.label(style="font-size: 1.2rem;") }}
-						{{ form.item_price_discount(class="form-control") }}
-						{% if form.item_price_discount.errors %}
-						{% for error in form.item_price_discount.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-				<div class="col-md-2 order-fifth">
-					<div class="form-group">
-						{{ form.item_quantity_min.label(style="font-size: 1.2rem;") }}
-						{{ form.item_quantity_min(class="form-control") }}
-						{% if form.item_quantity_min.errors %}
-						{% for error in form.item_quantity_min.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-				<div class="col-md-2 order-sixth">
-					<div class="form-group">
-						{{ form.item_quantity_um.label(style="font-size: 1.2rem;") }}
-						{{ form.item_quantity_um(class="form-control", style="text-align: center;") }}
-						{% if form.item_quantity_um.errors %}
-						{% for error in form.item_quantity_um.errors %}
+						{{ form.oda_description.label(style="font-size: 1.2rem;") }}
+						{{ form.oda_description(class="form-control emphasis") }}
+						{% if form.oda_description.errors %}
+						{% for error in form.oda_description.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
@@ -90,15 +48,104 @@
 			</div>
 			<div class="row no-gutters justify-content-center rounded"
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="form-group">
-					{{ form.item_description.label(style="font-size: 1.2rem;") }}
-					{{ form.item_description(class="form-control emphasis") }}
-					{% if form.item_description.errors %}
-					{% for error in form.item_description.errors %}
-					<span class="text-danger">{{ error }}</span>
-					<br>
-					{% endfor %}
-					{% endif %}
+				<div class="col-md-2 order-first">
+					<div class="form-group">
+						{{ form.oda_delivery_date.label(style="font-size: 1.2rem;") }}
+						{{ form.oda_delivery_date(class="form-control emphasis") }}
+						{% if form.oda_delivery_date.errors %}
+						{% for error in form.oda_delivery_date.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-1 order-second">
+					<div class="form-group">
+						{{ form.oda_currency.label(style="font-size: 1.2rem;") }}
+						{{ form.oda_currency(class="form-control") }}
+						{% if form.oda_currency.errors %}
+						{% for error in form.supplier_id.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-6 order-third">
+					<div class="form-group">
+						{{ form.oda_payment.label(style="font-size: 1.2rem;") }}
+						{{ form.oda_payment(class="form-control", style="text-align: center;") }}
+						{% if form.oda_payment.errors %}
+						{% for error in form.oda_payment.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-3 order-fourth">
+					<div class="form-group">
+						{{ form.oda_status.label(style="font-size: 1.2rem;") }}
+						{{ form.oda_status(class="form-control", style="text-align: center;") }}
+						{% if form.oda_status.errors %}
+						{% for error in form.oda_status.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-3 order-first">
+					<div class="form-group">
+						{{ form.supplier_offer.label(style="font-size: 1.2rem;") }}
+						{{ form.supplier_offer(class="form-control emphasis") }}
+						{% if form.supplier_offer.errors %}
+						{% for error in form.supplier_offer.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-3 order-second">
+					<div class="form-group">
+						{{ form.supplier_offer_date.label(style="font-size: 1.2rem;") }}
+						{{ form.supplier_offer_date(class="form-control") }}
+						{% if form.supplier_offer_date.errors %}
+						{% for error in form.supplier_offer_date.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-3 order-third">
+					<div class="form-group">
+						{{ form.supplier_invoice.label(style="font-size: 1.2rem;") }}
+						{{ form.supplier_invoice(class="form-control") }}
+						{% if form.supplier_invoice.errors %}
+						{% for error in form.supplier_invoice.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-3 order-fourth">
+					<div class="form-group">
+						{{ form.supplier_invoice_date.label(style="font-size: 1.2rem;") }}
+						{{ form.supplier_invoice_date(class="form-control") }}
+						{% if form.supplier_invoice_date.errors %}
+						{% for error in form.supplier_invoice_date.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
 				</div>
 			</div>
 			<div class="row no-gutters justify-content-center rounded"
@@ -121,6 +168,33 @@
 						{{ form.supplier_site_id(class="form-control", style="text-align: center;") }}
 						{% if form.supplier_site_id.errors %}
 						{% for error in form.supplier_site_id.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-6 order-first">
+					<div class="form-group">
+						{{ form.plant_id.label(style="font-size: 1.2rem;") }}
+						{{ form.plant_id(class="form-control emphasis", style="text-align: center;") }}
+						{% if form.plant_id.errors %}
+						{% for error in form.plant_id.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-6 order-second">
+					<div class="form-group">
+						{{ form.plant_site_id.label(style="font-size: 1.2rem;") }}
+						{{ form.plant_site_id(class="form-control", style="text-align: center;") }}
+						{% if form.plant_site_id.errors %}
+						{% for error in form.plant_site_id.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}

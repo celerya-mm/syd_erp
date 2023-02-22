@@ -42,7 +42,6 @@ db.init_app(app)
 migrate = Migrate(app, db)
 migrate.init_app(app, db)
 
-
 # importo i Blueprint
 with app.app_context():
 	from app.event_db.routes import event_bp

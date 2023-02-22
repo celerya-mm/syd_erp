@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, EmailField, BooleanField, SelectField
+from wtforms import StringField, SubmitField, EmailField, BooleanField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 from app.app import db, session
@@ -17,11 +17,11 @@ def list_partners():
 		else:
 			_list = [x.to_dict() for x in records]
 
-		_partner = [d["organization"] for d in _list]
-		_email = [d["email"] for d in _list]
-		_pec = [d["email"] for d in _list]
+		_partner = [d["organization"].lower() for d in _list]
+		_email = [d["email"].lower() for d in _list]
+		_pec = [d["email"].lower() for d in _list]
 		_vat = [d["vat_number"] for d in _list]
-		_sdi_code = [d["sdi_code"] for d in _list]
+		_sdi_code = [d["sdi_code"].lower() for d in _list]
 
 		db.session.close()
 		return _partner, _email, _pec, _vat, _sdi_code
@@ -61,7 +61,7 @@ class FormPartner(FlaskForm):
 	iban = StringField('IBAN', validators=[Optional(), Length(min=27, max=27)], default='IT')
 	swift = StringField('SWIFT', validators=[Optional(), Length(min=12, max=12)])
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
 
 	submit = SubmitField("SAVE")
 
@@ -73,17 +73,17 @@ class FormPartner(FlaskForm):
 
 	def validate_organization(self, field):  # noqa
 		"""Verifica presenza organization nella tabella del DB."""
-		if field.data.strip() in list_partners()[0]:
+		if field.data.strip().lower() in list_partners()[0]:
 			raise ValidationError("Organizzazione già presente in tabella partners.")
 
 	def validate_email(self, field):  # noqa
 		"""Verifica email già assegnata a partner nella tabella del DB."""
-		if field.data.strip() in list_partners()[1]:
+		if field.data.strip().lower() in list_partners()[1]:
 			raise ValidationError("Email già assegnata in tabella partners.")
 
 	def validate_pec(self, field):  # noqa
 		"""Verifica pec già assegnata a partner nella tabella del DB."""
-		if field.data.strip() in list_partners()[2]:
+		if field.data.strip().lower() in list_partners()[2]:
 			raise ValidationError("Pec già assegnata in tabella partners.")
 
 	def validate_vat_number(self, field):  # noqa
@@ -93,7 +93,7 @@ class FormPartner(FlaskForm):
 
 	def validate_sdi_code(self, field):  # noqa
 		"""Verifica SDI già assegnata a partner nella tabella del DB."""
-		if field.data.strip() in list_partners()[4]:
+		if field.data.strip().lower() in list_partners()[4]:
 			raise ValidationError("SDI Code già assegnato in tabella partners.")
 
 	def to_dict(self):

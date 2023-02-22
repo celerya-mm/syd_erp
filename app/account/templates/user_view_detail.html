@@ -11,9 +11,9 @@
 			</a>
 			Dati UTENTE [ {{ form.id }} ]
 			{%
-				if 'superuser' in session['user_roles']
-				or 'users_admin' in session['user_roles']
-				or 'users_write' in session['user_roles']
+			if 'superuser' in session['user_roles']
+			or 'users_admin' in session['user_roles']
+			or 'users_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
 			   title="Modifica utente"
@@ -38,7 +38,7 @@
 			<div class="col-md-2 order-first">
 				<div class="form-group">
 					<h6> Attivo </h6>
-					{% if form.active == True  or form.active == SI %}
+					{% if form.active == True or form.active == SI %}
 					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
 					{% else %}
 					<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
@@ -98,7 +98,9 @@
 		</div>
 		<div class="row no-gutters rounded"
 			 style="background-color: #DEDEDE; padding: 10px;">
-			<h6> Sede Legale </h6>
+			<a href="{{ url_for(plant_detail, _id=p_id) }}" title="Vai all'azienda">
+				Sede Legale
+			</a>
 			<p class="form-control" style="font-weight: bold; color: #5B5A5B">
 				{{ form.plant_id }}
 			</p>
@@ -106,7 +108,9 @@
 		{% if form.plant_site_id and form.plant_site_active%}
 		<div class="row no-gutters rounded"
 			 style="background-color: #DEDEDE; padding: 10px;">
-			<h6> Sede Operativa </h6>
+			<a href="{{ url_for(site_detail, _id=s_id) }}" title="Vai all'azienda">
+				Sede Operativa
+			</a>
 			<p class="form-control" style="font-weight: bold; color: #5B5A5B">
 				{{ form.plant_site_id }}
 			</p>
@@ -153,9 +157,9 @@
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'roles_admin' in session['user_roles']
-									or 'roles_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'roles_admin' in session['user_roles']
+								or 'roles_read' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(role_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -163,7 +167,7 @@
 									{{ row.id|e }}
 								</a>
 								{% else %}
-									{{ row.id|e }}
+								{{ row.id|e }}
 								{% endif %}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 1rem;">
@@ -206,9 +210,9 @@
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'users_admin' in session['user_roles']
-									or 'users_write' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'users_admin' in session['user_roles']
+								or 'users_write' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(event_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -216,7 +220,7 @@
 									{{ row.id|e }}
 								</a>
 								{% else %}
-									{{ row.id|e }}
+								{{ row.id|e }}
 								{% endif %}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.5rem;">
@@ -279,5 +283,6 @@
             },
         });
     });
+
 </script>
 {% endblock %}

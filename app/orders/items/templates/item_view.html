@@ -47,30 +47,34 @@
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'partners_admin' in session['user_roles']
-									or 'partners_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'partners_admin' in session['user_roles']
+								or 'partners_read' in session['user_roles']
 								%}
 								<a class="tab-link" href="{{ url_for(partner_detail, _id=row.supplier_id) }}" style=""
 								   title="Visualizza">
 									{{ row.supplier_id|e }}
 								</a>
 								{% else %}
-									{{ row.supplier_id|e }}
+								{{ row.supplier_id|e }}
 								{% endif %}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'partner_sites_admin' in session['user_roles']
-									or 'partner_sites_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'partner_sites_admin' in session['user_roles']
+								or 'partner_sites_read' in session['user_roles']
 								%}
-								<a class="tab-link" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}" style=""
-								   title="Visualizza">
+									{% if row.supplier_site_id %}
+									<a class="tab-link" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}" style=""
+									   title="Visualizza">
+										{{ row.supplier_site_id|e }}
+									</a>
+									{% else %}
 									{{ row.supplier_site_id|e }}
-								</a>
+									{% endif %}
 								{% else %}
-									{{ row.supplier_site_id|e }}
+								{{ row.supplier_site_id|e }}
 								{% endif %}
 							</td>
 						</tr>
@@ -105,5 +109,6 @@
             }
         });
     });
+
 </script>
 {% endblock %}

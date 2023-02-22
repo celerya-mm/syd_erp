@@ -1,8 +1,10 @@
+import json
+
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required
+from app.functions import token_user_validate, access_required, serialize_dict
 from .forms import FormPartner
 from .models import Partner
 
@@ -99,8 +101,11 @@ def partner_create():
 def partner_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
+
 	from app.organizations.partner_contacts.routes import DETAIL_FOR as CONTACT_DETAIL, CREATE_FOR as CONTACT_CREATE_FOR
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL, CREATE_FOR as SITE_CREATE_FOR
+
+	from app.orders.orders.routes import DETAIL_FOR as ODA_DETAIL, CREATE_FOR as ODA_CREATE_FOR
 	from app.orders.items.routes import DETAIL_FOR as ITEM_DETAIL, CREATE_FOR as ITEM_CREATE_FOR
 
 	# Interrogo il DB
@@ -128,6 +133,13 @@ def partner_view_detail(_id):
 	else:
 		sites_list = []
 
+	# Estraggo la lista degli ordini
+	oda_list = partner.orders
+	if oda_list:
+		oda_list = [item.to_dict() for item in oda_list]
+	else:
+		oda_list = []
+
 	# Estraggo la lista degli articoli
 	items_list = partner.items
 	if items_list:
@@ -142,7 +154,8 @@ def partner_view_detail(_id):
 		contact_detail=CONTACT_DETAIL, contacts_list=contacts_list, c_len=len(contacts_list),
 		contact_create=CONTACT_CREATE_FOR,
 		site_create=SITE_CREATE_FOR, site_detail=SITE_DETAIL, sites_list=sites_list, s_len=len(sites_list),
-		item_create=ITEM_CREATE_FOR, item_detail=ITEM_DETAIL, items_list=items_list, i_len=len(items_list)
+		oda_create=ODA_CREATE_FOR, oda_detail=ODA_DETAIL, oda_list=oda_list, o_len=len(oda_list),
+		item_create=ITEM_CREATE_FOR, item_detail=ITEM_DETAIL, items_list=items_list, i_len=len(items_list),
 	)
 
 
@@ -159,6 +172,7 @@ def partner_update(_id):
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormPartner(request.form).to_dict()
+		# print("PARTNET_UPDATE:", json.dumps(new_data, indent=2, default=serialize_datetime))
 
 		previous_data = partner.to_dict()
 		previous_data.pop("updated_at")

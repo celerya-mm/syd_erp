@@ -5,15 +5,11 @@
 	{{ form.csrf_token }}
 	<div class="container text-center mt-2">
 		<h5 class="card-title">
-			<a class="btn btn-update" href="{{ url_for(view) }}" title="Vai a lista records"
-			   type="button">
-				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/list_blue.svg') }}"/>
-			</a>
-			Dettaglio ARTICOLO [ {{ form.id }} ]
+			Dettaglio RIGA ORDINE ID: [ {{ form.id }} ]
 			{%
 			if 'superuser' in session['user_roles']
-			or 'items_admin' in session['user_roles']
-			or 'items_write' in session['user_roles']
+			or 'oda_rows_admin' in session['user_roles']
+			or 'oda_rows_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
 			   title="Modifica Articolo"
@@ -29,7 +25,28 @@
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="col-md-2 order-first">
 				<div class="form-group">
-					<h6> Cod. ITM </h6>
+					<h6> Totale riga </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.item_amount }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-2 order-first">
+				<div class="form-group">
+					<a href="{{ url_for(order_detail, _id=form.oda_id) }}" title="Vai al fornitore">
+						Ordine ID
+					</a>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.oda_id }}
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="col-md-2 order-first">
+				<div class="form-group">
+					<h6> Cod. Art. </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
 						{{ form.item_code }}
 					</p>
@@ -74,14 +91,14 @@
 			<div class="col-md-2 order-sixth">
 				<div class="form-group">
 					<div class="form-group">
-						<h6> Q. Minima </h6>
+						<h6> Quantità </h6>
 						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-							{{ form.item_quantity_min }}
+							{{ form.item_quantity }}
 						</p>
 					</div>
 				</div>
 			</div>
-			<div class="col-md-2 order-seventh">
+			<div class="col-md-1 order-seventh">
 				<div class="form-group">
 					<div class="form-group">
 						<h6> U.M. </h6>
@@ -105,19 +122,13 @@
 		</div>
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="col-md-6 order-first">
+			<div class="col-md-12 order-first">
 				<div class="form-group">
-					<h6> Fornitore </h6>
+					<a href="{{ url_for(partner_detail, _id=p_id) }}" title="Vai al fornitore">
+						Fornitore
+					</a>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
 						{{ form.supplier_id }}
-					</p>
-				</div>
-			</div>
-			<div class="col-md-6 order-second">
-				<div class="form-group">
-					<h6> Sito Fornitore </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.supplier_site_id }}
 					</p>
 				</div>
 			</div>
@@ -219,15 +230,6 @@
             },
         });
     });
-
-
-
-
-
-
-
-
-
 
 </script>
 {% endblock %}

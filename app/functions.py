@@ -1,3 +1,4 @@
+from _decimal import Decimal
 from datetime import datetime, date
 from functools import wraps
 
@@ -158,7 +159,6 @@ def not_empty(_v):
 	if _v in ["", "-", None, 0] or _v is Null:
 		return None
 	else:
-		_v = str(_v).strip()
 		return _v
 
 
@@ -178,6 +178,14 @@ def status_si_no(_str):
 		return "SI"
 	else:
 		return "NO"
+
+
+def serialize_dict(obj):
+	"""Verifica presenza campi data e li converte in iso format."""
+	if isinstance(obj, datetime):
+		return obj.isoformat()
+	else:
+		raise TypeError(f"{obj} is not JSON serializable")
 
 
 list_currency = ['€', '$', 'unit']

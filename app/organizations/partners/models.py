@@ -36,13 +36,14 @@ class Partner(db.Model):
 	fiscal_code = db.Column(db.String(13), index=False, unique=False, nullable=True)
 	sdi_code = db.Column(db.String(7), index=False, unique=False, nullable=True)
 
-	payment_condition = db.Column(db.String(25), index=False, unique=False, nullable=True)
+	payment_condition = db.Column(db.String(50), index=False, unique=False, nullable=True)
 	iban = db.Column(db.String(27), index=False, unique=False, nullable=True)
 	swift = db.Column(db.String(12), index=False, unique=False, nullable=True)
 
 	contacts = db.relationship(
 		'PartnerContact', backref='partners', order_by='PartnerContact.last_name.asc()', lazy='dynamic')
 	sites = db.relationship('PartnerSite', backref='partners', lazy='dynamic')
+	orders = db.relationship('Oda', backref='partners', lazy='dynamic')
 	items = db.relationship('Item', backref='partners', lazy='dynamic')
 	events = db.relationship('EventDB', backref='partners', order_by='EventDB.id.desc()', lazy='dynamic')
 

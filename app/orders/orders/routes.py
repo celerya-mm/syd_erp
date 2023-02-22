@@ -56,10 +56,12 @@ def oda_view():
 def oda_create(p_id, s_id=None):
 	"""Creazione ODA."""
 	from app.organizations.plant.models import Plant
-	from app.organizations.plant_site.models import PlantSite
 
-	from app.organizations.plant.routes import DETAIL_FOR as PLANT_DETAIL
-	from app.organizations.plant_site.routes import DETAIL_FOR as SITE_DETAIL
+	from app.organizations.partners.models import Partner
+	from app.organizations.partner_sites.models import PartnerSite
+
+	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
+	from app.organizations.partner_sites.routes import DETAIL_FOR as PARTNER_SITE_DETAIL
 
 	form = FormOda.new()
 	if request.method == 'POST' and form.validate():
@@ -95,16 +97,19 @@ def oda_create(p_id, s_id=None):
 			flash("ODA creato correttamente.")
 
 			if s_id not in [None, 0]:
-				return redirect(url_for(SITE_DETAIL, _id=s_id))
+				return redirect(url_for(PARTNER_SITE_DETAIL, _id=s_id))
 			else:
-				return redirect(url_for(PLANT_DETAIL, _id=p_id))
+				return redirect(url_for(PARTNER_DETAIL, _id=p_id))
 
 		except IntegrityError as err:
 			db.session.rollback()
 			db.session.close()
 			flash(f"ERRORE: {str(err.orig)}")
-			return render_template(CREATE_HTML, form=form, plant_view=PLANT_DETAIL, p_id=p_id,
-								   site_view=SITE_DETAIL, s_id=s_id)
+			return render_template(
+				CREATE_HTML, form=form,
+				partner_view=PARTNER_DETAIL, p_id=p_id,
+				partner_site_view=PARTNER_SITE_DETAIL, s_id=s_id,
+			)
 	else:
 		# setto il nuovo numero d'ordine
 		last_id = Oda.query.order_by(Oda.id.desc()).first()
@@ -113,17 +118,26 @@ def oda_create(p_id, s_id=None):
 		else:
 			form.oda_number.data = f'oda_{str(int(last_id.id) + 1).zfill(4)}'
 
-		plant = Plant.query.get(p_id)
+		# Estraggo dati azienda
+		plant = Plant.query.get(1)
 		form.plant_id.data = f'{plant.id} - {plant.organization}'
 		# print('PLANT:', form.plant_id.data)
 
-		if s_id not in [None, 0]:
-			site = PlantSite.query.get(s_id)
-			form.plant_site_id.data = f'{site.id} - {site.organization}'
-			# print('SITE:', form.plant_site_id.data)
+		# Estraggo dati fornitore
+		partner = Partner.query.get(p_id)
+		form.supplier_id.data = f'{partner.id} - {partner.organization}'
+		# print('PARTNER:', form.supplier_id.data)
 
-		return render_template(CREATE_HTML, form=form, plant_view=PLANT_DETAIL, p_id=p_id,
-							   site_view=SITE_DETAIL, s_id=s_id)
+		if s_id:
+			partner_site = PartnerSite.query.get(s_id)
+			form.supplier_site_id.data = f'{partner_site.id} - {partner_site.organization}'
+			# print('PARTNER_SITE:', form.supplier_site_id.data)
+
+		return render_template(
+			CREATE_HTML, form=form,
+			partner_view=PARTNER_DETAIL, p_id=p_id,
+			partner_site_view=PARTNER_SITE_DETAIL, s_id=s_id,
+		)
 
 
 @oda_bp.route(DETAIL, methods=["GET", "POST"])
@@ -133,11 +147,10 @@ def oda_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 
-	from app.organizations.plant.routes import DETAIL_FOR as PLANT_DETAIL
-	from app.organizations.plant_site.routes import DETAIL_FOR as PLANT_SITE_DETAIL
-
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as PARTNER_SITE_DETAIL
+
+	from app.orders.order_rows.routes import CREATE_FOR as ODA_ROW_CREATE, DETAIL_FOR as ODA_ROW_DETAIL
 
 	# Interrogo il DB
 	oda = Oda.query \
@@ -156,15 +169,39 @@ def oda_view_detail(_id):
 	else:
 		history_list = []
 
+	# Estraggo la lista delle righe ordine
+	rows_list = oda.oda_rows
+	if rows_list:
+		rows_list = [row.to_dict() for row in rows_list]
+	else:
+		rows_list = []
+
+	amount = _item["oda_amount"]
+	if rows_list:
+		_item["oda_amount"] = 0
+		for row in rows_list:
+			_item["oda_amount"] = _item["oda_amount"] + row["item_amount"]
+	else:
+		_item["oda_amount"] = None
+
+	if amount != _item["oda_amount"]:
+		flash("TOTALE ORDINE aggiornato.")
+		Oda.update(_id, _item)
+
+		from app.event_db.routes import event_create
+		_event = {
+			"username": session["user"]["username"],
+			"table": Oda.__tablename__,
+			"Modification": f"Update ODA whit id: {_id}",
+			"Previous_data": oda.to_dict()
+		}
+		_event = event_create(_event, order_id=_id)
+
 	# Organizzazione
 	_item["plant_id"] = f'{oda.plant.id} - {oda.plant.organization}'
-	pl_id = oda.plant.id
 
 	if oda.plant_site:
 		_item["plant_site_id"] = f'{oda.plant_site.id} - {oda.plant_site.organization}'
-		ps_id = oda.plant_site.id
-	else:
-		ps_id = None
 
 	# Fornitore
 	_item["supplier_id"] = f'{oda.supplier.id} - {oda.supplier.organization}'
@@ -180,10 +217,9 @@ def oda_view_detail(_id):
 	return render_template(
 		DETAIL_HTML, form=_item, view=VIEW_FOR, update=UPDATE_FOR,
 		event_detail=EVENT_DETAIL, history_list=history_list, h_len=len(history_list),
-		plant_detail=PLANT_DETAIL, pl_id=pl_id,
-		plant_site_detail=PLANT_SITE_DETAIL, ps_id=ps_id,
 		partner_detail=PARTNER_DETAIL, p_id=p_id,
-		partner_site_detail=PARTNER_SITE_DETAIL, s_id=s_id
+		partner_site_detail=PARTNER_SITE_DETAIL, s_id=s_id,
+		oda_row_create=ODA_ROW_CREATE, row_detail=ODA_ROW_DETAIL, rows_list=rows_list, r_len=len(rows_list),
 	)
 
 

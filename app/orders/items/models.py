@@ -16,13 +16,13 @@ class Item(db.Model):
 	item_code = db.Column(db.String(8), index=True, unique=True, nullable=False)
 	item_code_supplier = db.Column(db.String(25), index=True, unique=False, nullable=True)
 
-	item_description = db.Column(db.String(255), index=True, unique=False, nullable=False)
+	item_description = db.Column(db.String(500), index=True, unique=False, nullable=False)
 
 	item_price = db.Column(db.Float, index=False, unique=False, nullable=False)
 	item_price_discount = db.Column(db.Float, index=False, unique=False, nullable=True)  # considerato in %
 	item_currency = db.Column(db.String(3), index=False, unique=False, nullable=True)
 
-	item_quantity_min = db.Column(db.Integer, index=False, unique=False, nullable=True)  # min unità di acquisto
+	item_quantity_min = db.Column(db.Float, index=False, unique=False, nullable=True)  # min unità di acquisto
 	item_quantity_um = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
 	supplier_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=False)
@@ -30,6 +30,8 @@ class Item(db.Model):
 
 	supplier = db.relationship('Partner', backref='s_items', viewonly=True)
 	supplier_site = db.relationship('PartnerSite', backref='ss_items', viewonly=True)
+
+	oda_rows = db.relationship('OdaRow', backref='items', viewonly=True, lazy='dynamic')
 
 	events = db.relationship('EventDB', backref='items', order_by='EventDB.id.desc()', lazy='dynamic')
 
@@ -78,9 +80,6 @@ class Item(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
-
-		supplier_site_id = self.supplier_site_id or None
-
 		return {
 			'id': self.id,
 
@@ -96,7 +95,7 @@ class Item(db.Model):
 			'item_quantity_um': self.item_quantity_um,
 
 			'supplier_id': self.supplier_id,
-			'supplier_site_id': supplier_site_id,
+			'supplier_site_id': self.supplier_site_id or None,
 
 			'note': self.note,
 			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),

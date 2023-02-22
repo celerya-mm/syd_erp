@@ -12,13 +12,14 @@
 						<thead>
 						<tr style="background-color: #2B4692; vertical-align: center;">
 							<th class="title" id="h1">ID</th>
-							<th class="title" id="h2">Codice</th>
-							<th class="title" id="h3">Codice F.</th>
-							<th class="title" id="h4">Descrizione</th>
-							<th class="title" id="h5">Prezzo</th>
-							<th class="title" id="h6">Sconto</th>
-							<th class="title" id="h7">F.</th>
-							<th class="title" id="h8">F.S.</th>
+							<th class="title" id="h2">oda</th>
+							<th class="title" id="h3">Data</th>
+							<th class="title" id="h4">Consegna</th>
+							<th class="title" id="h5">Descrizione</th>
+							<th class="title" id="h6">Totale</th>
+							<th class="title" id="h7">Stato</th>
+							<th class="title" id="h8">F.</th>
+							<th class="title" id="h9">F.S.</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -31,19 +32,31 @@
 								</a>
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.item_code|e }}
+								{{ row.oda_number|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.item_code_supplier|e }}
+								{{ row.oda_date|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.item_description|e }}
+								{{ row.oda_delivery_date|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.oda_description|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.item_price|e }}
+								{{ row.oda_amount|e }}
 							</td>
-							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.item_price_discount|e }}
+							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{% if row.oda_status == "Pagato/Chiuso" %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
+								{% elif row.oda_status == "Ricevuto NC (note)" %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
+								{% elif row.oda_status == "Ricevuto OK" %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_pending.svg') }}">
+								{% else %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_emitted.svg') }}">
+								{% endif %}
+								{{ row.oda_status }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
@@ -65,12 +78,16 @@
 									or 'partner_sites_admin' in session['user_roles']
 									or 'partner_sites_read' in session['user_roles']
 								%}
-								<a class="tab-link" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}" style=""
-								   title="Visualizza">
-									{{ row.supplier_site_id|e }}
-								</a>
+								{% if row.supplier_site_id %}
+									<a class="tab-link" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}" style=""
+									   title="Visualizza">
+										{{ row.supplier_site_id|e }}
+									</a>
+									{% else %}
+										{{ row.supplier_site_id|e }}
+									{% endif %}
 								{% else %}
-									{{ row.supplier_site_id|e }}
+								{{ row.supplier_site_id|e }}
 								{% endif %}
 							</td>
 						</tr>
