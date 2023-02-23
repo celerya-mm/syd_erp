@@ -56,38 +56,6 @@ class PartnerSite(db.Model):
 	def __str__(self):
 		return f'<PARTNER_SITE: [{self.id}] - {self.site}>'
 
-	def __init__(self, site, active, site_type, client, supplier, partner, email, pec, phone, partner_id, address, cap,
-				 city, vat_number, fiscal_code, sdi_code=None, events=None, note=None):
-		self.site = site
-
-		self.active = active
-		self.site_type = site_type
-
-		self.client = client
-		self.supplier = supplier
-		self.partner = partner
-
-		self.email = email
-		self.pec = pec
-		self.phone = phone
-
-		self.address = address or None
-		self.cap = cap or None
-		self.city = city or None
-		self.full_address = mount_full_address(address, cap, city) or None
-
-		self.partner_id = partner_id
-
-		self.vat_number = vat_number
-		self.fiscal_code = fiscal_code
-		self.sdi_code = sdi_code or None
-
-		self.events = events or []
-
-		self.note = note or None
-		self.created_at = datetime.now()
-		self.updated_at = datetime.now()
-
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""
 		db.session.add(self)

@@ -27,12 +27,6 @@ class AuthToken(db.Model):
 	def __str__(self):
 		return f'<AuthToken: {self.token}>'
 
-	def __init__(self, token, user_id):
-		self.token = token
-		self.user_id = user_id
-		self.created_at = datetime.now()
-		self.expires_at = (datetime.now() + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""
 		db.session.add(self)

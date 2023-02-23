@@ -54,41 +54,6 @@ class User(db.Model):
 	def __str__(self):
 		return f'<USER: [{self.id}] - {self.username}>'
 
-	def __init__(self, username, password=None, psw_changed=False, active=None, name=None, last_name=None, phone=None,
-				 email=None, address=None, cap=None, city=None, plant_id=None, plant_site_id=None, auth_tokens=None,
-				 events=None, note=None):
-		from app.functions import mount_full_address, mount_full_name
-
-		self.username = username
-
-		self.password = password
-		self.psw_changed = psw_changed
-
-		self.active = active
-
-		self.name = name
-		self.last_name = last_name
-		self.full_name = mount_full_name(name, last_name)
-
-		self.phone = phone
-		self.email = email
-
-		self.address = address
-		self.cap = cap
-		self.city = city
-		self.full_address = mount_full_address(address, cap, city)
-
-		self.plant_id = plant_id
-		self.plant_site_id = plant_site_id
-
-		self.auth_tokens = auth_tokens or []
-
-		self.events = events or []
-
-		self.note = note or None
-		self.created_at = datetime.now()
-		self.updated_at = datetime.now()
-
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""
 		db.session.add(self)

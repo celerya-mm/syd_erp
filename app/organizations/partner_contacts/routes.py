@@ -5,8 +5,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required, not_empty
-from .forms import FormPartnerContactCreate, FormPartnerContactUpdate
+from app.functions import token_user_validate, access_required, timer_func
+from .forms import FormPartnerContact
 from .models import PartnerContact
 from ..partner_sites.models import PartnerSite
 from ..partners.models import Partner
@@ -35,6 +35,7 @@ UPDATE_HTML = "contact_update.html"
 
 
 @partner_contact_bp.route(VIEW, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partner_contacts_admin', 'partner_contacts_read'])
 def contact_view():
@@ -50,6 +51,7 @@ def contact_view():
 
 
 @partner_contact_bp.route(CREATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partner_contacts_admin', 'partner_contacts_write'])
 def contact_create(p_id, s_id=None):
@@ -57,26 +59,31 @@ def contact_create(p_id, s_id=None):
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 
-	form = FormPartnerContactCreate.new()
+	form = FormPartnerContact.new()
 	if request.method == 'POST' and form.validate():
 		try:
-			form_data = json.loads(json.dumps(request.form))
+			form_data = FormPartnerContact(request.form).to_dict()
 			# print('NEW_CONTACT:', json.dumps(form_data, indent=2))
 
 			new_p = PartnerContact(
 				name=form_data['name'],
 				last_name=form_data['last_name'],
+				full_name=form_data['full_name'],
 
 				role=form_data['role'],
+
+				email=form_data["email"],
+				phone=form_data["phone"],
+
 				partner_id=form_data['partner_id'],
 				partner_site_id=form_data['partner_site_id'],
 
-				email=form_data["email"],
-				phone=not_empty(form_data["phone"]),
-
-				note=not_empty(form_data["note"])
+				note=form_data["note"],
+				created_at=form_data["updated_at"],
+				updated_at=form_data["updated_at"]
 			)
 			PartnerContact.create(new_p)
+			session.pop('partner_id')
 			flash("CONTACT creato correttamente.")
 
 			if s_id not in [None, 0]:
@@ -93,19 +100,20 @@ def contact_create(p_id, s_id=None):
 	else:
 		partner = Partner.query.get(p_id)
 		form.partner_id.data = f'{partner.id} - {partner.organization}'
+		session['partner_id'] = p_id
 		# print('PARTNER:', form.partner_id.data)
 
-		print('SITE_ID:', s_id)
 		if s_id not in [None, 0]:
 			site = PartnerSite.query.get(s_id)
 			form.partner_site_id.data = f'{site.id} - {site.site}'
-			print('SITE:', form.partner_site_id.data)
-
+			# print('SITE:', form.partner_site_id.data)
+		db.session.close()
 		return render_template(CREATE_HTML, form=form, partner_view=PARTNER_DETAIL, p_id=p_id,
 							   site_view=SITE_DETAIL, s_id=s_id)
 
 
 @partner_contact_bp.route(DETAIL, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partner_contacts_admin', 'partner_contacts_read'])
 def contact_view_detail(_id):
@@ -142,6 +150,7 @@ def contact_view_detail(_id):
 
 
 @partner_contact_bp.route(UPDATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partner_contacts_admin', 'partner_contacts_write'])
 def contact_update(_id):
@@ -153,16 +162,17 @@ def contact_update(_id):
 		.options(joinedload(PartnerContact.partner)) \
 		.options(joinedload(PartnerContact.partner_site)) \
 		.get(_id)
-	form = FormPartnerContactUpdate.update(obj=contact)
+	form = FormPartnerContact.update(obj=contact)
 
 	if request.method == 'POST' and form.validate():
-		new_data = FormPartnerContactUpdate(request.form).to_dict()
+		new_data = FormPartnerContact(request.form).to_dict()
 
 		previous_data = contact.to_dict()
 		previous_data.pop("updated_at")
 
 		try:
 			PartnerContact.update(_id, new_data)
+			session.pop('partner_id')
 			flash("PARTNER aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -186,7 +196,7 @@ def contact_update(_id):
 		form.partner_id.data = f'{contact.partner.id} - {contact.partner.organization}'
 		form.partner_site_id.data = f'{contact.partner_site.id} - {contact.partner_site.site}' if contact.partner_site \
 									else None
-
+		session['partner_id'] = contact.partner.id
 		_info = {
 			'created_at': contact.created_at,
 			'updated_at': contact.updated_at,

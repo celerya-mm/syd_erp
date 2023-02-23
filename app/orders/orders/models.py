@@ -16,9 +16,9 @@ class Oda(db.Model):
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
 	oda_number = db.Column(db.String(8), index=True, unique=True, nullable=False)
-	oda_date = db.Column(db.DateTime, index=False, unique=False, nullable=False)
+	oda_date = db.Column(db.Date, index=False, unique=False, nullable=False)
 	oda_description = db.Column(db.String(255), index=False, unique=False, nullable=False)
-	oda_delivery_date = db.Column(db.DateTime, index=False, unique=False, nullable=False)
+	oda_delivery_date = db.Column(db.Date, index=False, unique=False, nullable=False)
 	oda_amount = db.Column(db.Float, index=False, unique=False, nullable=True)
 	oda_currency = db.Column(db.String(3), index=False, unique=False, nullable=False)
 	oda_payment = db.Column(db.String(50), index=False, unique=False, nullable=False)
@@ -30,9 +30,9 @@ class Oda(db.Model):
 	plant_site = db.relationship('PlantSite', backref='ps_orders', viewonly=True)
 
 	supplier_offer = db.Column(db.String(20), index=True, unique=True, nullable=True)
-	supplier_offer_date = db.Column(db.DateTime, index=False, unique=False, nullable=True)
+	supplier_offer_date = db.Column(db.Date, index=False, unique=False, nullable=True)
 	supplier_invoice = db.Column(db.String(50), index=True, unique=True, nullable=True)
-	supplier_invoice_date = db.Column(db.DateTime, index=False, unique=False, nullable=True)
+	supplier_invoice_date = db.Column(db.Date, index=False, unique=False, nullable=True)
 
 	supplier_id = db.Column(db.Integer, db.ForeignKey('partners.id'), nullable=False)
 	supplier_site_id = db.Column(db.Integer, db.ForeignKey('partner_sites.id'), nullable=True)
@@ -54,34 +54,6 @@ class Oda(db.Model):
 
 	def __str__(self):
 		return f'<ODA_CLASS: [{self.item_code}] - {self.item_description}>'
-
-	def __init__(self, oda_number, oda_date, oda_description, oda_delivery_date, oda_amount, oda_currency, oda_payment,
-				 oda_status, plant_id, plant_site_id, supplier_offer, supplier_offer_date, supplier_invoice,
-				 supplier_invoice_date, supplier_id, supplier_site_id, note):
-
-		self.oda_number = oda_number
-		self.oda_date = oda_date
-		self.oda_description = oda_description
-		self.oda_delivery_date = oda_delivery_date
-		self.oda_amount = oda_amount
-		self.oda_currency = oda_currency
-		self.oda_payment = oda_payment
-		self.oda_status = oda_status
-
-		self.plant_id = plant_id
-		self.plant_site_id = plant_site_id
-
-		self.supplier_offer = supplier_offer
-		self.supplier_offer_date = supplier_offer_date
-		self.supplier_invoice = supplier_invoice
-		self.supplier_invoice_date = supplier_invoice_date
-
-		self.supplier_id = supplier_id
-		self.supplier_site_id = supplier_site_id
-
-		self.note = note or None
-		self.created_at = datetime.now()
-		self.updated_at = datetime.now()
 
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""

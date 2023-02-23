@@ -43,31 +43,6 @@ class PartnerContact(db.Model):
 	def __str__(self):
 		return f'<PARTNER_CONTACT: [{self.id}] - {self.full_name}>'
 
-	def __init__(self, name, last_name, role, email, phone, partner_id, partner_site_id=None, events=None, note=None):
-		self.name = name.strip().replace('  ', ' ')
-		self.last_name = last_name.strip().replace('  ', ' ')
-		self.full_name = mount_full_name(self.name, self.last_name)
-
-		self.role = role
-
-		self.email = email.strip().replace(' ', '')
-		self.phone = phone.strip()
-
-		self.partner_id = partner_id.split(' - ')[0]
-
-		if partner_site_id is not None and partner_site_id != '-':
-			partner_site_id = partner_site_id.split(' - ')[0]
-		else:
-			partner_site_id = None
-
-		self.partner_site_id = partner_site_id
-
-		self.events = events or []
-
-		self.note = note or None
-		self.created_at = datetime.now()
-		self.updated_at = datetime.now()
-
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""
 		db.session.add(self)

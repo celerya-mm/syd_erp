@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required
+from app.functions import token_user_validate, access_required, timer_func
 from .forms import FormPlant
 from .models import Plant
 
@@ -30,6 +30,7 @@ UPDATE_HTML = "plant_update.html"
 
 
 @plant_bp.route(VIEW, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partners_admin', 'partners_read'])
 def plant_view():
@@ -43,6 +44,7 @@ def plant_view():
 
 
 @plant_bp.route(CREATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['plants_admin', 'plants_write'])
 def plant_create():
@@ -54,8 +56,8 @@ def plant_create():
 
 		new_p = Plant(
 			organization=form_data["organization"],
-			active=True,
 
+			active=True,
 			site_type=form_data["site_type"],
 
 			email=form_data["email"],
@@ -65,12 +67,15 @@ def plant_create():
 			address=form_data["address"],
 			cap=form_data["cap"],
 			city=form_data["city"],
+			full_address=form_data["full_address"],
 
 			vat_number=form_data["vat_number"],
 			fiscal_code=form_data["fiscal_code"],
 			sdi_code=form_data["sdi_code"],
 
-			note=form_data["note"]
+			note=form_data["note"],
+			created_at=form_data["updated_at"],
+			updated_at=form_data["updated_at"]
 		)
 		try:
 			Plant.create(new_p)
@@ -86,6 +91,7 @@ def plant_create():
 
 
 @plant_bp.route(DETAIL, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['plants_admin', 'plants_read'])
 def plant_view_detail(_id):
@@ -120,6 +126,7 @@ def plant_view_detail(_id):
 
 
 @plant_bp.route(UPDATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['plants_admin', 'plants_write'])
 def plant_update(_id):

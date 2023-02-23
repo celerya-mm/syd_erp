@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from ..app import db
 from .models import EventDB
 
-from app.functions import token_user_validate, date_to_str
+from app.functions import token_user_validate, date_to_str, timer_func
 
 
 event_bp = Blueprint(
@@ -25,6 +25,7 @@ RESTORE = "/event/restore/<int:_id>/<int:id_record>/<table>/<view_for>/"
 RESTORE_FOR = "event_bp.event_restore"
 
 
+@timer_func
 def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None, item_id=None,
 				 order_id=None, plant_id=None, plant_site_id=None, oda_row_id=None):
 	"""Registro evento DB."""
@@ -40,6 +41,7 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 			plant_id=plant_id,
 			plant_site_id=plant_site_id,
 			oda_row_id=oda_row_id,
+			created_at=datetime.now()
 		)
 
 		EventDB.create(new_event)
@@ -61,6 +63,7 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 
 
 @event_bp.route(DETAIL, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 def event_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
@@ -197,6 +200,7 @@ def event_view_detail(_id):
 
 
 @event_bp.route(RESTORE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 def event_restore(_id, id_record, table, view_for):
 	from app.account.models import User

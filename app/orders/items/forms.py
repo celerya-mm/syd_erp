@@ -1,10 +1,10 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, IntegerField, DecimalField, TextAreaField
+from wtforms import StringField, SubmitField, SelectField, DecimalField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional
 
-from app.app import db
+from app.app import db, session
 from app.functions import list_currency
 
 
@@ -29,16 +29,13 @@ def list_partner_sites():
 
 	_list = ["-"]
 	try:
-		records = PartnerSite.query.all()
+		records = PartnerSite.query.filter_by(partner_id=session['partner_id'])
 		for r in records:
-			# print("PARTNER_ID:", r.partner_id, supplier_id, r.partner_id == supplier_id)
-			# if r.partner_id == supplier_id:
 			_list.append(f"{r.id} - {r.site}")
 	except Exception as err:
-		print(err)
+		print('EXTRACT_LIST:', err)
 		pass
 
-	# print("LIST:", _list)
 	db.session.close()
 	return _list
 
@@ -104,6 +101,34 @@ class FormItem(FlaskForm):
 
 		form.note.data = obj.note
 		return form
+
+	def to_dict_new(self):
+		"""Converte form in dict."""
+		from app.functions import not_empty
+
+		if self.supplier_site_id.data and self.supplier_site_id.data not in ['', '-']:
+			supplier_site_id = self.supplier_site_id.data.split(' - ')[0]
+		else:
+			supplier_site_id = None
+
+		return {
+			'item_code': self.item_code.data,
+			'item_code_supplier': not_empty(self.item_code_supplier.data.strip().replace('  ', ' ')),
+
+			'item_description': self.item_description.data.strip().replace('  ', ' '),
+
+			'item_price': self.item_price.data,
+			'item_price_discount': not_empty(self.item_price_discount.data),
+			'item_currency': self.item_currency.data,
+
+			'item_quantity_min': not_empty(self.item_quantity_min.data),
+			'item_quantity_um': not_empty(self.item_quantity_um.data),
+
+			'supplier_id': self.supplier_id.data.split(' - ')[0],
+			'supplier_site_id': supplier_site_id,
+
+			'note': not_empty(self.note.data.strip())
+		}
 
 	def to_dict(self):
 		"""Converte form in dict."""

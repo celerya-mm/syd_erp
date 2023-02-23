@@ -1,11 +1,12 @@
 import json
+from datetime import datetime
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required, not_empty
+from app.functions import token_user_validate, access_required, not_empty, timer_func
 from .forms import FormItem
 from .models import Item
 from app.organizations.partner_sites.models import PartnerSite
@@ -35,6 +36,7 @@ UPDATE_HTML = "item_update.html"
 
 
 @item_bp.route(VIEW, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['items_admin', 'items_read'])
 def item_view():
@@ -52,6 +54,7 @@ def item_view():
 
 
 @item_bp.route(CREATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['items_admin', 'items_write'])
 def item_create(p_id, s_id=None):
@@ -62,29 +65,33 @@ def item_create(p_id, s_id=None):
 	form = FormItem.new()
 	if request.method == 'POST' and form.validate():
 		try:
-			form_data = json.loads(json.dumps(request.form))
+			form_data = FormItem(request.form).to_dict_new()
 			# print('NEW_ITEM:', json.dumps(form_data, indent=2))
+
+			_time = datetime.now()
 
 			new_p = Item(
 				item_code=form_data['item_code'],
-				item_code_supplier=not_empty(form_data['item_code_supplier'].strip().replace('  ', ' ')),
+				item_code_supplier=form_data['item_code_supplier'],
 
-				item_description=form_data['item_description'].strip().replace('  ', ' '),
+				item_description=form_data['item_description'],
 
 				item_price=form_data['item_price'],
-				item_price_discount=not_empty(form_data['item_price_discount']),
+				item_price_discount=form_data['item_price_discount'],
 				item_currency=form_data['item_currency'],
 
-				item_quantity_min=not_empty(form_data["item_quantity_min"]),
-				item_quantity_um=not_empty(form_data["item_quantity_um"]),
+				item_quantity_min=form_data["item_quantity_min"],
+				item_quantity_um=form_data["item_quantity_um"],
 
-				supplier_id=form_data["supplier_id"].split(' - ')[0],
-				supplier_site_id=not_empty(form_data["supplier_site_id"].split(' - ')[0]),
+				supplier_id=form_data["supplier_id"],
+				supplier_site_id=form_data["supplier_site_id"],
 
-				note=not_empty(form_data["note"])
+				note=form_data["note"],
+				created_at=_time,
+				updated_at=_time
 			)
 			Item.create(new_p)
-
+			session.pop('partner_id')
 			flash("ITEM creato correttamente.")
 
 			if s_id not in [None, 0]:
@@ -107,6 +114,7 @@ def item_create(p_id, s_id=None):
 			form.item_code.data = f'itm_{str(int(last_id.id) + 1).zfill(4)}'
 
 		partner = Partner.query.get(p_id)
+		session['partner_id'] = p_id
 		form.supplier_id.data = f'{partner.id} - {partner.organization}'
 		# print('PARTNER:', form.partner_id.data)
 
@@ -120,6 +128,7 @@ def item_create(p_id, s_id=None):
 
 
 @item_bp.route(DETAIL, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['items_admin', 'items_read'])
 def item_view_detail(_id):
@@ -159,6 +168,7 @@ def item_view_detail(_id):
 
 
 @item_bp.route(UPDATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['items_admin', 'items_write'])
 def item_update(_id):

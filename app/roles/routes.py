@@ -7,7 +7,7 @@ from app.app import db
 from .forms import FormRole, FormRoleAddUser
 from .models import Role, UserRoles
 from ..account.models import User
-from ..functions import token_user_validate, access_required
+from ..functions import token_user_validate, access_required, timer_func
 
 role_bp = Blueprint(
 	'role_bp', __name__,
@@ -40,6 +40,7 @@ REMOVE_FOR = "role_bp.remove_role_to_user"
 
 
 @role_bp.route(VIEW, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['roles_admin', 'roles_read'])
 def role_view():
@@ -54,6 +55,7 @@ def role_view():
 
 
 @role_bp.route(CREATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['roles_admin', 'roles_write'])
 def role_create():
@@ -78,6 +80,7 @@ def role_create():
 
 
 @role_bp.route(DETAIL, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['roles_admin', 'roles_read'])
 def role_view_detail(_id):
@@ -102,6 +105,7 @@ def role_view_detail(_id):
 
 
 @role_bp.route(UPDATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['roles_admin', 'roles_write'])
 def role_update(_id):
@@ -135,6 +139,7 @@ def role_update(_id):
 
 
 @role_bp.route(ADD, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['roles_admin'])
 def add_role_to_user(_id):
@@ -160,6 +165,7 @@ def add_role_to_user(_id):
 
 
 @role_bp.route(REMOVE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['roles_admin', 'roles_delete'])
 def remove_role_to_user(id_role, id_user):

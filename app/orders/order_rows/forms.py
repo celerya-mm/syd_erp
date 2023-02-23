@@ -47,10 +47,9 @@ def list_partner_sites():
 
 	_list = ["-"]
 	try:
-		records = PartnerSite.query.all()
+		records = PartnerSite.query.filter_by(partner_id=session['partner_id'])
 		for r in records:
-			if r.partner_id == session['partner_id']:
-				_list.append(f"{r.id} - {r.site}")
+			_list.append(f"{r.id} - {r.site}")
 	except Exception as err:
 		print(err)
 		pass

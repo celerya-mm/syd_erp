@@ -45,31 +45,6 @@ class Plant(db.Model):
 	def __str__(self):
 		return f'<PLANT: [{self.id}] - {self.organization}>'
 
-	def __init__(self, organization, active, site_type, email, pec, phone, address, cap, city, vat_number,
-				 fiscal_code, sdi_code=None, note=None):
-		self.organization = organization
-
-		self.active = active
-
-		self.site_type = site_type
-
-		self.email = email
-		self.pec = pec
-		self.phone = phone
-
-		self.address = address or None
-		self.cap = cap or None
-		self.city = city or None
-		self.full_address = mount_full_address(address, cap, city) or None
-
-		self.vat_number = vat_number
-		self.fiscal_code = fiscal_code
-		self.sdi_code = sdi_code or None
-
-		self.note = note or None
-		self.created_at = datetime.now()
-		self.updated_at = datetime.now()
-
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""
 		db.session.add(self)

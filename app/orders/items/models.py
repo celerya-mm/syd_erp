@@ -46,28 +46,6 @@ class Item(db.Model):
 	def __str__(self):
 		return f'<ITEM_CLASS: [{self.item_code}] - {self.item_description}>'
 
-	def __init__(self, item_code, item_code_supplier, item_description, item_price, item_price_discount, item_currency,
-				 item_quantity_min, item_quantity_um, supplier_id, supplier_site_id, note):
-
-		self.item_code = item_code
-		self.item_code_supplier = item_code_supplier
-		self.item_description = item_description
-
-		self.item_price = item_price
-		self.item_price_discount = item_price_discount
-		self.item_currency = item_currency
-
-		self.item_quantity_min = item_quantity_min
-		self.item_quantity_um = item_quantity_um
-
-		self.supplier_id = supplier_id
-
-		self.supplier_site_id = supplier_site_id
-
-		self.note = note or None
-		self.created_at = datetime.now()
-		self.updated_at = datetime.now()
-
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""
 		db.session.add(self)

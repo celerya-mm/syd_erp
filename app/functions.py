@@ -1,4 +1,4 @@
-from _decimal import Decimal
+from time import time
 from datetime import datetime, date
 from functools import wraps
 
@@ -20,23 +20,23 @@ def token_user_validate(func):
 			authenticated = AuthToken.query.filter_by(token=str(session["token_login"])).first()
 			_user = User.query.get(authenticated.user_id)
 			if authenticated is None:
-				print("AUTHORIZATION_CHECK_FAIL_2")
+				print("AUTHORIZATION_CHECK_FAIL token don't match.")
 				msg = f"Non è stato passato un token valido, ripetere la login."
 				return redirect(url_for('account_bp.logout', msg=msg))
 			elif authenticated.expires_at < datetime.now():
-				print("AUTHORIZATION_CHECK_FAIL_3")
+				print("AUTHORIZATION_CHECK_FAIL token_expired:", authenticated.expires_at)
 				msg = f"Il token è scaduto: {authenticated.expires_at}, ripetere la login."
 				return redirect(url_for('account_bp.logout', msg=msg))
 			elif authenticated.user_id in ["", None]:
-				print("AUTHORIZATION_CHECK_FAIL_4")
-				msg = f"Non è stato registrato nessun utente, effettuare la login."
+				print("AUTHORIZATION_CHECK_FAIL user don't match.")
+				msg = f"Non è registrato nessun utente con username '{session['user']['username']}', " \
+					  f"provare a ripetere la login."
 				return redirect(url_for('account_bp.logout', msg=msg))
 			elif _user.active is False:
-				print("AUTHORIZATION_CHECK_FAIL_5")
+				print("AUTHORIZATION_CHECK_FAIL user_active:", _user.active)
 				msg = f"L'utente {_user.username} non è abilitato all'accesso."
 				return redirect(url_for('account_bp.logout', msg=msg))
 			else:
-				print("AUTHORIZATION_CHECK_PASS")
 				# esegue la funzione
 				return func(*args, **kwargs)
 		else:
@@ -96,6 +96,18 @@ def access_required_update_psw(roles='ANY'):
 				return msg
 
 		return check_rule
+	return wrapper
+
+
+def timer_func(fn):
+	"""Calcola il tempo di esecuzione di una funzione."""
+
+	@wraps(fn)
+	def wrapper(*args, **kwargs):
+			t1 = time()
+			result = fn(*args, **kwargs)
+			print(f'Function {fn.__name__!r} executed in {(time()-t1):.4f}s')
+			return result
 	return wrapper
 
 
@@ -184,12 +196,16 @@ def serialize_dict(obj):
 	"""Verifica presenza campi data e li converte in iso format."""
 	if isinstance(obj, datetime):
 		return obj.isoformat()
+	elif isinstance(obj, date):
+		return obj.isoformat()
 	else:
 		raise TypeError(f"{obj} is not JSON serializable")
 
 
 list_currency = ['€', '$', 'unit']
+
 site_type = ['Sede Legale', 'Sede Legale e Operativa', 'Sede Operativa', 'Sede Secondaria']
+
 list_payments = [
 	'Rimessa diretta ricevimento Fattura',
 	'BB + 30gg DFFM',
@@ -197,6 +213,7 @@ list_payments = [
 	'BB + 90gg DFFM',
 	'Come da Offerta'
 ]
+
 list_order_types = [
 	'Emesso',
 	'Ricevuto OK',
@@ -204,3 +221,13 @@ list_order_types = [
 	'Pagato/Chiuso'
 ]
 
+list_roles = [
+	'Amministratore Delegato',
+	'Referente Commerciale',
+	'Referente Tecnico',
+	'Referente Amministrativo',
+	'Referente Acquisti',
+	'Responsabile IT',
+	'Direttore Stabilimento',
+	'Direttore Amministrativo'
+]

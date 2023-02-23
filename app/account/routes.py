@@ -11,7 +11,8 @@ from .forms import FormUserLogin, FormUserCreate, FormUserUpdate, FormUserPswCha
 from .functions import psw_hash
 from .models import User
 from ..auth_token.functions import __save_auth_token
-from ..functions import token_user_validate, access_required, access_required_update_psw, status_true_false
+from ..functions import (token_user_validate, access_required, access_required_update_psw, status_true_false,
+						 mount_full_address, mount_full_name, timer_func)
 from ..roles.models import Role
 
 account_bp = Blueprint(
@@ -42,6 +43,7 @@ UPDATE_PSW_HTML = "user_update_password.html"
 
 
 @account_bp.route("/login/", methods=["GET", "POST"])
+@timer_func
 def login():
 	"""Effettua la log-in."""
 	form = FormUserLogin()
@@ -86,6 +88,7 @@ def login():
 
 
 @account_bp.route("/logout/")
+@timer_func
 def logout(msg=None):
 	"""Effettua il log-out ed elimina i dati della sessione."""
 	if msg:
@@ -96,6 +99,7 @@ def logout(msg=None):
 
 
 @account_bp.route(VIEW, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['users_admin', 'users_read'])
 def user_view():
@@ -107,7 +111,7 @@ def user_view():
 
 		# Estraggo la lista degli utenti
 		_list = User.query.all()
-		_list = [r.to_dict() for r in _list]
+		_list = [r.to_dict() for r in _list if r.username != 'celerya_superuser']
 
 		db.session.close()
 		return render_template(
@@ -120,6 +124,7 @@ def user_view():
 
 
 @account_bp.route(CREATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['users_admin', 'users_write'])
 def user_create():
@@ -127,6 +132,9 @@ def user_create():
 	form = FormUserCreate.new()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
+
+		_time = datetime.now()
+
 		new_user = User(
 			username=form_data["username"].replace(" ", ""),
 
@@ -137,6 +145,8 @@ def user_create():
 
 			name=form_data["name"].strip(),
 			last_name=form_data["last_name"].strip(),
+			full_name=mount_full_name(
+				form_data["name"].strip(), form_data["last_name"].strip()),
 
 			email=form_data["email"].strip(),
 			phone=form_data["phone"].strip(),
@@ -144,11 +154,15 @@ def user_create():
 			address=form_data["address"].strip(),
 			cap=form_data["cap"].strip(),
 			city=form_data["city"].strip(),
+			full_address=mount_full_address(
+				form_data["address"].strip(), form_data["cap"].strip(), form_data["city"].strip()),
 
 			plant_id=form_data["plant_id"].split(' - ')[0],
 			plant_site_id=form_data["plant_site_id"].split(' - ')[0] if form_data["plant_site_id"] else None,
 
-			note=form_data["note"].strip()
+			note=form_data["note"].strip(),
+			created_at=_time,
+			updated_at=_time
 		)
 		try:
 			User.create(new_user)
@@ -164,6 +178,7 @@ def user_create():
 
 
 @account_bp.route(DETAIL, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['users_admin', 'users_read'])
 def user_view_detail(_id):
@@ -184,10 +199,12 @@ def user_view_detail(_id):
 
 	_user = user.to_dict()
 
-	_user["plant_id"] = f'{user.plant_user.id} - {user.plant_user.organization}' if user.plant_user else None
+	_user["plant_id"] = \
+		f'{user.plant_user.id} - {user.plant_user.organization}' if user.plant_user else None
 	p_id = user.plant_user.id if user.plant_user else None
 
-	_user["plant_site_id"] = f'{user.plant_site_user.id} - {user.plant_site_user.organization}' if user.plant_site_user else None
+	_user["plant_site_id"] = \
+		f'{user.plant_site_user.id} - {user.plant_site_user.organization}' if user.plant_site_user else None
 	_user["plant_site_active"] = user.plant_site_user.active if user.plant_site_user else None
 	s_id = user.plant_site_user.id if user.plant_site_user else None
 
@@ -216,6 +233,7 @@ def user_view_detail(_id):
 
 
 @account_bp.route(UPDATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['users_admin', 'users_write'])
 def user_update(_id):
@@ -227,10 +245,6 @@ def user_update(_id):
 		.options(joinedload(User.plant_user)) \
 		.options(joinedload(User.plant_site_user)) \
 		.get(_id)
-
-	print(user.plant_user)
-	print(user.plant_site_user)
-
 	form = FormUserUpdate.update(obj=user)
 
 	if request.method == 'POST' and form.validate():
@@ -280,6 +294,7 @@ def user_update(_id):
 
 
 @account_bp.route(UPDATE_PSW, methods=["GET", "POST"])
+@timer_func
 @access_required_update_psw(roles=['users_admin', 'users_write'])
 def user_update_password(_id, msg=None):
 	"""Aggiorna password Utente."""

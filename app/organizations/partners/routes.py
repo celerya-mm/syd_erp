@@ -1,10 +1,11 @@
 import json
+from datetime import datetime
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required, serialize_dict
+from app.functions import token_user_validate, access_required, serialize_dict, timer_func
 from .forms import FormPartner
 from .models import Partner
 
@@ -32,6 +33,7 @@ UPDATE_HTML = "partner_update.html"
 
 
 @partner_bp.route(VIEW, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partners_admin', 'partners_read'])
 def partner_view():
@@ -45,6 +47,7 @@ def partner_view():
 
 
 @partner_bp.route(CREATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partners_admin', 'partners_write'])
 def partner_create():
@@ -52,10 +55,10 @@ def partner_create():
 	form = FormPartner()
 	if form.validate_on_submit():
 		form_data = FormPartner(request.form).to_dict()
-		# print('TYPE:', type(form_data), 'NEW_PARTNER:', json.dumps(form_data, indent=2))y
+		# print('TYPE:', type(form_data), 'NEW_PARTNER:', json.dumps(form_data, indent=2))
 
 		new_p = Partner(
-			organization=form_data["organization"].strip().replace('  ', ' '),
+			organization=form_data["organization"],
 
 			active=True,
 			site_type=form_data["site_type"],
@@ -64,13 +67,14 @@ def partner_create():
 			supplier=form_data["supplier"],
 			partner=form_data["partner"],
 
-			email=form_data["email"].strip().replace(' ', ''),
-			pec=form_data["pec"].strip().replace(' ', ''),
+			email=form_data["email"],
+			pec=form_data["pec"],
 			phone=form_data["phone"],
 
 			address=form_data["address"],
 			cap=form_data["cap"],
 			city=form_data["city"],
+			full_address=form_data["full_address"],
 
 			vat_number=form_data["vat_number"],
 			fiscal_code=form_data["fiscal_code"],
@@ -80,7 +84,9 @@ def partner_create():
 			iban=form_data["iban"],
 			swift=form_data["swift"],
 
-			note=form_data["note"]
+			note=form_data["note"],
+			created_at=form_data["updated_at"],
+			updated_at=form_data["updated_at"]
 		)
 		try:
 			Partner.create(new_p)
@@ -96,6 +102,7 @@ def partner_create():
 
 
 @partner_bp.route(DETAIL, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partners_admin', 'partners_read'])
 def partner_view_detail(_id):
@@ -160,6 +167,7 @@ def partner_view_detail(_id):
 
 
 @partner_bp.route(UPDATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partners_admin', 'partners_write'])
 def partner_update(_id):

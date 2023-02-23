@@ -17,17 +17,13 @@ def list_partner_sites():
 		else:
 			_list = [x.to_dict() for x in records]
 
-		_partner = [d["site"] for d in _list]
-		_email = [d["email"] for d in _list]
-		_pec = [d["email"] for d in _list]
-		_vat = [d["vat_number"] for d in _list]
-		_sdi_code = [d["sdi_code"] for d in _list]
+		_partner = [d["site"].lower() for d in _list]
 
 		db.session.close()
-		return _partner, _email, _pec, _vat, _sdi_code
+		return _partner
 	except Exception as err:
 		print(err)
-		return [], [], [], [], []
+		return []
 
 
 def list_partners():
@@ -89,16 +85,8 @@ class FormPartnerSite(FlaskForm):
 
 	def validate_site(self, field):  # noqa
 		"""Verifica presenza organization nella tabella del DB."""
-		if field.data.strip() in list_partner_sites()[0]:
-			raise ValidationError("Sito già presente in tabella partner_sites.")
-
-	@classmethod
-	def new(cls):
-		# Instantiate the form
-		form = cls()
-		# Update the choices
-		form.partner_id.choices = list_partners()
-		return form
+		if field.data.strip().replace('  ', ' ').lower() in list_partner_sites():
+			raise ValidationError("Sito già presente in tabella.")
 
 	@classmethod
 	def update(cls, obj):

@@ -4,15 +4,18 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
-from config import db
+from app.app import db, session
 from .models import PartnerContact
-from app.functions import not_empty, mount_full_name
+from app.functions import not_empty, mount_full_name, list_roles
 
 
 def list_partner_contacts():
 	try:
 		records = PartnerContact.query.all()
-		_list = [x.to_dict() for x in records]
+		if 'partner_id' in session.keys():
+			_list = [x.to_dict() for x in records if x.partner_id != session['partner_id']]
+		else:
+			_list = [x.to_dict() for x in records]
 
 		_contact = [d["full_name"] for d in _list]
 		_email = [d["email"] for d in _list]
@@ -46,7 +49,7 @@ def list_partner_sites():
 
 	_list = ["-"]
 	try:
-		records = PartnerSite.query.all()
+		records = PartnerSite.query.filter_by(partner_id=session['partner_id'])
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
 	except Exception as err:
@@ -57,11 +60,7 @@ def list_partner_sites():
 	return _list
 
 
-list_roles = ['Amministratore Delegato', 'Referente Commerciale', 'Referente Tecnico', 'Referente Amministrativo',
-			  'Referente Acquisti', 'Responsabile IT', 'Direttore Stabilimento', 'Direttore Amministrativo']
-
-
-class FormPartnerContactCreate(FlaskForm):
+class FormPartnerContact(FlaskForm):
 	"""Form per creare un Contatto."""
 	name = StringField('Nome', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=25)])
 	last_name = StringField('Cognome', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=50)])
@@ -93,40 +92,6 @@ class FormPartnerContactCreate(FlaskForm):
 		form.partner_site_id.choices = list_partner_sites()
 		return form
 
-	def validate_full_name(self):  # noqa
-		"""Verifica presenza contatto nella tabella del DB."""
-		if f'{self.name.data} {self.last_name.data}' in list_partner_contacts()[0]:
-			raise ValidationError(f"Contatto già presente in tabella contacts: {self.name.data} {self.last_name.data}.")
-
-	def validate_email(self, field):  # noqa
-		"""Verifica email già assegnata a partner nella tabella del DB."""
-		if field.data.strip() in list_partner_contacts()[1]:
-			raise ValidationError("Email già assegnata in tabella contacts.")
-
-
-class FormPartnerContactUpdate(FlaskForm):
-	"""Form per modificare un Contatto."""
-	name = StringField('Nome', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=25)])
-	last_name = StringField('Cognome', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=50)])
-
-	role = SelectField('Ruolo', choices=list_roles)
-
-	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
-
-	partner_id = SelectField("Seleziona Partner")
-	partner_site_id = SelectField("Seleziona Sito")
-
-	note = StringField('Note', validators=[Length(max=255), Optional()])
-
-	submit = SubmitField("SIGNUP")
-
-	def __repr__(self):
-		return f'<PARTNER_CONTACT_UPDATED: {self.name} {self.last_name}>'
-
-	def __str__(self):
-		return f'<PARTNER_CONTACT_UPDATED: {self.name} {self.last_name}>'
-
 	@classmethod
 	def update(cls, obj):
 		# Instantiate the form
@@ -145,6 +110,16 @@ class FormPartnerContactUpdate(FlaskForm):
 
 		form.note.data = obj.note
 		return form
+
+	def validate_full_name(self):  # noqa
+		"""Verifica presenza contatto nella tabella del DB."""
+		if f'{self.name.data} {self.last_name.data}' in list_partner_contacts()[0]:
+			raise ValidationError(f"Contatto già presente in tabella contacts: {self.name.data} {self.last_name.data}.")
+
+	def validate_email(self, field):  # noqa
+		"""Verifica email già assegnata a partner nella tabella del DB."""
+		if field.data.strip() in list_partner_contacts()[1]:
+			raise ValidationError("Email già assegnata in tabella contacts.")
 
 	def to_dict(self):
 		"""Converte form in dict."""

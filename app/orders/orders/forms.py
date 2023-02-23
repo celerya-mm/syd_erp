@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField, DecimalField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional
 
-from app.app import db
+from app.app import db, session
 from app.functions import list_currency, list_payments, list_order_types
 
 
@@ -26,7 +26,7 @@ def list_partner_sites():
 	from app.organizations.partner_sites.models import PartnerSite
 	_list = ["-"]
 	try:
-		records = PartnerSite.query.all()
+		records = PartnerSite.query.filter_by(partner_id=session['partner_id'])
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
 	except Exception as err:
@@ -157,7 +157,8 @@ class FormOda(FlaskForm):
 			'oda_description': self.oda_description.data.strip().replace('  ', ' '),
 			'oda_delivery_date': date_to_str(self.oda_delivery_date.data),
 			'oda_currency': self.oda_currency.data,
-			'oda_payment': self.oda_payment.data,
+			'oda_payment': not_empty(self.oda_payment.data),
+			'oda_status': not_empty(self.oda_status.data),
 
 			'plant_id': self.plant_id.data.split(' - ')[0],
 			'plant_site_id': plant_site_id,

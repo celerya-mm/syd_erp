@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required, not_empty, str_to_date
+from app.functions import token_user_validate, access_required, not_empty, str_to_date, timer_func
 
 from .forms import FormOda
 from .models import Oda
@@ -34,6 +34,7 @@ UPDATE_HTML = "oda_update.html"
 
 
 @oda_bp.route(VIEW, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['orders_admin', 'orders_read'])
 def oda_view():
@@ -51,6 +52,7 @@ def oda_view():
 
 
 @oda_bp.route(CREATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['orders_admin', 'orders_write'])
 def oda_create(p_id, s_id=None):
@@ -66,34 +68,36 @@ def oda_create(p_id, s_id=None):
 	form = FormOda.new()
 	if request.method == 'POST' and form.validate():
 		try:
-			form_data = json.loads(json.dumps(request.form))
-			print('NEW_CONTACT:', json.dumps(form_data, indent=2))
+			form_data = FormOda(request.form).to_dict()
+			# print('NEW_CONTACT:', json.dumps(form_data, indent=2))
 
-			new_p = Oda(
+			new_oda = Oda(
 				oda_number=form_data['oda_number'],
-				oda_date=str_to_date(form_data['oda_date']),
-				oda_description=form_data['oda_description'].strip().replace('  ', ' '),
-				oda_delivery_date=str_to_date(form_data['oda_delivery_date']),
+				oda_date=form_data['oda_date'],
+				oda_description=form_data['oda_description'],
+				oda_delivery_date=form_data['oda_delivery_date'],
 				oda_amount=None,
 				oda_currency=form_data['oda_currency'],
 				oda_payment=form_data['oda_payment'],
 				oda_status=form_data['oda_status'],
 
-				plant_id=form_data["plant_id"].split(' - ')[0],
-				plant_site_id=not_empty(form_data["plant_site_id"].split(' - ')[0]),
+				plant_id=form_data["plant_id"],
+				plant_site_id=form_data["plant_site_id"],
 
-				supplier_offer=not_empty(form_data["supplier_offer"]),
-				supplier_offer_date=str_to_date(form_data["supplier_offer_date"]),
-				supplier_invoice=not_empty(form_data["supplier_invoice"]),
-				supplier_invoice_date=str_to_date(form_data["supplier_invoice_date"]),
+				supplier_offer=form_data["supplier_offer"],
+				supplier_offer_date=form_data["supplier_offer_date"],
+				supplier_invoice=form_data["supplier_invoice"],
+				supplier_invoice_date=form_data["supplier_invoice_date"],
 
-				supplier_id=form_data["supplier_id"].split(' - ')[0],
-				supplier_site_id=not_empty(form_data["supplier_site_id"].split(' - ')[0]),
+				supplier_id=form_data["supplier_id"],
+				supplier_site_id=form_data["supplier_site_id"],
 
-				note=not_empty(form_data["note"])
+				note=form_data["note"],
+				created_at=form_data["updated_at"],
+				updated_at=form_data["updated_at"]
 			)
-			Oda.create(new_p)
-
+			Oda.create(new_oda)
+			session.pop('partner_id')
 			flash("ODA creato correttamente.")
 
 			if s_id not in [None, 0]:
@@ -126,6 +130,7 @@ def oda_create(p_id, s_id=None):
 		# Estraggo dati fornitore
 		partner = Partner.query.get(p_id)
 		form.supplier_id.data = f'{partner.id} - {partner.organization}'
+		session['partner_id'] = partner.id
 		# print('PARTNER:', form.supplier_id.data)
 
 		if s_id:
@@ -141,6 +146,7 @@ def oda_create(p_id, s_id=None):
 
 
 @oda_bp.route(DETAIL, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['orders_admin', 'orders_read'])
 def oda_view_detail(_id):
@@ -224,6 +230,7 @@ def oda_view_detail(_id):
 
 
 @oda_bp.route(UPDATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['orders_admin', 'orders_write'])
 def oda_update(_id):
@@ -231,31 +238,32 @@ def oda_update(_id):
 	from app.event_db.routes import event_create
 
 	# recupero i dati
-	item = Oda.query \
+	oda = Oda.query \
 		.options(joinedload(Oda.plant)) \
 		.options(joinedload(Oda.plant_site)) \
 		.options(joinedload(Oda.supplier)) \
 		.options(joinedload(Oda.supplier_site)) \
 		.get(_id)
 
-	form = FormOda.update(obj=item)
+	form = FormOda.update(obj=oda)
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormOda(request.form).to_dict()
 
-		previous_data = item.to_dict()
+		previous_data = oda.to_dict()
 		previous_data.pop("updated_at")
 
 		try:
 			Oda.update(_id, new_data)
+			session.pop('partner_id')
 			flash("ODA aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
 			db.session.close()
 			flash(f"ERRORE: {str(err.orig)}")
 			_info = {
-				'created_at': item.created_at,
-				'updated_at': item.updated_at,
+				'created_at': oda.created_at,
+				'updated_at': oda.updated_at,
 			}
 			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=DETAIL_FOR)
 
@@ -269,15 +277,17 @@ def oda_update(_id):
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		# Organizzazione
-		form.plant_id.data = f'{item.plant.id} - {item.plant.organization}'
-		form.plant_site_id.data = f'{item.plant_site.id} - {item.plant_site.site}' if item.plant_site else None
+		form.plant_id.data = f'{oda.plant.id} - {oda.plant.organization}'
+		form.plant_site_id.data = f'{oda.plant_site.id} - {oda.plant_site.site}' if oda.plant_site else None
+
 		# Fornitore
-		form.supplier_id.data = f'{item.supplier.id} - {item.supplier.organization}'
-		form.supplier_site_id.data = f'{item.supplier_site.id} - {item.supplier_site.site}' if item.supplier_site else None
+		form.supplier_id.data = f'{oda.supplier.id} - {oda.supplier.organization}'
+		form.supplier_site_id.data = f'{oda.supplier_site.id} - {oda.supplier_site.site}' if oda.supplier_site else None
+		session['partner_id'] = oda.supplier.id
 
 		_info = {
-			'created_at': item.created_at,
-			'updated_at': item.updated_at,
+			'created_at': oda.created_at,
+			'updated_at': oda.updated_at,
 		}
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=DETAIL_FOR)

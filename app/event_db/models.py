@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from sqlalchemy.dialects.postgresql import JSONB
 
 from config import db
@@ -29,22 +27,6 @@ class EventDB(db.Model):
 
     def __str__(self):
         return f'<EVENTO_RECORD: [{self.event}]>'
-
-    def __init__(self, event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None,
-                 item_id=None, order_id=None, plant_id=None, plant_site_id=None, oda_row_id=None):
-        self.event = event
-
-        self.user_id = user_id
-        self.partner_id = partner_id
-        self.partner_contact_id = partner_contact_id
-        self.partner_site_id = partner_site_id
-        self.item_id = item_id
-        self.order_id = order_id
-        self.plant_id = plant_id
-        self.plant_site_id = plant_site_id
-        self.oda_row_id = oda_row_id
-
-        self.created_at = datetime.now()
 
     def create(self):
         """Crea un nuovo record e lo salva nel db."""

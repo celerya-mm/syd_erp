@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from app.functions import token_user_validate, access_required
+from app.functions import token_user_validate, access_required, timer_func
 from app.app import session, db
 from .forms import FormPartnerSite
 from .models import PartnerSite
@@ -33,6 +33,7 @@ UPDATE_HTML = "partner_site_update.html"
 
 
 @partner_site_bp.route(VIEW, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partner_sites_admin', 'partner_sites_read'])
 def partner_site_view():
@@ -49,13 +50,14 @@ def partner_site_view():
 
 
 @partner_site_bp.route(CREATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partner_sites_admin', 'partner_sites_write'])
 def partner_site_create(p_id):
 	"""Creazione Sito."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL_FOR
 
-	form = FormPartnerSite.new()
+	form = FormPartnerSite()
 	if form.validate_on_submit():
 		form_data = FormPartnerSite(request.form).to_dict()
 		# print('TYPE:', type(form_data), 'NEW_PARTNER:', json.dumps(form_data, indent=2))
@@ -77,14 +79,18 @@ def partner_site_create(p_id):
 			address=form_data["address"],
 			cap=form_data["cap"],
 			city=form_data["city"],
-
-			partner_id=form_data["partner_id"],
+			full_address=form_data["full_address"],
 
 			vat_number=form_data["vat_number"],
 			fiscal_code=form_data["fiscal_code"],
 			sdi_code=form_data["sdi_code"],
 
-			note=form_data["note"]
+			partner_id=form_data["partner_id"],
+
+			note=form_data["note"],
+
+			created_at=form_data["updated_at"],
+			updated_at=form_data["updated_at"]
 		)
 		try:
 			PartnerSite.create(new_p)
@@ -96,15 +102,18 @@ def partner_site_create(p_id):
 			flash(f"ERRORE: {str(err.orig)}")
 			return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
 	else:
-		if p_id:
-			from ..partners.models import Partner
-			partner = Partner.query.get(p_id)
-			form.partner_id.data = f'{partner.id} - {partner.organization}'
-			print("PARTNER:", form.partner_id.data)
-		return render_template(CREATE_HTML, form=form, view=VIEW_FOR, p_id=p_id, partner_detail=PARTNER_DETAIL_FOR)
+		from ..partners.models import Partner
+		partner = Partner.query.get(p_id)
+		form.partner_id.data = f'{partner.id} - {partner.organization}'
+		db.session.close()
+		partner = f'[ {partner.id} ] - {partner.organization}'
+		# print("PARTNER:", form.partner_id.data)
+		return render_template(CREATE_HTML, form=form, view=VIEW_FOR, p_id=p_id, partner_detail=PARTNER_DETAIL_FOR,
+							   partner=partner)
 
 
 @partner_site_bp.route(DETAIL, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partner_sites_admin', 'partner_sites_read'])
 def partner_site_view_detail(_id):
@@ -154,6 +163,7 @@ def partner_site_view_detail(_id):
 
 
 @partner_site_bp.route(UPDATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['partner_sites_admin', 'partner_sites_write'])
 def partner_site_update(_id):

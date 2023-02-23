@@ -1,25 +1,33 @@
 # copiare l'intero progetto nella macchina sul quale si vuole installare e che ha Docker installato.
-# Una volta impostato il "dockerfile" lanciare il seguente comando dal prompt:
+# Una volta impostato il "dockerfile" lanciare i seguenti comandi dal prompt
 # Spostarsi all'interno della cartella radice dell'applicazione dove è contenuto il Dockerfile
 
+# su QNAP loggarsi come utente di default 'admin' altrimenti non si ha accesso al crontab
+
 ### docker classico
-cd ../../Multimedia/05_Documenti/Flask/cbgc_server
+cd ../../Multimedia/05_Documenti/Flask/syd_erp
 
-docker build --force-rm -t cbgc:latest .
-docker build --force-rm -t nginx:latest .
 
-# Verificare l'immagine creata
-docker image ls
+### app
+docker build --force-rm -t syd_erp:latest .
 
 # Lanciare il docker usando l'immagine appena creata (fare attenzione a lanciare gunicorn con la porta 5000)
-docker run -d -p 8000:5000 --name cbgc-service --restart=always cbgc:latest
-docker run -d -p 80:80 -p 62233:62233 --name reverse-proxy --restart=always nginx:latest
+docker run -d -p 8008:5000 --name syd-erp --restart=always syd_erp:latest
 
-# Rimuovere immagini non utilizzate
+
+### nginx
+cd nginx
+docker build --force-rm -t nginx:latest .
+docker run -d -p 80:80 -p 62233:62233 -p 62230:62230 --name reverse-proxy --restart=always nginx:latest
+
+### Verificare l'immagine creata
+docker image ls
+
+### Rimuovere immagini non utilizzate
 docker image ls -f dangling=true
 docker image prune -f --filter "dangling=true"
 
-# rimuove container non attivi
+### rimuove container non attivi
 docker container prune
 
 ### docker-compose (da file docker-compose.yml)
@@ -58,3 +66,6 @@ vim default.conf
 
 # copiare chiave certificato da fuori il container and save under ./nginx folder
 docker cp -L reverse_proxy:/etc/letsencrypt <your_path>
+
+
+https://cbg.celerya.com:62230

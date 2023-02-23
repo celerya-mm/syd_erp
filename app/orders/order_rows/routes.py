@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required, serialize_dict
+from app.functions import token_user_validate, access_required, serialize_dict, timer_func
 from .forms import FormOdaRowUpdate, FormOdaRowCreate
 from .models import OdaRow
 
@@ -19,39 +19,38 @@ oda_rows_bp = Blueprint(
 
 CREATE = "/create/<int:o_id>/<int:p_id>/<int:s_id>/"
 CREATE_FOR = "oda_rows_bp.oda_rows_create"
-CREATE_HTML = "order_rows_create.html"
+CREATE_HTML = "oda_rows_create.html"
 
 DETAIL = "/view/detail/<int:_id>"
 DETAIL_FOR = "oda_rows_bp.oda_rows_view_detail"
-DETAIL_HTML = "order_rows_view_detail.html"
+DETAIL_HTML = "oda_rows_view_detail.html"
 
 UPDATE = "/update/<int:_id>"
 UPDATE_FOR = "oda_rows_bp.oda_rows_update"
-UPDATE_HTML = "order_rows_update.html"
+UPDATE_HTML = "oda_rows_update.html"
 
 
 @oda_rows_bp.route(CREATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
-@access_required(roles=['order_rows_admin', 'order_rows_write'])
+@access_required(roles=['oda_rows_admin', 'oda_rows_write'])
 def oda_rows_create(o_id, p_id, s_id=None):
 	"""Creazione Item."""
 	from app.orders.orders.routes import DETAIL_FOR as ORDER_DETAIL
 	from app.orders.items.models import Item
 
-	ajax = '_ajax' in request.form  # noqa
-
 	form = FormOdaRowCreate.new()
 	if request.method == 'POST' and form.validate():
 		try:
 			form_data = json.loads(json.dumps(request.form))
-			print('NEW_ROWS:', json.dumps(form_data, indent=2))
+			# print('NEW_ROWS:', json.dumps(form_data, indent=2))
 
 			_code = form_data['item_code'].split(" - ")[0]
 
 			_item = Item.query.filter_by(item_code=_code).first()
 			# print("ITEM_ODA_ROW:", json.dumps(_item.to_dict(), indent=2))
 
-			_date = datetime.now()
+			_time = datetime.now()
 
 			new_p = OdaRow(
 				item_code=_item.item_code,
@@ -74,8 +73,8 @@ def oda_rows_create(o_id, p_id, s_id=None):
 				supplier_site_id=s_id if s_id not in [0, None] else None,
 
 				note=None,
-				created_at=_date,
-				updated_at=_date
+				created_at=_time,
+				updated_at=_time
 			)
 
 			OdaRow.create(new_p)
@@ -95,8 +94,9 @@ def oda_rows_create(o_id, p_id, s_id=None):
 
 
 @oda_rows_bp.route(DETAIL, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
-@access_required(roles=['order_rows_admin', 'order_rows_read'])
+@access_required(roles=['oda_rows_admin', 'oda_rows_read'])
 def oda_rows_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
@@ -129,8 +129,9 @@ def oda_rows_view_detail(_id):
 
 
 @oda_rows_bp.route(UPDATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
-@access_required(roles=['order_rows_admin', 'order_rows_write'])
+@access_required(roles=['oda_rows_admin', 'oda_rows_write'])
 def oda_rows_update(_id):
 	"""Aggiorna dati Item."""
 	from app.event_db.routes import event_create
@@ -146,6 +147,7 @@ def oda_rows_update(_id):
 
 		_tot = round(float(new_data["item_price"]) * float(new_data["item_quantity"]), 2)
 		_discount = (100 - float(new_data["item_price_discount"])) / 100 if new_data["item_price_discount"] else None
+
 		new_data["item_amount"] = round(float(_tot) * _discount, 2) if _discount else _tot
 		# print("NEW_DATA_ROW:", json.dumps(new_data, indent=2, default=serialize_dict))
 

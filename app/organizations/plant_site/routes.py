@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required
+from app.functions import token_user_validate, access_required, timer_func
 from .forms import FormPlantSite
 from .models import PlantSite
 
@@ -31,6 +31,7 @@ UPDATE_HTML = "plant_site_update.html"
 
 
 @plant_site_bp.route(VIEW, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['plant_sites_admin', 'plant_sites_read'])
 def plant_site_view():
@@ -44,6 +45,7 @@ def plant_site_view():
 
 
 @plant_site_bp.route(CREATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['plant_sites_admin', 'plant_sites_write'])
 def plant_site_create(p_id):
@@ -57,8 +59,8 @@ def plant_site_create(p_id):
 
 		new_p = PlantSite(
 			organization=form_data["organization"],
-			active=form_data["active"],
 
+			active=form_data["active"],
 			site_type=form_data["site_type"],
 
 			email=form_data["email"],
@@ -68,14 +70,17 @@ def plant_site_create(p_id):
 			address=form_data["address"],
 			cap=form_data["cap"],
 			city=form_data["city"],
-
-			plant_id=form_data["plant_id"],
+			full_address=form_data["full_address"],
 
 			vat_number=form_data["vat_number"],
 			fiscal_code=form_data["fiscal_code"],
 			sdi_code=form_data["sdi_code"],
 
-			note=form_data["note"]
+			plant_id=form_data["plant_id"],
+
+			note=form_data["note"],
+			created_at=form_data["updated_at"],
+			updated_at=form_data["updated_at"]
 		)
 		try:
 			PlantSite.create(new_p)
@@ -101,6 +106,7 @@ def plant_site_create(p_id):
 
 
 @plant_site_bp.route(DETAIL, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['plant_sites_admin', 'plant_sites_read'])
 def plant_site_view_detail(_id):
@@ -131,6 +137,7 @@ def plant_site_view_detail(_id):
 
 
 @plant_site_bp.route(UPDATE, methods=["GET", "POST"])
+@timer_func
 @token_user_validate
 @access_required(roles=['plant_sites_admin', 'plant_sites_write'])
 def plant_site_update(_id):
