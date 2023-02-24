@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, IntegerField, DecimalField, TextAreaField
-from wtforms.validators import Length, Optional
+from wtforms.validators import Length, Optional, DataRequired
 
 from app.app import db, session
 from app.functions import list_currency
@@ -83,25 +83,25 @@ class FormOdaRowCreate(FlaskForm):
 class FormOdaRowUpdate(FlaskForm):
 	"""Form per creare un Articolo."""
 	item_code = SelectField('Articolo', choices=list_items)
-	item_code_supplier = StringField('Cod. F.', validators=[Length(max=50), Optional()])
+	item_code_supplier = StringField('Cod. F.', validators=[Optional(), Length(max=50)])
 
-	item_description = TextAreaField('Descrizione', validators=[Optional(), Length(max=500)])
+	item_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"), Length(max=500)])
 
-	item_price = DecimalField('Prezzo', validators=[Optional()], places=2)
+	item_price = DecimalField('Prezzo', validators=[DataRequired("Campo obbligatorio!")], places=2)
 	item_price_discount = DecimalField('Sconto %', validators=[Optional()], places=2)
 	item_currency = SelectField('Valuta', choices=list_currency)
 
 	item_amount = DecimalField('Prezzo', validators=[Optional()], places=2)
 
-	oda_id = IntegerField("Oda", validators=[Optional()])
+	oda_id = IntegerField("Oda", validators=[DataRequired("Campo obbligatorio!")])
 
 	item_quantity = DecimalField('Q.', validators=[Optional()])
 	item_quantity_um = SelectField('U.M.', choices=list_um, validators=[Optional()])
 
-	supplier_id = IntegerField("Fornitore.", validators=[Optional()])
+	supplier_id = IntegerField("Fornitore.", validators=[DataRequired("Campo obbligatorio!")])
 	supplier_site_id = IntegerField("Sito F.", validators=[Optional()])
 
-	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 
@@ -116,21 +116,21 @@ class FormOdaRowUpdate(FlaskForm):
 		# Instantiate the form
 		form = cls()
 		form.item_code.data = obj.item_code
-		form.item_code_supplier.data = obj.item_code_supplier
+		form.item_code_supplier.data = obj.item_code_supplier or None
 
 		form.item_description.data = obj.item_description
 
 		form.item_price.data = obj.item_price
-		form.item_price_discount.data = obj.item_price_discount
-		form.item_currency.data = obj.item_currency
+		form.item_price_discount.data = obj.item_price_discount or None
+		form.item_currency.data = obj.item_currency or None
 
-		form.item_quantity.data = obj.item_quantity
-		form.item_quantity_um.data = obj.item_quantity_um
+		form.item_quantity.data = obj.item_quantity or None
+		form.item_quantity_um.data = obj.item_quantity_um or None
 
 		# Update the choices
 		form.supplier_site_id.choices = list_partner_sites()
 
-		form.note.data = obj.note
+		form.note.data = obj.note or None
 		return form
 
 	def to_dict(self):
@@ -146,7 +146,7 @@ class FormOdaRowUpdate(FlaskForm):
 			'item_code': self.item_code.data.split(' - ')[0],
 			'item_code_supplier': not_empty(self.item_code_supplier.data.strip().replace('  ', ' ')),
 
-			'item_description': self.item_description.data.strip().replace('  ', ' '),
+			'item_description': not_empty(self.item_description.data.strip().replace('  ', ' ')),
 
 			'item_price': float(self.item_price.data),
 			'item_price_discount': float(self.item_price_discount.data) if self.item_price_discount.data else None,

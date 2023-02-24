@@ -1,10 +1,9 @@
-from datetime import datetime
-from config import db
-from app.functions import mount_full_address, date_to_str
+from app.app import db
 
 # importazioni per creare relazioni in tabella
 from app.organizations.plant_site.models import PlantSite  # noqa
 from app.event_db.models import EventDB  # noqa
+from app.account.models import User  # noqa
 
 
 class Plant(db.Model):
@@ -71,13 +70,13 @@ class Plant(db.Model):
 			'address': self.address,
 			'cap': self.cap,
 			'city': self.city,
-			'full_address': mount_full_address(self.address, self.cap, self.city),
+			'full_address': self.full_address,
 
 			'vat_number': self.vat_number,
 			'fiscal_code': self.fiscal_code,
 			'sdi_code': self.sdi_code,
 
 			'note': self.note,
-			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
-			'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f")
+			'created_at': self.created_at,
+			'updated_at': self.updated_at
 		}

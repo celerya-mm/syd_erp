@@ -72,21 +72,21 @@ def item_create(p_id, s_id=None):
 
 			new_p = Item(
 				item_code=form_data['item_code'],
-				item_code_supplier=form_data['item_code_supplier'],
+				item_code_supplier=not_empty(form_data['item_code_supplier']),
 
 				item_description=form_data['item_description'],
 
 				item_price=form_data['item_price'],
-				item_price_discount=form_data['item_price_discount'],
+				item_price_discount=not_empty(form_data['item_price_discount']),
 				item_currency=form_data['item_currency'],
 
-				item_quantity_min=form_data["item_quantity_min"],
-				item_quantity_um=form_data["item_quantity_um"],
+				item_quantity_min=not_empty(form_data["item_quantity_min"]),
+				item_quantity_um=not_empty(form_data["item_quantity_um"]),
 
 				supplier_id=form_data["supplier_id"],
-				supplier_site_id=form_data["supplier_site_id"],
+				supplier_site_id=not_empty(form_data["supplier_site_id"]),
 
-				note=form_data["note"],
+				note=not_empty(form_data["note"]),
 				created_at=_time,
 				updated_at=_time
 			)

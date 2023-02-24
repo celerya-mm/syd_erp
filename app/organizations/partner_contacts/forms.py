@@ -68,12 +68,12 @@ class FormPartnerContact(FlaskForm):
 	role = SelectField('Ruolo', choices=list_roles)
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=25)], default="+39 ")
 
 	partner_id = SelectField("Seleziona Partner")
 	partner_site_id = SelectField("Seleziona Sito")
 
-	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SIGNUP")
 
@@ -102,13 +102,13 @@ class FormPartnerContact(FlaskForm):
 		form.role.data = obj.role
 
 		form.email.data = obj.email
-		form.phone.data = obj.phone
+		form.phone.data = obj.phone if obj.phone else None
 
 		# Update the choices
 		form.partner_id.choices = list_partners()
 		form.partner_site_id.choices = list_partner_sites()
 
-		form.note.data = obj.note
+		form.note.data = obj.note if obj.note else None
 		return form
 
 	def validate_full_name(self):  # noqa

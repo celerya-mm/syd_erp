@@ -46,7 +46,7 @@ list_um = ['kg', 'pz', 'unit']
 class FormItem(FlaskForm):
 	"""Form per creare un Articolo."""
 	item_code = StringField('Cod. ITM', validators=[DataRequired("Campo obbligatorio!"), Length(min=8, max=8)])
-	item_code_supplier = StringField('Cod. F.', validators=[Length(max=50), Optional()])
+	item_code_supplier = StringField('Cod. F.', validators=[Optional(), Length(max=50)])
 
 	item_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"), Length(max=500)])
 
@@ -60,7 +60,7 @@ class FormItem(FlaskForm):
 	supplier_id = SelectField("Seleziona Fornitore")
 	supplier_site_id = SelectField("Seleziona Sito Fornitore")
 
-	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 
@@ -84,22 +84,22 @@ class FormItem(FlaskForm):
 		# Instantiate the form
 		form = cls()
 		form.item_code.data = obj.item_code
-		form.item_code_supplier.data = obj.item_code_supplier
+		form.item_code_supplier.data = obj.item_code_supplier if obj.item_code_supplier else None
 
 		form.item_description.data = obj.item_description
 
 		form.item_price.data = obj.item_price
-		form.item_price_discount.data = obj.item_price_discount
+		form.item_price_discount.data = obj.item_price_discount if obj.item_price_discount else None
 		form.item_currency.data = obj.item_currency
 
-		form.item_quantity_min.data = obj.item_quantity_min
-		form.item_quantity_um.data = obj.item_quantity_um
+		form.item_quantity_min.data = obj.item_quantity_min if obj.item_quantity_min else None
+		form.item_quantity_um.data = obj.item_quantity_um if obj.item_quantity_um else None
 
 		# Update the choices
 		form.supplier_id.choices = list_partners()
 		form.supplier_site_id.choices = list_partner_sites()
 
-		form.note.data = obj.note
+		form.note.data = obj.note if obj.note else None
 		return form
 
 	def to_dict_new(self):
@@ -147,7 +147,7 @@ class FormItem(FlaskForm):
 
 			'item_price': self.item_price.data,
 			'item_price_discount': not_empty(self.item_price_discount.data),
-			'item_currency': self.item_currency.data,
+			'item_currency': not_empty(self.item_currency.data),
 
 			'item_quantity_min': not_empty(self.item_quantity_min.data),
 			'item_quantity_um': not_empty(self.item_quantity_um.data),

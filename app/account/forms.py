@@ -70,7 +70,7 @@ class FormUserCreate(FlaskForm):
 
 	active = BooleanField("Attivo", false_values=(False, ))
 
-	syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
+	syd_user = StringField('User SYD', validators=[Optional(), Length(min=3, max=25)])
 
 	new_password_1 = PasswordField('Nuova Password', validators=[
 		DataRequired("Campo obbligatorio!"), Length(min=8, max=64)])
@@ -79,20 +79,20 @@ class FormUserCreate(FlaskForm):
 		EqualTo('new_password_1',
 				message='Le due password inserite non corrispondono tra di loro. Riprova a inserirle!')])
 
-	name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
-	last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
+	name = StringField('Nome', validators=[Optional(), Length(min=3, max=25)])
+	last_name = StringField('Cognome', validators=[Optional(), Length(min=3, max=25)])
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=25)], default="+39 ")
 
-	address = StringField('Indirizzo', validators=[Length(min=3, max=150), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
+	address = StringField('Indirizzo', validators=[Optional(), Length(min=3, max=150)])
+	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
+	city = StringField('Città', validators=[Optional(), Length(min=3, max=55)])
 
 	plant_id = SelectField("Sede Legale", validators=[DataRequired("Campo obbligatorio!")])
 	plant_site_id = SelectField("Sede Operativa", validators=[Optional()])
 
-	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 
@@ -142,16 +142,16 @@ class FormUserUpdate(FlaskForm):
 	last_name = StringField('Cognome', validators=[Optional()])
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()])
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=25)])
 
-	address = StringField('Indirizzo', validators=[Length(min=3, max=150), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
+	address = StringField('Indirizzo', validators=[Optional(), Length(min=3, max=150)])
+	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
+	city = StringField('Città', validators=[Optional(), Length(min=3, max=55)])
 
 	plant_id = SelectField("Sede Legale", validators=[DataRequired("Campo obbligatorio!")])
 	plant_site_id = SelectField("Sede Operativa", validators=[Optional()])
 
-	note = StringField('Note', validators=[Length(max=255)])
+	note = StringField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 
@@ -168,21 +168,21 @@ class FormUserUpdate(FlaskForm):
 		form.username.data = obj.username
 		form.active.data = obj.active
 
-		form.name.data = obj.name
-		form.last_name.data = obj.last_name
+		form.name.data = obj.name if obj.name else None
+		form.last_name.data = obj.last_name if obj.last_name else None
 
-		form.email.data = obj.email
-		form.phone.data = obj.phone
+		form.email.data = obj.email if obj.email else None
+		form.phone.data = obj.phone if obj.phone else None
 
-		form.address.data = obj.address
-		form.cap.data = obj.cap
-		form.city.data = obj.city
+		form.address.data = obj.address if obj.address else None
+		form.cap.data = obj.cap if obj.cap else None
+		form.city.data = obj.city if obj.city else None
 
 		# Update the choices
 		form.plant_id.choices = list_plants()
 		form.plant_site_id.choices = list_plant_sites()
 
-		form.note.data = obj.note
+		form.note.data = obj.note if obj.note else None
 		return form
 
 	def validate_username(self, field):  # noqa
@@ -201,13 +201,13 @@ class FormUserUpdate(FlaskForm):
 			'username': self.username.data.strip().replace(" ", ""),
 			'active': status_true_false(self.active.data),
 
-			'name': self.name.data.strip(),
-			'last_name': self.last_name.data.strip(),
+			'name': not_empty(self.name.data.strip()),
+			'last_name': not_empty(self.last_name.data.strip()),
 			'full_name': mount_full_name(self.name.data, self.last_name.data),
 
-			'address': self.address.data.strip(),
-			'cap': self.cap.data.strip(),
-			'city': self.city.data.strip(),
+			'address': not_empty(self.address.data.strip()),
+			'cap': not_empty(self.cap.data.strip()),
+			'city': not_empty(self.city.data.strip()),
 			'full_address': mount_full_address(self.address.data, self.cap.data, self.city.data),
 
 			'email': self.email.data.strip().replace(" ", ""),

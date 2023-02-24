@@ -1,6 +1,4 @@
-from datetime import datetime
-from config import db
-from app.functions import mount_full_address, date_to_str
+from app.app import db
 
 # importazioni per creare relazioni in tabella
 from app.organizations.partner_contacts.models import PartnerContact  # noqa
@@ -88,7 +86,7 @@ class Partner(db.Model):
 			'address': self.address,
 			'cap': self.cap,
 			'city': self.city,
-			'full_address': mount_full_address(self.address, self.cap, self.city),
+			'full_address': self.full_address,
 
 			'vat_number': self.vat_number,
 			'fiscal_code': self.fiscal_code,
@@ -99,6 +97,6 @@ class Partner(db.Model):
 			'swift': self.swift,
 
 			'note': self.note,
-			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
-			'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f")
+			'created_at': self.created_at,
+			'updated_at': self.updated_at
 		}

@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from config import db
+from app.app import db
 from app.functions import date_to_str
 
 # importazioni per creare relazioni in tabella

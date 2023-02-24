@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from ..app import db
+from app.app import db
 
 
 def calc_exp_token_reset_psw():

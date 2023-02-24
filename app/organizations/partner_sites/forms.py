@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, BooleanField, SelectField, TextAreaField
-from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
+from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional, StopValidation
 
 from app.app import db, session
 from .models import PartnerSite
@@ -17,10 +17,11 @@ def list_partner_sites():
 		else:
 			_list = [x.to_dict() for x in records]
 
-		_partner = [d["site"].lower() for d in _list]
+		_partner_site = [d["site"].lower() for d in _list]
+		_id = [d["id"] for d in _list]
 
 		db.session.close()
-		return _partner
+		return _partner_site, _id
 	except Exception as err:
 		print(err)
 		return []
@@ -56,12 +57,12 @@ class FormPartnerSite(FlaskForm):
 	partner = BooleanField('P', false_values=(False, 0))
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	pec = EmailField('pec', validators=[Email(), Length(max=80), Optional()])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
+	pec = EmailField('pec', validators=[Email(), Optional(), Length(max=80)])
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=25)], default="+39 ")
 
-	address = StringField('Indirizzo', validators=[Length(min=3, max=150), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
+	address = StringField('Indirizzo', validators=[Optional(), Length(min=3, max=150)])
+	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
+	city = StringField('Città', validators=[Optional(), Length(min=3, max=55)])
 
 	partner_id = SelectField("Seleziona Organizzazione", validators=[DataRequired("Campo obbligatorio!")])
 
@@ -73,7 +74,7 @@ class FormPartnerSite(FlaskForm):
 	)
 	sdi_code = StringField('SDI', validators=[Optional(), Length(min=7, max=7)])
 
-	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 
@@ -85,8 +86,12 @@ class FormPartnerSite(FlaskForm):
 
 	def validate_site(self, field):  # noqa
 		"""Verifica presenza organization nella tabella del DB."""
-		if field.data.strip().replace('  ', ' ').lower() in list_partner_sites():
-			raise ValidationError("Sito già presente in tabella.")
+		if field.data.strip().replace('  ', ' ').lower() in list_partner_sites()[0]:
+			for sites_id in list_partner_sites()[1]:
+				if 'partner_site_id' in session.keys() and session['partner_site_id'] == sites_id:
+					raise StopValidation()
+				else:
+					raise ValidationError("Sito già presente in tabella.")
 
 	@classmethod
 	def update(cls, obj):
@@ -102,21 +107,21 @@ class FormPartnerSite(FlaskForm):
 		form.partner.data = obj.partner
 
 		form.email.data = obj.email
-		form.pec.data = obj.pec
-		form.phone.data = obj.phone
+		form.pec.data = obj.pec if obj.pec else None
+		form.phone.data = obj.phone if obj.phone else None
 
-		form.address.data = obj.address
-		form.cap.data = obj.cap
-		form.city.data = obj.city
+		form.address.data = obj.address if obj.address else None
+		form.cap.data = obj.cap if obj.cap else None
+		form.city.data = obj.city if obj.city else None
 
 		# Update the choices
 		form.partner_id.choices = list_partners()
 
 		form.vat_number.data = obj.vat_number
 		form.fiscal_code.data = obj.fiscal_code
-		form.sdi_code.data = obj.sdi_code
+		form.sdi_code.data = obj.sdi_code if obj.sdi_code else None
 
-		form.note.data = obj.note
+		form.note.data = obj.note if obj.note else None
 		return form
 
 	def to_dict(self):
@@ -133,7 +138,7 @@ class FormPartnerSite(FlaskForm):
 			'partner': status_true_false(self.partner.data) if self.partner.data else False,
 
 			'email': self.email.data.strip().replace(" ", ""),
-			'pec': self.pec.data.strip().replace(" ", ""),
+			'pec': not_empty(self.pec.data.strip().replace(" ", "")),
 			'phone': not_empty(self.phone.data.strip()),
 
 			'address': not_empty(self.address.data.strip()),

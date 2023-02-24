@@ -54,18 +54,18 @@ def oda_rows_create(o_id, p_id, s_id=None):
 
 			new_p = OdaRow(
 				item_code=_item.item_code,
-				item_code_supplier=_item.item_code_supplier,
+				item_code_supplier=_item.item_code_supplier if _item.item_code_supplier else None,
 
-				item_description=_item.item_description,
+				item_description=_item.item_description if _item.item_description else None,
 
 				item_price=_item.item_price,
-				item_price_discount=_item.item_price_discount,
-				item_currency=_item.item_currency,
+				item_price_discount=_item.item_price_discount if _item.item_price_discount else None,
+				item_currency=_item.item_currency if _item.item_currency else None,
 
-				item_quantity=_item.item_quantity_min,
-				item_quantity_um=_item.item_quantity_um,
+				item_quantity=_item.item_quantity_min if _item.item_quantity_min else None,
+				item_quantity_um=_item.item_quantity_um if _item.item_quantity_um else None,
 
-				item_amount=_item.item_quantity_min * _item.item_price,
+				item_amount=_item.item_quantity_min * _item.item_price if _item.item_quantity_min else None,
 
 				oda_id=o_id,
 

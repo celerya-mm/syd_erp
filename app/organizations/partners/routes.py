@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
@@ -180,7 +179,7 @@ def partner_update(_id):
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormPartner(request.form).to_dict()
-		# print("PARTNET_UPDATE:", json.dumps(new_data, indent=2, default=serialize_datetime))
+		# print("PARTNET_UPDATE:", json.dumps(new_data, indent=2, default=serialize_dict))
 
 		previous_data = partner.to_dict()
 		previous_data.pop("updated_at")

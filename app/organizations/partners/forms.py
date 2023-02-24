@@ -42,12 +42,13 @@ class FormPartner(FlaskForm):
 	partner = BooleanField('P', false_values=(False, 0))
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	pec = EmailField('pec', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80), Optional()])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
+	pec = EmailField('pec', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
+	phone = StringField(
+		'Telefono', validators=[DataRequired("Campo obbligatorio!"), Length(min=7, max=25)], default="+39 ")
 
-	address = StringField('Indirizzo', validators=[Length(min=3, max=150), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
+	address = StringField('Indirizzo', validators=[Optional(), Length(min=3, max=150)])
+	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
+	city = StringField('Città', validators=[Optional(), Length(min=3, max=55)])
 
 	vat_number = StringField(
 		'P. IVA', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=13)], default='IT'
@@ -61,7 +62,7 @@ class FormPartner(FlaskForm):
 	iban = StringField('IBAN', validators=[Optional(), Length(min=27, max=27)], default='IT')
 	swift = StringField('SWIFT', validators=[Optional(), Length(min=12, max=12)])
 
-	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 
@@ -111,7 +112,7 @@ class FormPartner(FlaskForm):
 
 			'email': self.email.data.strip().replace(" ", ""),
 			'pec': self.pec.data.strip().replace(" ", ""),
-			'phone': not_empty(self.phone.data.strip()),
+			'phone': self.phone.data.strip(),
 
 			'address': not_empty(self.address.data.strip()),
 			'cap': not_empty(self.cap.data.strip()),

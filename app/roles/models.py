@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from config import db
+from app.app import db
 
 
 # Define the Role data-model

@@ -1,9 +1,8 @@
-from datetime import datetime
-from config import db
+from app.app import db
 
 # importazioni per creare relazioni in tabella
 from app.auth_token.models import AuthToken  # noqa
-from app.organizations.plant.models import Plant  # noqa
+# from app.organizations.plant.models import Plant  # noqa
 from app.organizations.plant_site.models import PlantSite  # noqa
 from app.roles.models import Role  # noqa
 from app.event_db.models import EventDB  # noqa

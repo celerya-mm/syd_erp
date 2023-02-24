@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required, not_empty, str_to_date, timer_func
+from app.functions import token_user_validate, access_required, timer_func
 
 from .forms import FormOda
 from .models import Oda

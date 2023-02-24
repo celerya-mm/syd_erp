@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from config import db
+from app.app import db
 from app.functions import date_to_str
 
 # importazioni per creare relazioni in tabella
@@ -25,7 +23,7 @@ class OdaRow(db.Model):
 	item_quantity = db.Column(db.Float, index=False, unique=False, nullable=True)
 	item_quantity_um = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
-	item_amount = db.Column(db.Float, index=False, unique=False, nullable=False)
+	item_amount = db.Column(db.Float, index=False, unique=False, nullable=True)
 
 	oda_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='CASCADE'), nullable=False)
 

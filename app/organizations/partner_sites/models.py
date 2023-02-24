@@ -1,11 +1,6 @@
-from datetime import datetime
-
-from config import db
-from app.functions import mount_full_address, date_to_str
+from app.app import db
 
 # importazioni per creare relazioni in tabella
-# from app.organizations.partners.models import Partner  # noqa
-# from app.organizations.partner_contacts.models import PartnerContact  # noqa
 from app.orders.items.models import Item  # noqa
 from app.event_db.models import EventDB  # noqa
 
@@ -86,7 +81,7 @@ class PartnerSite(db.Model):
 			'address': self.address,
 			'cap': self.cap,
 			'city': self.city,
-			'full_address': mount_full_address(self.address, self.cap, self.city),
+			'full_address': self.full_address,
 
 			'partner_id': self.partner_id,
 
@@ -95,6 +90,6 @@ class PartnerSite(db.Model):
 			'sdi_code': self.sdi_code,
 
 			'note': self.note,
-			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
-			'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f")
+			'created_at': self.created_at,
+			'updated_at': self.updated_at
 		}

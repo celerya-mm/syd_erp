@@ -35,25 +35,24 @@ class FormPlant(FlaskForm):
 	organization = StringField('Rag. Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=80)])
 
 	active = BooleanField('Stato', false_values=(False, 0))
-	site_type = SelectField("Seleziona Tipo", validators=[DataRequired("Campo obbligatorio!")], choices=site_type)
+	site_type = SelectField("Seleziona Tipo", validators=[Optional()], choices=site_type)
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	pec = EmailField('pec', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80), Optional()])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
+	pec = EmailField('pec', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
+	phone = StringField(
+		'Telefono', validators=[DataRequired("Campo obbligatorio!"), Length(min=7, max=25)], default="+39 ")
 
-	address = StringField('Indirizzo', validators=[Length(min=3, max=150), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
+	address = StringField('Indirizzo', validators=[Optional(), Length(min=3, max=150)])
+	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
+	city = StringField('Città', validators=[Optional(), Length(min=3, max=55)])
 
 	vat_number = StringField(
 		'P. IVA', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=13)], default='IT'
 	)
-	fiscal_code = StringField(
-		'C.F.', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=13)], default='IT'
-	)
+	fiscal_code = StringField('C.F.', validators=[Optional(), Length(min=13, max=13)], default='IT')
 	sdi_code = StringField('SDI', validators=[Optional(), Length(min=7, max=7)])
 
-	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 
@@ -95,11 +94,11 @@ class FormPlant(FlaskForm):
 			'organization': self.organization.data.strip().replace("  ", " "),
 
 			'active': status_true_false(self.active.data),
-			'site_type': self.site_type.data,
+			'site_type': not_empty(self.site_type.data),
 
 			'email': self.email.data.strip().replace(" ", ""),
 			'pec': self.pec.data.strip().replace(" ", ""),
-			'phone': not_empty(self.phone.data.strip()),
+			'phone': self.phone.data.strip(),
 
 			'address': not_empty(self.address.data.strip()),
 			'cap': not_empty(self.cap.data.strip()),
@@ -107,7 +106,7 @@ class FormPlant(FlaskForm):
 			'full_address': mount_full_address(self.address.data, self.cap.data, self.city.data),
 
 			'vat_number': self.vat_number.data,
-			'fiscal_code': self.fiscal_code.data,
+			'fiscal_code': not_empty(self.fiscal_code.data),
 			'sdi_code': not_empty(self.sdi_code.data),
 
 			'note': not_empty(self.note.data.strip()),

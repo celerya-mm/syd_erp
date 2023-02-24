@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from ..app import db
 from .models import EventDB
 
-from app.functions import token_user_validate, date_to_str, timer_func
+from app.functions import token_user_validate, date_to_str, timer_func, serialize_dict
 
 
 event_bp = Blueprint(
@@ -31,7 +31,7 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
-			event=event,
+			event=json.dumps(event, default=serialize_dict),
 			user_id=user_id,
 			partner_id=partner_id,
 			partner_contact_id=partner_contact_id,

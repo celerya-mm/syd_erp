@@ -12,7 +12,7 @@ from .functions import psw_hash
 from .models import User
 from ..auth_token.functions import __save_auth_token
 from ..functions import (token_user_validate, access_required, access_required_update_psw, status_true_false,
-						 mount_full_address, mount_full_name, timer_func)
+						 mount_full_address, mount_full_name, timer_func, not_empty, serialize_dict)
 from ..roles.models import Role
 
 account_bp = Blueprint(
@@ -143,24 +143,24 @@ def user_create():
 
 			active=status_true_false(form_data["active"]),
 
-			name=form_data["name"].strip(),
-			last_name=form_data["last_name"].strip(),
+			name=not_empty(form_data["name"].strip()),
+			last_name=not_empty(form_data["last_name"].strip()),
 			full_name=mount_full_name(
 				form_data["name"].strip(), form_data["last_name"].strip()),
 
-			email=form_data["email"].strip(),
-			phone=form_data["phone"].strip(),
+			email=form_data["email"].strip().replace(' ', ''),
+			phone=not_empty(form_data["phone"].strip()),
 
-			address=form_data["address"].strip(),
-			cap=form_data["cap"].strip(),
-			city=form_data["city"].strip(),
+			address=not_empty(form_data["address"].strip()),
+			cap=not_empty(form_data["cap"]),
+			city=not_empty(form_data["city"].strip().replace('  ', ' ')),
 			full_address=mount_full_address(
 				form_data["address"].strip(), form_data["cap"].strip(), form_data["city"].strip()),
 
 			plant_id=form_data["plant_id"].split(' - ')[0],
 			plant_site_id=form_data["plant_site_id"].split(' - ')[0] if form_data["plant_site_id"] else None,
 
-			note=form_data["note"].strip(),
+			note=not_empty(form_data["note"].strip().replace('  ', ' ')),
 			created_at=_time,
 			updated_at=_time
 		)
@@ -241,11 +241,10 @@ def user_update(_id):
 	from app.event_db.routes import event_create
 
 	# recupero i dati
-	user = User.query \
-		.options(joinedload(User.plant_user)) \
-		.options(joinedload(User.plant_site_user)) \
-		.get(_id)
+	user = User.query.filter_by(id=_id) \
+		.options(joinedload(User.plant_user), joinedload(User.plant_site_user)).one()
 	form = FormUserUpdate.update(obj=user)
+	print(json.dumps(user.to_dict(), indent=2, default=serialize_dict))
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormUserUpdate(request.form).to_dict()

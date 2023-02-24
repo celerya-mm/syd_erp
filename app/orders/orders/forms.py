@@ -89,7 +89,7 @@ class FormOda(FlaskForm):
 	supplier_id = SelectField("Seleziona Fornitore")
 	supplier_site_id = SelectField("Seleziona Sito Fornitore")
 
-	note = TextAreaField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 

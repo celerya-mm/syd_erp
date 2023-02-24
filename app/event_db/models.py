@@ -1,6 +1,6 @@
 from sqlalchemy.dialects.postgresql import JSONB
 
-from config import db
+from app.app import db
 
 
 class EventDB(db.Model):

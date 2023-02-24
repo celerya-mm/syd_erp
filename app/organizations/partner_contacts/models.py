@@ -1,10 +1,6 @@
-from datetime import datetime
-
-from config import db
-from app.functions import date_to_str, mount_full_name
+from app.app import db
 
 # importazioni per creare relazioni in tabella
-# from app.organizations.partners.models import Partner  # noqa
 from app.organizations.partner_sites.models import PartnerSite  # noqa
 from app.event_db.models import EventDB  # noqa
 
@@ -63,7 +59,7 @@ class PartnerContact(db.Model):
 
 			'name': self.name,
 			'last_name': self.last_name,
-			'full_name': mount_full_name(self.name, self.last_name),
+			'full_name': self.full_name,
 
 			'role': self.role,
 
@@ -74,6 +70,6 @@ class PartnerContact(db.Model):
 			'phone': self.phone,
 
 			'note': self.note,
-			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
-			'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f")
+			'created_at': self.created_at,
+			'updated_at': self.updated_at
 		}
