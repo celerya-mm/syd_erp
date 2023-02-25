@@ -183,6 +183,22 @@ def oda_view_detail(_id):
 	else:
 		rows_list = []
 
+	# Organizzazione
+	_item["plant_id"] = f'{oda.plant.id} - {oda.plant.organization}'
+
+	if oda.plant_site:
+		_item["plant_site_id"] = f'{oda.plant_site.id} - {oda.plant_site.organization}'
+
+	# Fornitore
+	_item["supplier_id"] = f'{oda.supplier.id} - {oda.supplier.organization}'
+	p_id = oda.supplier.id
+
+	if oda.supplier_site:
+		_item["supplier_site_id"] = f'{oda.supplier_site.id} - {oda.supplier_site.site}'
+		s_id = oda.supplier_site.id
+	else:
+		s_id = None
+
 	amount = _item["oda_amount"]
 	if rows_list:
 		_item["oda_amount"] = 0
@@ -203,22 +219,6 @@ def oda_view_detail(_id):
 			"Previous_data": oda.to_dict()
 		}
 		_event = event_create(_event, order_id=_id)
-
-	# Organizzazione
-	_item["plant_id"] = f'{oda.plant.id} - {oda.plant.organization}'
-
-	if oda.plant_site:
-		_item["plant_site_id"] = f'{oda.plant_site.id} - {oda.plant_site.organization}'
-
-	# Fornitore
-	_item["supplier_id"] = f'{oda.supplier.id} - {oda.supplier.organization}'
-	p_id = oda.supplier.id
-
-	if oda.supplier_site:
-		_item["supplier_site_id"] = f'{oda.supplier_site.id} - {oda.supplier_site.site}'
-		s_id = oda.supplier_site.id
-	else:
-		s_id = None
 
 	db.session.close()
 	return render_template(

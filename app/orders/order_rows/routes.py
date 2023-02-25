@@ -146,11 +146,15 @@ def oda_rows_update(_id):
 	if request.method == 'POST' and form.validate():
 		new_data = FormOdaRowUpdate(request.form).to_dict()
 
-		_tot = round(float(new_data["item_price"]) * float(new_data["item_quantity"]), 2)
-		_discount = (100 - float(new_data["item_price_discount"])) / 100 if new_data["item_price_discount"] else None
-
-		new_data["item_amount"] = round(float(_tot) * _discount, 2) if _discount else _tot
-		# print("NEW_DATA_ROW:", json.dumps(new_data, indent=2, default=serialize_dict))
+		if new_data["item_price_discount"] == 100:
+			new_data["item_amount"] = 0
+		elif new_data["item_price_discount"] > 0:
+			_tot = round(float(new_data["item_price"]) * float(new_data["item_quantity"]), 2)
+			_discount = (100 - float(new_data["item_price_discount"])) / 100
+			new_data["item_amount"] = round(float(_tot) * _discount, 2) if _discount else _tot
+		else:
+			new_data["item_amount"] = round(float(new_data["item_price"]) * float(new_data["item_quantity"]), 2)
+			# print("NEW_DATA_ROW:", json.dumps(new_data, indent=2, default=serialize_dict))
 
 		previous_data = oda_row.to_dict()
 		previous_data.pop("updated_at")

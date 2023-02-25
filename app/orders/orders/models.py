@@ -26,9 +26,9 @@ class Oda(db.Model):
 	plant = db.relationship('Plant', backref='p_orders', viewonly=True)
 	plant_site = db.relationship('PlantSite', backref='ps_orders', viewonly=True)
 
-	supplier_offer = db.Column(db.String(20), index=True, unique=True, nullable=True)
+	supplier_offer = db.Column(db.String(20), index=True, unique=False, nullable=True)
 	supplier_offer_date = db.Column(db.Date, index=False, unique=False, nullable=True)
-	supplier_invoice = db.Column(db.String(50), index=True, unique=True, nullable=True)
+	supplier_invoice = db.Column(db.String(50), index=True, unique=False, nullable=True)
 	supplier_invoice_date = db.Column(db.Date, index=False, unique=False, nullable=True)
 
 	supplier_id = db.Column(db.Integer, db.ForeignKey('partners.id'), nullable=False)
