@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 
 from app.app import session, db
 from app.functions import token_user_validate, access_required, serialize_dict, timer_func
-from .forms import FormOdaRowUpdate, FormOdaRowCreate, list_items
+from .forms import FormOdaRowUpdate, FormOdaRowCreate, list_items, list_partner_sites
 from .models import OdaRow
 
 oda_rows_bp = Blueprint(
@@ -89,7 +89,7 @@ def oda_rows_create(o_id, p_id, s_id=None):
 			flash(f"ERRORE: {str(err.orig)}")
 			return render_template(CREATE_HTML, form=form)
 	else:
-		session['supplier_id'] = p_id
+		session['supplier_id'] = int(p_id)
 		list_items()
 		return render_template(CREATE_HTML, form=form, order_view=ORDER_DETAIL, o_id=o_id)
 
@@ -157,7 +157,7 @@ def oda_rows_update(_id):
 
 		try:
 			OdaRow.update(_id, new_data)
-			session.pop('partner_id')
+			session.pop('supplier_id')
 			flash("ODA_ROW aggiornata correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -179,7 +179,9 @@ def oda_rows_update(_id):
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.item_code.data = f'{oda_row.item_code} - {oda_row.item_description}'
-		session['partner_id'] = oda_row.supplier.id
+		session['supplier_id'] = oda_row.supplier.id
+		list_partner_sites()
+
 		if oda_row.supplier_site:
 			form.supplier_site_id.data = f'{oda_row.supplier_site.id} - {oda_row.supplier_site.site}'
 

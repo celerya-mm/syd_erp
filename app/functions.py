@@ -125,9 +125,11 @@ def str_to_date(_str, _form="%Y-%m-%d"):
 
 def date_to_str(_date, _form="%Y-%m-%d"):
 	"""Converte datetime in stringa."""
-	if _date in [None, ""]:
+	if _date in [None, "None", "nan", ""]:
 		return None
-	elif _date not in [None, "None", "nan", ""] and isinstance(_date, datetime) or isinstance(_date, date):
+	elif isinstance(_date, date):
+		return date.strftime(_date, _form)
+	elif isinstance(_date, datetime):
 		return datetime.strftime(_date, _form)
 	else:
 		return _date

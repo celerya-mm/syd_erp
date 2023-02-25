@@ -51,6 +51,7 @@ class PartnerContact(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
+		from app.functions import date_to_str
 
 		site_id = self.partner_site_id or None
 
@@ -70,6 +71,6 @@ class PartnerContact(db.Model):
 			'phone': self.phone,
 
 			'note': self.note,
-			'created_at': self.created_at,
-			'updated_at': self.updated_at
+			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
+			'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f")
 		}

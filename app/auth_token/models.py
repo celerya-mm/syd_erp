@@ -38,7 +38,8 @@ class AuthToken(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
-		from ..functions import date_to_str
+		from app.functions import date_to_str
+
 		return {
 			'id': self.id,
 			'token': self.token,

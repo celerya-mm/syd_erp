@@ -131,6 +131,7 @@ def oda_create(p_id, s_id=None):
 		partner = Partner.query.get(p_id)
 		form.supplier_id.data = f'{partner.id} - {partner.organization}'
 		session['partner_id'] = partner.id
+		print(session['partner_id'])
 		# print('PARTNER:', form.supplier_id.data)
 
 		if s_id:
@@ -186,7 +187,7 @@ def oda_view_detail(_id):
 	if rows_list:
 		_item["oda_amount"] = 0
 		for row in rows_list:
-			_item["oda_amount"] = _item["oda_amount"] + row["item_amount"]
+			_item["oda_amount"] = round(_item["oda_amount"] + row["item_amount"], 2)
 	else:
 		_item["oda_amount"] = None
 
@@ -284,6 +285,7 @@ def oda_update(_id):
 		form.supplier_id.data = f'{oda.supplier.id} - {oda.supplier.organization}'
 		form.supplier_site_id.data = f'{oda.supplier_site.id} - {oda.supplier_site.site}' if oda.supplier_site else None
 		session['partner_id'] = oda.supplier.id
+		print(session['partner_id'])
 
 		_info = {
 			'created_at': oda.created_at,

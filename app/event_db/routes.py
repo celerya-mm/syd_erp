@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from ..app import db
 from .models import EventDB
 
-from app.functions import token_user_validate, date_to_str, timer_func, serialize_dict
+from app.functions import token_user_validate, date_to_str, timer_func
 
 
 event_bp = Blueprint(
@@ -31,7 +31,7 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
-			event=json.dumps(event, default=serialize_dict),
+			event=event,
 			user_id=user_id,
 			partner_id=partner_id,
 			partner_contact_id=partner_contact_id,
@@ -99,104 +99,107 @@ def event_view_detail(_id):
 	_event = event.to_dict()
 
 	# estraggo record collegato
-	# Utente
-	if event.user_id:
-		related = User.query.get(event.user_id)
-		related = related.to_dict()
-		field = "user_id"
-		table = User.__tablename__
-		id_related = related["id"]
-		type_related = "Utenti"
-		view_related = USER_DETAIL
-	# Plant
-	elif event.plant_id:
-		related = Plant.query.get(event.plant_id)
-		related = related.to_dict()
-		field = "plant_id"
-		table = Plant.__tablename__
-		id_related = related["id"]
-		type_related = "Plant"
-		view_related = PLANT_DETAIL
-	# Plant
-	elif event.plant_site_id:
-		related = PlantSite.query.get(event.plant_site_id)
-		related = related.to_dict()
-		field = "plant_site_id"
-		table = PlantSite.__tablename__
-		id_related = related["id"]
-		type_related = "Plant_Site"
-		view_related = PLANT_SITE_DETAIL
-	# Partner
-	elif event.partner_id:
-		related = Partner.query.get(event.partner_id)
-		related = related.to_dict()
-		field = "partner_id"
-		table = Partner.__tablename__
-		id_related = related["id"]
-		type_related = "Partner"
-		view_related = PARTNER_DETAIL
-	# Contatto Partner
-	elif event.partner_contact_id:
-		related = PartnerSite.query.get(event.partner_contact_id)
-		related = related.to_dict()
-		field = "partner_contact_id"
-		table = PartnerContact.__tablename__
-		id_related = related["id"]
-		type_related = "Partner_Contact"
-		view_related = PARTNER_CONTACT_DETAIL
-	# Sito Partner
-	elif event.partner_site_id:
-		related = PartnerSite.query.get(event.partner_site_id)
-		related = related.to_dict()
-		field = "partner_site_id"
-		table = PartnerSite.__tablename__
-		id_related = related["id"]
-		type_related = "Partner_Site"
-		view_related = PARTNER_SITE_DETAIL
-	# Articolo
-	elif event.item_id:
-		related = Item.query.get(event.item_id)
-		related = related.to_dict()
-		field = "item_id"
-		table = Item.__tablename__
-		id_related = related["id"]
-		type_related = "Item"
-		view_related = ITEM_DETAIL
-	# Ordine
-	elif event.order_id:
-		related = Oda.query.get(event.order_id)
-		related = related.to_dict()
-		field = "order_id"
-		table = Oda.__tablename__
-		id_related = related["id"]
-		type_related = "Order"
-		view_related = ORDER_DETAIL
-	# Ordine
-	elif event.order_row_id:
-		related = OdaRow.query.get(event.order_row_id)
-		related = related.to_dict()
-		field = "order_row_id"
-		table = OdaRow.__tablename__
-		id_related = related["id"]
-		type_related = "Order_Row"
-		view_related = ORDER_ROW_DETAIL
-	else:
+	try:
+		# Utente
+		if event.user_id:
+			related = User.query.get(event.user_id)
+			related = related.to_dict()
+			field = "user_id"
+			table = User.__tablename__
+			id_related = related["id"]
+			type_related = "Utenti"
+			view_related = USER_DETAIL
+		# Plant
+		elif event.plant_id:
+			related = Plant.query.get(event.plant_id)
+			related = related.to_dict()
+			field = "plant_id"
+			table = Plant.__tablename__
+			id_related = related["id"]
+			type_related = "Plant"
+			view_related = PLANT_DETAIL
+		# Plant
+		elif event.plant_site_id:
+			related = PlantSite.query.get(event.plant_site_id)
+			related = related.to_dict()
+			field = "plant_site_id"
+			table = PlantSite.__tablename__
+			id_related = related["id"]
+			type_related = "Plant_Site"
+			view_related = PLANT_SITE_DETAIL
+		# Partner
+		elif event.partner_id:
+			related = Partner.query.get(event.partner_id)
+			related = related.to_dict()
+			field = "partner_id"
+			table = Partner.__tablename__
+			id_related = related["id"]
+			type_related = "Partner"
+			view_related = PARTNER_DETAIL
+		# Contatto Partner
+		elif event.partner_contact_id:
+			related = PartnerContact.query.get(event.partner_contact_id)
+			related = related.to_dict()
+			field = "partner_contact_id"
+			table = PartnerContact.__tablename__
+			id_related = related["id"]
+			type_related = "Partner_Contact"
+			view_related = PARTNER_CONTACT_DETAIL
+		# Sito Partner
+		elif event.partner_site_id:
+			related = PartnerSite.query.get(event.partner_site_id)
+			related = related.to_dict()
+			field = "partner_site_id"
+			table = PartnerSite.__tablename__
+			id_related = related["id"]
+			type_related = "Partner_Site"
+			view_related = PARTNER_SITE_DETAIL
+		# Articolo
+		elif event.item_id:
+			related = Item.query.get(event.item_id)
+			related = related.to_dict()
+			field = "item_id"
+			table = Item.__tablename__
+			id_related = related["id"]
+			type_related = "Item"
+			view_related = ITEM_DETAIL
+		# Ordine
+		elif event.order_id:
+			related = Oda.query.get(event.order_id)
+			related = related.to_dict()
+			field = "order_id"
+			table = Oda.__tablename__
+			id_related = related["id"]
+			type_related = "Order"
+			view_related = ORDER_DETAIL
+		# Ordine
+		elif event.oda_row_id:
+			related = OdaRow.query.get(event.oda_row_id)
+			related = related.to_dict()
+			field = "oda_row_id"
+			table = OdaRow.__tablename__
+			id_related = related["id"]
+			type_related = "Order_Row"
+			view_related = ORDER_ROW_DETAIL
+		else:
+			db.session.close()
+			msg = "Nessun record trovato"
+			return msg
+
+		# Estraggo la storia delle modifiche del record di origine
+		history_list = EventDB.query.filter(getattr(EventDB, field) == int(id_related), EventDB.id != int(_id)).all()
+		history_list = [history.to_dict() for history in history_list]
+
+		_event = json.loads(json.dumps(_event))
+
 		db.session.close()
-		msg = "Nessun record trovato"
-		return msg
-
-	# Estraggo la storia delle modifiche del record di origine
-	history_list = EventDB.query.filter(getattr(EventDB, field) == int(id_related), EventDB.id != int(_id)).all()
-	history_list = [history.to_dict() for history in history_list]
-
-	_event = json.loads(json.dumps(_event))
-
-	db.session.close()
-	return render_template(
-		DETAIL_HTML, form=_event, restore=RESTORE_FOR, table=table,
-		history_list=history_list, h_len=len(history_list), view_detail=DETAIL_FOR,
-		id_related=id_related, view_related=view_related, type_related=type_related
-	)
+		return render_template(
+			DETAIL_HTML, form=_event, restore=RESTORE_FOR, table=table,
+			history_list=history_list, h_len=len(history_list), view_detail=DETAIL_FOR,
+			id_related=id_related, view_related=view_related, type_related=type_related
+		)
+	except Exception as err:
+		return f'ERROR_VIEW_EVENT: {err}'
 
 
 @event_bp.route(RESTORE, methods=["GET", "POST"])

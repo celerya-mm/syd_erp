@@ -101,6 +101,7 @@ def contact_create(p_id, s_id=None):
 		partner = Partner.query.get(p_id)
 		form.partner_id.data = f'{partner.id} - {partner.organization}'
 		session['partner_id'] = p_id
+		print(session['partner_id'])
 		# print('PARTNER:', form.partner_id.data)
 
 		if s_id not in [None, 0]:
@@ -173,7 +174,7 @@ def contact_update(_id):
 		try:
 			PartnerContact.update(_id, new_data)
 			session.pop('partner_id')
-			flash("PARTNER aggiornato correttamente.")
+			flash("CONTATTO PARTNER aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
 			db.session.close()
@@ -187,7 +188,7 @@ def contact_update(_id):
 		_event = {
 			"username": session["user"]["username"],
 			"table": PartnerContact.__tablename__,
-			"Modification": f"Update CONTACT whit id: {_id}",
+			"Modification": f"Update PARTNER CONTACT whit id: {_id}",
 			"Previous_data": previous_data
 		}
 		_event = event_create(_event, partner_contact_id=_id)
@@ -197,6 +198,7 @@ def contact_update(_id):
 		form.partner_site_id.data = f'{contact.partner_site.id} - {contact.partner_site.site}' if contact.partner_site \
 									else None
 		session['partner_id'] = contact.partner.id
+		print(session['partner_id'])
 		_info = {
 			'created_at': contact.created_at,
 			'updated_at': contact.updated_at,

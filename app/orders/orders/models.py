@@ -64,13 +64,15 @@ class Oda(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
+		from app.functions import date_to_str
+
 		return {
 			'id': self.id,
 
 			'oda_number': self.oda_number,
-			'oda_date': self.oda_date,
+			'oda_date': date_to_str(self.oda_date, "%Y-%m-%d"),
 			'oda_description': self.oda_description,
-			'oda_delivery_date': self.oda_delivery_date,
+			'oda_delivery_date': date_to_str(self.oda_delivery_date, "%Y-%m-%d"),
 			'oda_amount': self.oda_amount,
 			'oda_currency': self.oda_currency,
 			'oda_payment': self.oda_payment,
@@ -80,14 +82,14 @@ class Oda(db.Model):
 			'plant_site_id': self.plant_site_id or None,
 
 			'supplier_offer': self.supplier_offer,
-			'supplier_offer_date': self.supplier_offer_date,
+			'supplier_offer_date': date_to_str(self.supplier_offer_date, "%Y-%m-%d"),
 			'supplier_invoice': self.supplier_invoice,
-			'supplier_invoice_date': self.supplier_invoice_date,
+			'supplier_invoice_date': date_to_str(self.supplier_invoice_date, "%Y-%m-%d"),
 
 			'supplier_id': self.supplier_id,
 			'supplier_site_id': self.supplier_site_id or None,
 
 			'note': self.note,
-			'created_at': self.created_at,
-			'updated_at': self.updated_at
+			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
+			'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f")
 		}

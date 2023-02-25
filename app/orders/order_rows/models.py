@@ -1,5 +1,5 @@
 from app.app import db
-from app.functions import date_to_str
+
 
 # importazioni per creare relazioni in tabella
 from app.event_db.models import EventDB  # noqa
@@ -58,6 +58,7 @@ class OdaRow(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
+		from app.functions import date_to_str
 		return {
 			'id': self.id,
 

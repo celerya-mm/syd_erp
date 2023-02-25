@@ -68,6 +68,8 @@ class Partner(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
+		from app.functions import date_to_str
+
 		return {
 			'id': self.id,
 			'organization': self.organization,
@@ -97,6 +99,6 @@ class Partner(db.Model):
 			'swift': self.swift,
 
 			'note': self.note,
-			'created_at': self.created_at,
-			'updated_at': self.updated_at
+			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
+			'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f"),
 		}

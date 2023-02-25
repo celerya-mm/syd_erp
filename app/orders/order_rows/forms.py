@@ -13,9 +13,14 @@ def list_items():
 
 	_list = ["-"]
 	try:
-		records = Item.query.filter_by(supplier_id=session['supplier_id']).all()
+		if 'supplier_id' in session.keys():
+			records = Item.query.filter_by(supplier_id=int(session['supplier_id'])).all()
+		else:
+			records = Item.query.all()\
+
 		for r in records:
 			_list.append(f"{r.item_code} - {r.item_description}")
+
 	except Exception as err:
 		print('ERROR_LIST_ITEMS:', err)
 		pass
