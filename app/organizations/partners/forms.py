@@ -26,7 +26,7 @@ def list_partners():
 		db.session.close()
 		return _partner, _email, _pec, _vat, _sdi_code
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_PARTNERS', err)
 		return [], [], [], [], []
 
 

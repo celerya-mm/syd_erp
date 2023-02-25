@@ -23,7 +23,7 @@ def list_partner_sites():
 		db.session.close()
 		return _partner_site, _id
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_PARTNER_SITES', err)
 		return []
 
 
@@ -39,7 +39,7 @@ def list_partners():
 			_list.append(f"{str(d['id'])} - {d['organization']}")
 	except Exception as err:
 		db.session.close()
-		print(err)
+		print('ERROR_LIST_PARTNERS', err)
 		pass
 
 	return _list

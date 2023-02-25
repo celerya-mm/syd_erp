@@ -16,7 +16,7 @@ def list_partners():
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_PARTNERS', err)
 		pass
 	db.session.close()
 	return _list
@@ -30,9 +30,8 @@ def list_partner_sites():
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_PARTNER_SITES', err)
 		pass
-	# print("LIST:", _list)
 	db.session.close()
 	return _list
 
@@ -45,7 +44,7 @@ def list_plants():
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_PLANTS', err)
 		pass
 	db.session.close()
 	return _list

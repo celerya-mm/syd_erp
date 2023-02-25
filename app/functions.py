@@ -62,7 +62,7 @@ def access_required(roles='ANY'):
 			else:
 				for r in session['user_roles']:
 					if r in roles_ or r == 'superuser':
-						print(f'CHECK_ROLE: {r} [OK]')
+						print(f'CHECK_ROLE: {r} [ OK ]')
 						return fn(*args, **kwargs)
 
 				# print(f"RUOLI: {session['user_roles']}")
@@ -104,10 +104,12 @@ def timer_func(fn):
 
 	@wraps(fn)
 	def wrapper(*args, **kwargs):
-			t1 = time()
-			result = fn(*args, **kwargs)
-			print(f'Function {fn.__name__!r} executed in {(time()-t1):.4f}s')
-			return result
+		t1 = time()
+		# chiama la funzione
+		result = fn(*args, **kwargs)
+		print(f'Function {fn.__name__!r} executed in {(time()-t1):.4f}s')
+		# ritorna il risultato della funzione
+		return result
 	return wrapper
 
 
@@ -203,6 +205,8 @@ def serialize_dict(obj):
 
 
 list_currency = ['€', '$', 'unit']
+
+list_um = ['kg', 'pz', 'unit']
 
 site_type = ['Sede Legale', 'Sede Legale e Operativa', 'Sede Operativa', 'Sede Secondaria']
 

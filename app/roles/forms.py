@@ -16,7 +16,7 @@ def list_roles():
             _list.append(r.name)
         return _list
     except Exception as err:
-        print(err)
+        print('ERROR_LIST_ROLES', err)
         return _list
 
 
@@ -31,7 +31,7 @@ def list_Users():
                 _list.append(f'{r.id} - {r.username}')
         return _list
     except Exception as err:
-        print(err)
+        print('ERROR_LIST_USERS', err)
         return _list
 
 

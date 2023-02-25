@@ -5,9 +5,7 @@ from wtforms import StringField, SubmitField, SelectField, IntegerField, Decimal
 from wtforms.validators import Length, Optional, DataRequired
 
 from app.app import db, session
-from app.functions import list_currency
-
-list_um = ['kg', 'pz', 'unit']
+from app.functions import list_currency, list_um
 
 
 def list_items():
@@ -15,11 +13,11 @@ def list_items():
 
 	_list = ["-"]
 	try:
-		records = Item.query.filter_by(supplier_id=session['partner_id'])
+		records = Item.query.filter_by(supplier_id=session['supplier_id']).all()
 		for r in records:
 			_list.append(f"{r.item_code} - {r.item_description}")
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_ITEMS:', err)
 		pass
 
 	db.session.close()
@@ -35,7 +33,7 @@ def list_partners():
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_PARTNERS:', err)
 		pass
 
 	db.session.close()
@@ -47,11 +45,11 @@ def list_partner_sites():
 
 	_list = ["-"]
 	try:
-		records = PartnerSite.query.filter_by(partner_id=session['partner_id'])
+		records = PartnerSite.query.filter_by(partner_id=session['supplier_id']).all()
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_PARTNER_SITES:', err)
 		pass
 
 	# print("LIST:", _list)
@@ -66,10 +64,10 @@ class FormOdaRowCreate(FlaskForm):
 	submit = SubmitField("SAVE")
 
 	def __repr__(self):
-		return f'<ODA_ROW_FORM_CREATE: [{self.item_code}]>'
+		return f'<ODA_ROW_FORM_CREATE: [ {self.item_code} ]>'
 
 	def __str__(self):
-		return f'<ODA_ROW_FORM_CREATE: [{self.item_code}]>'
+		return f'<ODA_ROW_FORM_CREATE: [ {self.item_code} ]>'
 
 	@classmethod
 	def new(cls):
@@ -106,10 +104,10 @@ class FormOdaRowUpdate(FlaskForm):
 	submit = SubmitField("SAVE")
 
 	def __repr__(self):
-		return f'<ODA_ROW_FORM_UPDATE: [{self.item_code}] - {self.item_description}>'
+		return f'<ODA_ROW_FORM_UPDATE: [ {self.item_code} ] - {self.item_description}>'
 
 	def __str__(self):
-		return f'<ODA_ROW_FORM_UPDATE: [{self.item_code}] - {self.item_description}>'
+		return f'<ODA_ROW_FORM_UPDATE: [ {self.item_code} ] - {self.item_description}>'
 
 	@classmethod
 	def update(cls, obj):

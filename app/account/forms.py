@@ -22,7 +22,7 @@ def list_user():
 		_email = [d["email"] for d in _list if "email" in d]
 		return _user, _email
 	except Exception as err:
-		print('ERROR:', err)
+		print('ERROR_LIST_USERS:', err)
 		return [], []
 
 
@@ -38,7 +38,7 @@ def list_plant_sites():
 			_list.append(f"{str(d['id'])} - {d['organization']}")
 	except Exception as err:
 		db.session.close()
-		print(err)
+		print('ERROR_LIST_PLANT_SITES:', err)
 		pass
 
 	return _list
@@ -56,7 +56,7 @@ def list_plants():
 			_list.append(f"{str(d['id'])} - {d['organization']}")
 	except Exception as err:
 		db.session.close()
-		print(err)
+		print('ERROR_LIST_PLANTS:', err)
 		pass
 
 	return _list

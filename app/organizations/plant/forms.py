@@ -26,7 +26,7 @@ def list_plants():
 		db.session.close()
 		return _plant, _email, _pec, _vat, _sdi_code
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_PLANTS', err)
 		return [], [], [], [], []
 
 

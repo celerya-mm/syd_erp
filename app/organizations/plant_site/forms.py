@@ -26,7 +26,7 @@ def list_plant_sites():
 		db.session.close()
 		return _plant, _email, _pec, _vat, _sdi_code
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_PLANT_SITES', err)
 		return [], [], [], [], []
 
 
@@ -38,7 +38,7 @@ def list_plants():
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_PLANTS', err)
 		pass
 	db.session.close()
 	return _list
