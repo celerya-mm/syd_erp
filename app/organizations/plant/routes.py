@@ -135,6 +135,7 @@ def plant_update(_id):
 
 	# recupero i dati
 	partner = Plant.query.get(_id)
+	session['plant_id'] = _id
 	form = FormPlant(obj=partner)
 
 	if request.method == 'POST' and form.validate():
@@ -171,6 +172,5 @@ def plant_update(_id):
 			'updated_at': partner.updated_at,
 		}
 
-		session['plant_id'] = _id
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=DETAIL_FOR)

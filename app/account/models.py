@@ -25,7 +25,7 @@ class User(db.Model):
 	full_name = db.Column(db.String(101), index=False, unique=True, nullable=True)
 
 	email = db.Column(db.String(80), index=False, unique=True, nullable=True)
-	phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
+	phone = db.Column(db.String(50), index=False, unique=False, nullable=True)
 
 	address = db.Column(db.String(150), index=False, unique=False, nullable=True)
 	cap = db.Column(db.String(5), index=False, unique=False, nullable=True)

@@ -59,7 +59,7 @@ def contact_create(p_id, s_id=None):
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 
-	form = FormPartnerContact.new()
+	form = FormPartnerContact.new(p_id=p_id)
 	if request.method == 'POST' and form.validate():
 		try:
 			form_data = FormPartnerContact(request.form).to_dict()
@@ -82,8 +82,8 @@ def contact_create(p_id, s_id=None):
 				created_at=form_data["updated_at"],
 				updated_at=form_data["updated_at"]
 			)
+
 			PartnerContact.create(new_p)
-			session.pop('partner_id')
 			flash("CONTACT creato correttamente.")
 
 			if s_id not in [None, 0]:
@@ -100,14 +100,13 @@ def contact_create(p_id, s_id=None):
 	else:
 		partner = Partner.query.get(p_id)
 		form.partner_id.data = f'{partner.id} - {partner.organization}'
-		session['partner_id'] = p_id
-		print(session['partner_id'])
 		# print('PARTNER:', form.partner_id.data)
 
 		if s_id not in [None, 0]:
 			site = PartnerSite.query.get(s_id)
 			form.partner_site_id.data = f'{site.id} - {site.site}'
 			# print('SITE:', form.partner_site_id.data)
+
 		db.session.close()
 		return render_template(CREATE_HTML, form=form, partner_view=PARTNER_DETAIL, p_id=p_id,
 							   site_view=SITE_DETAIL, s_id=s_id)
@@ -163,7 +162,9 @@ def contact_update(_id):
 		.options(joinedload(PartnerContact.partner)) \
 		.options(joinedload(PartnerContact.partner_site)) \
 		.get(_id)
-	form = FormPartnerContact.update(obj=contact)
+
+	session['partner_id'] = contact.partner_id
+	form = FormPartnerContact.update(obj=contact, p_id=contact.partner_id)
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormPartnerContact(request.form).to_dict()
@@ -195,10 +196,9 @@ def contact_update(_id):
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.partner_id.data = f'{contact.partner.id} - {contact.partner.organization}'
-		form.partner_site_id.data = f'{contact.partner_site.id} - {contact.partner_site.site}' if contact.partner_site \
-									else None
-		session['partner_id'] = contact.partner.id
-		print(session['partner_id'])
+		form.partner_site_id.data = f'{contact.partner_site.id} - {contact.partner_site.site}' \
+									if contact.partner_site else None
+
 		_info = {
 			'created_at': contact.created_at,
 			'updated_at': contact.updated_at,

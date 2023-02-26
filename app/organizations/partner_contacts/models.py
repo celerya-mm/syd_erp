@@ -18,7 +18,7 @@ class PartnerContact(db.Model):
 	role = db.Column(db.String(50), index=False, unique=False, nullable=True)
 
 	email = db.Column(db.String(80), index=False, unique=True, nullable=False)
-	phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
+	phone = db.Column(db.String(50), index=False, unique=False, nullable=True)
 
 	partner_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=False)
 	partner_site_id = db.Column(db.Integer, db.ForeignKey('partner_sites.id', ondelete='CASCADE'), nullable=True)

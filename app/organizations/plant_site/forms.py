@@ -24,6 +24,13 @@ def list_plant_sites():
 		_sdi_code = [d["sdi_code"] for d in _list]
 
 		db.session.close()
+
+		_plant.sort()
+		_email.sort()
+		_pec.sort()
+		_vat.sort()
+		_sdi_code.sort()
+
 		return _plant, _email, _pec, _vat, _sdi_code
 	except Exception as err:
 		print('ERROR_LIST_PLANT_SITES', err)
@@ -40,7 +47,9 @@ def list_plants():
 	except Exception as err:
 		print('ERROR_LIST_PLANTS', err)
 		pass
+
 	db.session.close()
+	_list.sort()
 	return _list
 
 
@@ -53,7 +62,7 @@ class FormPlantSite(FlaskForm):
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	pec = EmailField('pec', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80), Optional()])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
+	phone = StringField('Telefono', validators=[Length(min=7, max=50), Optional()], default="+39 ")
 
 	address = StringField('Indirizzo', validators=[Length(min=3, max=150), Optional()])
 	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])

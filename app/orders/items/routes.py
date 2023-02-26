@@ -62,7 +62,7 @@ def item_create(p_id, s_id=None):
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 
-	form = FormItem.new()
+	form = FormItem.new(p_id=p_id)
 	if request.method == 'POST' and form.validate():
 		try:
 			form_data = FormItem(request.form).to_dict_new()
@@ -91,7 +91,6 @@ def item_create(p_id, s_id=None):
 				updated_at=_time
 			)
 			Item.create(new_p)
-			session.pop('partner_id')
 			flash("ITEM creato correttamente.")
 
 			if s_id not in [None, 0]:
@@ -114,7 +113,6 @@ def item_create(p_id, s_id=None):
 			form.item_code.data = f'itm_{str(int(last_id.id) + 1).zfill(4)}'
 
 		partner = Partner.query.get(p_id)
-		session['partner_id'] = p_id
 		form.supplier_id.data = f'{partner.id} - {partner.organization}'
 		# print('PARTNER:', form.partner_id.data)
 
@@ -179,7 +177,8 @@ def item_update(_id):
 	item = Item.query \
 		.options(joinedload(Item.supplier)) \
 		.options(joinedload(Item.supplier_site)).get(_id)
-	form = FormItem.update(obj=item)
+
+	form = FormItem.update(obj=item, p_id=item.supplier_id)
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormItem(request.form).to_dict()

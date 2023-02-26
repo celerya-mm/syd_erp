@@ -146,7 +146,7 @@ def create_superuser():
 			psw_changed=False,
 			active=True,
 			name='Marco',
-			last_name='Mazzini',
+			last_name=None,
 			email='develop@celerya.com',
 			phone='+39 391 735 3416',
 			address='Via Don Turinetti, 11',
@@ -186,6 +186,7 @@ def assign_superuser_role():
 	r_id = _role.id
 
 	role_assigned = session.query(UserRoles).filter_by(user_id=u_id, role_id=r_id).first()
+
 	if role_assigned is None:
 		user_role = UserRoles(user_id=u_id, role_id=r_id)
 		session.add(user_role)
@@ -193,6 +194,7 @@ def assign_superuser_role():
 		print('RUOLO superuser ASSEGNATO a UTENTE superuser.')
 	else:
 		print("RUOLO superuser a UTENTE superuser GIA' ASSEGNATO.")
+
 	return True
 
 

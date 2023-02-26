@@ -133,6 +133,21 @@
 				</div>
 			</div>
 		</div>
+		{% if form.supplier_site_id %}
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="col-md-12 order-first">
+				<div class="form-group">
+					<a href="{{ url_for(site_detail, _id=s_id) }}" title="Vai al sito del fornitore">
+						Sito Fornitore
+					</a>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.supplier_site_id }}
+					</p>
+				</div>
+			</div>
+		</div>
+		{% endif %}
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="form-group">

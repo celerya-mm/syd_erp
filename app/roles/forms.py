@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, ValidationError
 
+from app.app import db
 from .models import Role
 from ..account.models import User
 
@@ -14,6 +15,9 @@ def list_roles():
         records = Role.query.all()
         for r in records:
             _list.append(r.name)
+
+        db.session.close()
+        _list.sort()
         return _list
     except Exception as err:
         print('ERROR_LIST_ROLES', err)
@@ -29,6 +33,9 @@ def list_Users():
                 pass
             else:
                 _list.append(f'{r.id} - {r.username}')
+
+        db.session.close()
+        _list.sort()
         return _list
     except Exception as err:
         print('ERROR_LIST_USERS', err)

@@ -4,8 +4,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DecimalField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional
 
-from app.app import db, session
-from app.functions import list_currency
+from app.app import db
+from app.functions import list_currency, list_um
 
 
 def list_partners():
@@ -16,31 +16,36 @@ def list_partners():
 		records = Partner.query.all()
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
+
 	except Exception as err:
 		print('ERROR_LIST_PARTNERS:', err)
 		pass
 
 	db.session.close()
+	_list.sort()
 	return _list
 
 
-def list_partner_sites():
+def list_partner_sites(p_id=None):
 	from app.organizations.partner_sites.models import PartnerSite
 
 	_list = ["-"]
 	try:
-		records = PartnerSite.query.filter_by(partner_id=session['partner_id'])
+		if p_id:
+			records = PartnerSite.query.filter_by(partner_id=p_id).all()
+		else:
+			records = PartnerSite.query.all()
+
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
+
 	except Exception as err:
 		print('ERROR_LIST_PARTNER_SITES:', err)
 		pass
 
 	db.session.close()
+	_list.sort()
 	return _list
-
-
-list_um = ['kg', 'pz', 'unit']
 
 
 class FormItem(FlaskForm):
@@ -71,16 +76,16 @@ class FormItem(FlaskForm):
 		return f'<ITEM_FORM: [{self.item_code}] - {self.item_description}>'
 
 	@classmethod
-	def new(cls):
+	def new(cls, p_id=None):
 		# Instantiate the form
 		form = cls()
 		# Update the choices
 		form.supplier_id.choices = list_partners()
-		form.supplier_site_id.choices = list_partner_sites()
+		form.supplier_site_id.choices = list_partner_sites(p_id)
 		return form
 
 	@classmethod
-	def update(cls, obj):
+	def update(cls, obj, p_id=None):
 		# Instantiate the form
 		form = cls()
 		form.item_code.data = obj.item_code
@@ -97,7 +102,7 @@ class FormItem(FlaskForm):
 
 		# Update the choices
 		form.supplier_id.choices = list_partners()
-		form.supplier_site_id.choices = list_partner_sites()
+		form.supplier_site_id.choices = list_partner_sites(p_id)
 
 		form.note.data = obj.note if obj.note else None
 		return form

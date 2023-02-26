@@ -17,10 +17,14 @@ def list_partner_contacts():
 		else:
 			_list = [x.to_dict() for x in records]
 
-		_contact = [d["full_name"] for d in _list]
-		_email = [d["email"] for d in _list]
+		_contact = [d["full_name"].lower() for d in _list]
+		_email = [d["email"].lower() for d in _list]
 
 		db.session.close()
+
+		_contact.sort()
+		_email.sort()
+
 		return _contact, _email
 	except Exception as err:
 		print('ERROR_LIST_PARTNER_CONTACTS', err)
@@ -41,22 +45,29 @@ def list_partners():
 		pass
 
 	db.session.close()
+	_list.sort()
 	return _list
 
 
-def list_partner_sites():
+def list_partner_sites(p_id=None):
 	from app.organizations.partner_sites.models import PartnerSite
 
 	_list = ["-"]
 	try:
-		records = PartnerSite.query.filter_by(partner_id=session['partner_id'])
+		if p_id:
+			records = PartnerSite.query.filter_by(partner_id=p_id).all()
+		else:
+			records = PartnerSite.query.all()
+
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
+
 	except Exception as err:
 		print('ERROR_LIST_PARTNER_SITES', err)
 		pass
 
 	db.session.close()
+	_list.sort()
 	return _list
 
 
@@ -68,7 +79,7 @@ class FormPartnerContact(FlaskForm):
 	role = SelectField('Ruolo', choices=list_roles)
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=25)], default="+39 ")
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=50)], default="+39 ")
 
 	partner_id = SelectField("Seleziona Partner")
 	partner_site_id = SelectField("Seleziona Sito")
@@ -84,16 +95,16 @@ class FormPartnerContact(FlaskForm):
 		return f'<PARTNER_CONTACT: {self.name} {self.last_name}>'
 
 	@classmethod
-	def new(cls):
+	def new(cls, p_id=None):
 		# Instantiate the form
 		form = cls()
 		# Update the choices
 		form.partner_id.choices = list_partners()
-		form.partner_site_id.choices = list_partner_sites()
+		form.partner_site_id.choices = list_partner_sites(p_id)
 		return form
 
 	@classmethod
-	def update(cls, obj):
+	def update(cls, obj, p_id=None):
 		# Instantiate the form
 		form = cls()
 		form.name.data = obj.name
@@ -106,20 +117,20 @@ class FormPartnerContact(FlaskForm):
 
 		# Update the choices
 		form.partner_id.choices = list_partners()
-		form.partner_site_id.choices = list_partner_sites()
+		form.partner_site_id.choices = list_partner_sites(p_id)
 
 		form.note.data = obj.note if obj.note else None
 		return form
 
 	def validate_full_name(self):  # noqa
 		"""Verifica presenza contatto nella tabella del DB."""
-		if f'{self.name.data} {self.last_name.data}' in list_partner_contacts()[0]:
-			raise ValidationError(f"Contatto già presente in tabella contacts: {self.name.data} {self.last_name.data}.")
+		if f'{self.name.data.lower()} {self.last_name.data.lower()}' in list_partner_contacts()[0]:
+			raise ValidationError(f"Contatto già presente in tabella: {self.name.data} {self.last_name.data}.")
 
 	def validate_email(self, field):  # noqa
 		"""Verifica email già assegnata a partner nella tabella del DB."""
-		if field.data.strip() in list_partner_contacts()[1]:
-			raise ValidationError("Email già assegnata in tabella contacts.")
+		if field.data.strip().lower() in list_partner_contacts()[1]:
+			raise ValidationError("Email già assegnata in tabella.")
 
 	def to_dict(self):
 		"""Converte form in dict."""

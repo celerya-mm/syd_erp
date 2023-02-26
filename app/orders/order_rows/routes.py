@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 
 from app.app import session, db
 from app.functions import token_user_validate, access_required, serialize_dict, timer_func
-from .forms import FormOdaRowUpdate, FormOdaRowCreate, list_items, list_partner_sites
+from .forms import FormOdaRowUpdate, FormOdaRowCreate, list_partner_sites
 from .models import OdaRow
 
 oda_rows_bp = Blueprint(
@@ -39,7 +39,7 @@ def oda_rows_create(o_id, p_id, s_id=None):
 	from app.orders.orders.routes import DETAIL_FOR as ORDER_DETAIL
 	from app.orders.items.models import Item
 
-	form = FormOdaRowCreate.new()
+	form = FormOdaRowCreate.new(p_id=p_id)
 	if request.method == 'POST' and form.validate():
 		try:
 			form_data = json.loads(json.dumps(request.form))
@@ -78,7 +78,6 @@ def oda_rows_create(o_id, p_id, s_id=None):
 			)
 
 			OdaRow.create(new_p)
-			session.pop('supplier_id')
 			flash("ODA_ROW creata correttamente.")
 
 			return redirect(url_for(ORDER_DETAIL, _id=o_id))
@@ -89,8 +88,6 @@ def oda_rows_create(o_id, p_id, s_id=None):
 			flash(f"ERRORE: {str(err.orig)}")
 			return render_template(CREATE_HTML, form=form)
 	else:
-		session['supplier_id'] = int(p_id)
-		list_items()
 		return render_template(CREATE_HTML, form=form, order_view=ORDER_DETAIL, o_id=o_id)
 
 
@@ -102,12 +99,14 @@ def oda_rows_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
+	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 	from app.orders.orders.routes import DETAIL_FOR as ORDER_DETAIL
 
 	# Interrogo il DB
 	oda_row = OdaRow.query \
 		.options(joinedload(OdaRow.supplier)) \
 		.options(joinedload(OdaRow.supplier_site)).get(_id)
+
 	_oda_row = oda_row.to_dict()
 
 	# Estraggo la storia delle modifiche per l'articolo
@@ -120,11 +119,18 @@ def oda_rows_view_detail(_id):
 	_oda_row["supplier_id"] = f'{oda_row.supplier.id} - {oda_row.supplier.organization}'
 	p_id = oda_row.supplier.id
 
+	if oda_row.supplier_site:
+		_oda_row["supplier_site_id"] = f'{oda_row.supplier_site.id} - {oda_row.supplier_site.site}'
+		s_id = oda_row.supplier_site.id
+	else:
+		s_id = None
+
 	db.session.close()
 	return render_template(
 		DETAIL_HTML, form=_oda_row, update=UPDATE_FOR, event_detail=EVENT_DETAIL,
 		history_list=history_list, 		h_len=len(history_list),
 		partner_detail=PARTNER_DETAIL, 	p_id=p_id,
+		site_detail=SITE_DETAIL, s_id=s_id,
 		order_detail=ORDER_DETAIL
 	)
 
@@ -141,17 +147,20 @@ def oda_rows_update(_id):
 	oda_row = OdaRow.query \
 		.options(joinedload(OdaRow.supplier)) \
 		.options(joinedload(OdaRow.supplier_site)).get(_id)
-	form = FormOdaRowUpdate(obj=oda_row)
+
+	form = FormOdaRowUpdate.update(obj=oda_row, p_id=oda_row.supplier_id)
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormOdaRowUpdate(request.form).to_dict()
 
 		if new_data["item_price_discount"] == 100:
 			new_data["item_amount"] = 0
-		elif new_data["item_price_discount"] > 0:
+
+		elif new_data["item_price_discount"] is not None and new_data["item_price_discount"] > 0:
 			_tot = round(float(new_data["item_price"]) * float(new_data["item_quantity"]), 2)
 			_discount = (100 - float(new_data["item_price_discount"])) / 100
 			new_data["item_amount"] = round(float(_tot) * _discount, 2) if _discount else _tot
+
 		else:
 			new_data["item_amount"] = round(float(new_data["item_price"]) * float(new_data["item_quantity"]), 2)
 			# print("NEW_DATA_ROW:", json.dumps(new_data, indent=2, default=serialize_dict))
@@ -161,7 +170,6 @@ def oda_rows_update(_id):
 
 		try:
 			OdaRow.update(_id, new_data)
-			session.pop('supplier_id')
 			flash("ODA_ROW aggiornata correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -182,12 +190,10 @@ def oda_rows_update(_id):
 		_event = event_create(_event, oda_row_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
-		form.item_code.data = f'{oda_row.item_code} - {oda_row.item_description}'
-		session['supplier_id'] = oda_row.supplier.id
-		list_partner_sites()
-
 		if oda_row.supplier_site:
 			form.supplier_site_id.data = f'{oda_row.supplier_site.id} - {oda_row.supplier_site.site}'
+
+		list_partner_sites(oda_row.supplier_id)
 
 		_info = {
 			'created_at': oda_row.created_at,

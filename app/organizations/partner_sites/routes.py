@@ -172,6 +172,7 @@ def partner_site_update(_id):
 
 	# recupero i dati
 	site = PartnerSite.query.options(joinedload(PartnerSite.back_partner)).get(_id)
+	session['partner_site_id'] = _id
 	form = FormPartnerSite.update(obj=site)
 
 	if request.method == 'POST' and form.validate():
@@ -204,7 +205,6 @@ def partner_site_update(_id):
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.partner_id.data = f'{site.back_partner.id} - {site.back_partner.organization}'
-		session['partner_site_id'] = _id
 		_info = {
 			'created_at': site.created_at,
 			'updated_at': site.updated_at,

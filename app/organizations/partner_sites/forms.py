@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, BooleanField, SelectField, TextAreaField
-from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional, StopValidation
+from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 from app.app import db, session
 from .models import PartnerSite
@@ -21,10 +21,14 @@ def list_partner_sites():
 		_id = [d["id"] for d in _list]
 
 		db.session.close()
+
+		_partner_site.sort()
+		_id.sort()
+
 		return _partner_site, _id
 	except Exception as err:
 		print('ERROR_LIST_PARTNER_SITES', err)
-		return []
+		return [], []
 
 
 def list_partners():
@@ -34,14 +38,14 @@ def list_partners():
 	try:
 		records = Partner.query.all()
 		_dict = [x.to_dict() for x in records]
-		db.session.close()
 		for d in _dict:
 			_list.append(f"{str(d['id'])} - {d['organization']}")
 	except Exception as err:
-		db.session.close()
 		print('ERROR_LIST_PARTNERS', err)
 		pass
 
+	db.session.close()
+	_list.sort()
 	return _list
 
 
@@ -58,7 +62,7 @@ class FormPartnerSite(FlaskForm):
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	pec = EmailField('pec', validators=[Email(), Optional(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=25)], default="+39 ")
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=50)], default="+39 ")
 
 	address = StringField('Indirizzo', validators=[Optional(), Length(min=3, max=150)])
 	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
@@ -87,11 +91,7 @@ class FormPartnerSite(FlaskForm):
 	def validate_site(self, field):  # noqa
 		"""Verifica presenza organization nella tabella del DB."""
 		if field.data.strip().replace('  ', ' ').lower() in list_partner_sites()[0]:
-			for sites_id in list_partner_sites()[1]:
-				if 'partner_site_id' in session.keys() and session['partner_site_id'] == sites_id:
-					raise StopValidation()
-				else:
-					raise ValidationError("Sito già presente in tabella.")
+			raise ValidationError("Sito già presente in tabella.")
 
 	@classmethod
 	def update(cls, obj):

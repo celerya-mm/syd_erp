@@ -20,6 +20,10 @@ def list_user():
 
 		_user = [d["username"] for d in _list if "username" in d]
 		_email = [d["email"] for d in _list if "email" in d]
+
+		_user.sort()
+		_email.sort()
+
 		return _user, _email
 	except Exception as err:
 		print('ERROR_LIST_USERS:', err)
@@ -41,6 +45,7 @@ def list_plant_sites():
 		print('ERROR_LIST_PLANT_SITES:', err)
 		pass
 
+	_list.sort()
 	return _list
 
 
@@ -59,6 +64,7 @@ def list_plants():
 		print('ERROR_LIST_PLANTS:', err)
 		pass
 
+	_list.sort()
 	return _list
 
 
@@ -83,7 +89,7 @@ class FormUserCreate(FlaskForm):
 	last_name = StringField('Cognome', validators=[Optional(), Length(min=3, max=25)])
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=25)], default="+39 ")
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=50)], default="+39 ")
 
 	address = StringField('Indirizzo', validators=[Optional(), Length(min=3, max=150)])
 	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
@@ -142,7 +148,7 @@ class FormUserUpdate(FlaskForm):
 	last_name = StringField('Cognome', validators=[Optional()])
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=25)])
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=50)])
 
 	address = StringField('Indirizzo', validators=[Optional(), Length(min=3, max=150)])
 	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])

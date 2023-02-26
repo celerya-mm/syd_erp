@@ -146,6 +146,7 @@ def plant_site_update(_id):
 
 	# recupero i dati
 	plant_site = PlantSite.query.options(joinedload(PlantSite.back_plant)).get(_id)
+	session['plant_site_id'] = _id
 	form = FormPlantSite.update(obj=plant_site)
 
 	if request.method == 'POST' and form.validate():
@@ -178,7 +179,6 @@ def plant_site_update(_id):
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.plant_id.data = f'{plant_site.back_plant.id} - {plant_site.back_plant.organization}'
-		session['plant_site_id'] = _id
 
 		_info = {
 			'created_at': plant_site.created_at,

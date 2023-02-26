@@ -18,7 +18,7 @@ class Plant(db.Model):
 
 	email = db.Column(db.String(80), index=False, unique=True, nullable=False)
 	pec = db.Column(db.String(80), index=False, unique=True, nullable=False)
-	phone = db.Column(db.String(25), index=False, unique=False, nullable=False)
+	phone = db.Column(db.String(50), index=False, unique=False, nullable=False)
 
 	address = db.Column(db.String(150), index=False, unique=False, nullable=True)
 	cap = db.Column(db.String(5), index=False, unique=False, nullable=True)

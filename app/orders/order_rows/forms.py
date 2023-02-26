@@ -4,28 +4,29 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, IntegerField, DecimalField, TextAreaField
 from wtforms.validators import Length, Optional, DataRequired
 
-from app.app import db, session
+from app.app import db
 from app.functions import list_currency, list_um
 
 
-def list_items():
+def list_items(p_id=None):
 	from app.orders.items.models import Item
 
 	_list = ["-"]
 	try:
-		if 'supplier_id' in session.keys():
-			records = Item.query.filter_by(supplier_id=int(session['supplier_id'])).all()
+		if p_id:
+			records = Item.query.filter_by(supplier_id=int(p_id)).all()
 		else:
-			records = Item.query.all()\
+			records = Item.query.all()
 
 		for r in records:
-			_list.append(f"{r.item_code} - {r.item_description}")
+			_list.append(f"{r.item_code.strip()} - {r.item_description.strip()}")
 
 	except Exception as err:
 		print('ERROR_LIST_ITEMS:', err)
 		pass
 
 	db.session.close()
+	_list.sort()
 	return _list
 
 
@@ -37,28 +38,36 @@ def list_partners():
 		records = Partner.query.all()
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
+
 	except Exception as err:
 		print('ERROR_LIST_PARTNERS:', err)
 		pass
 
 	db.session.close()
+	_list.sort()
 	return _list
 
 
-def list_partner_sites():
+def list_partner_sites(p_id=None):
 	from app.organizations.partner_sites.models import PartnerSite
 
 	_list = ["-"]
 	try:
-		records = PartnerSite.query.filter_by(partner_id=session['supplier_id']).all()
+		if p_id:
+			records = PartnerSite.query.filter_by(partner_id=p_id).all()
+		else:
+			records = PartnerSite.query.all()
+
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
+
 	except Exception as err:
 		print('ERROR_LIST_PARTNER_SITES:', err)
 		pass
 
 	# print("LIST:", _list)
 	db.session.close()
+	_list.sort()
 	return _list
 
 
@@ -75,17 +84,17 @@ class FormOdaRowCreate(FlaskForm):
 		return f'<ODA_ROW_FORM_CREATE: [ {self.item_code} ]>'
 
 	@classmethod
-	def new(cls):
+	def new(cls, p_id=None):
 		# Instantiate the form
 		form = cls()
 		# Update the choices
-		form.item_code.choices = list_items()
+		form.item_code.choices = list_items(p_id)
 		return form
 
 
 class FormOdaRowUpdate(FlaskForm):
 	"""Form per creare un Articolo."""
-	item_code = SelectField('Articolo', choices=list_items)
+	item_code = SelectField('Codice Articolo', choices=list_items)
 	item_code_supplier = StringField('Cod. F.', validators=[Optional(), Length(max=50)])
 
 	item_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"), Length(max=500)])
@@ -101,8 +110,8 @@ class FormOdaRowUpdate(FlaskForm):
 	item_quantity = DecimalField('Q.', validators=[Optional()])
 	item_quantity_um = SelectField('U.M.', choices=list_um, validators=[Optional()])
 
-	supplier_id = IntegerField("Fornitore.", validators=[DataRequired("Campo obbligatorio!")])
-	supplier_site_id = IntegerField("Sito F.", validators=[Optional()])
+	supplier_id = IntegerField("Fornitore", validators=[DataRequired("Campo obbligatorio!")])
+	supplier_site_id = SelectField("Sito F.", validators=[Optional()])
 
 	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
@@ -115,10 +124,15 @@ class FormOdaRowUpdate(FlaskForm):
 		return f'<ODA_ROW_FORM_UPDATE: [ {self.item_code} ] - {self.item_description}>'
 
 	@classmethod
-	def update(cls, obj):
+	def update(cls, obj, p_id=None):
 		# Instantiate the form
 		form = cls()
-		form.item_code.data = obj.item_code
+
+		# Update the choices
+		form.item_code.choices = list_items(p_id)
+		form.supplier_site_id.choices = list_partner_sites(p_id)
+
+		form.item_code.data = f'{obj.item_code.strip()} - {obj.item_description.strip()}'
 		form.item_code_supplier.data = obj.item_code_supplier or None
 
 		form.item_description.data = obj.item_description
@@ -130,10 +144,12 @@ class FormOdaRowUpdate(FlaskForm):
 		form.item_quantity.data = obj.item_quantity or None
 		form.item_quantity_um.data = obj.item_quantity_um or None
 
-		# Update the choices
-		form.supplier_site_id.choices = list_partner_sites()
+		form.oda_id.data = obj.oda_id
+		form.supplier_id.data = obj.supplier_id
+		# form.supplier_site_id.data = obj.supplier_site
 
 		form.note.data = obj.note or None
+
 		return form
 
 	def to_dict(self):

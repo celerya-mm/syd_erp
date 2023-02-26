@@ -1,10 +1,10 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, DateField, DecimalField, TextAreaField
+from wtforms import StringField, SubmitField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional
 
-from app.app import db, session
+from app.app import db
 from app.functions import list_currency, list_payments, list_order_types
 
 
@@ -15,24 +15,34 @@ def list_partners():
 		records = Partner.query.all()
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
+
 	except Exception as err:
 		print('ERROR_LIST_PARTNERS', err)
 		pass
+
 	db.session.close()
+	_list.sort()
 	return _list
 
 
-def list_partner_sites():
+def list_partner_sites(spl_id=None):
 	from app.organizations.partner_sites.models import PartnerSite
 	_list = ["-"]
 	try:
-		records = PartnerSite.query.filter_by(partner_id=session['partner_id'])
+		if spl_id:
+			records = PartnerSite.query.filter_by(partner_id=spl_id).all()
+		else:
+			records = PartnerSite.query.all()
+
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
+
 	except Exception as err:
 		print('ERROR_LIST_PARTNER_SITES', err)
 		pass
+
 	db.session.close()
+	_list.sort()
 	return _list
 
 
@@ -43,24 +53,34 @@ def list_plants():
 		records = Plant.query.all()
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
+
 	except Exception as err:
 		print('ERROR_LIST_PLANTS', err)
 		pass
+
 	db.session.close()
+	_list.sort()
 	return _list
 
 
-def list_plant_sites():
+def list_plant_sites(pl_id=None):
 	from app.organizations.plant_site.models import PlantSite
 	_list = ["-"]
 	try:
-		records = PlantSite.query.all()
+		if pl_id:
+			records = PlantSite.query.filter_by(plant_id=pl_id).all()
+		else:
+			records = PlantSite.query.all()
+
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
+
 	except Exception as err:
 		print(err)
 		pass
+
 	db.session.close()
+	_list.sort()
 	return _list
 
 
@@ -99,18 +119,18 @@ class FormOda(FlaskForm):
 		return f'<ODA_FORM: [{self.oda_number}] - {self.oda_date}>'
 
 	@classmethod
-	def new(cls):
+	def new(cls, pl_id=None, spl_id=None):
 		# Instantiate the form
 		form = cls()
 		# Update the choices
 		form.plant_id.choices = list_plants()
-		form.plant_site_id.choices = list_plant_sites()
+		form.plant_site_id.choices = list_plant_sites(pl_id)
 		form.supplier_id.choices = list_partners()
-		form.supplier_site_id.choices = list_partner_sites()
+		form.supplier_site_id.choices = list_partner_sites(spl_id)
 		return form
 
 	@classmethod
-	def update(cls, obj):
+	def update(cls, obj, pl_id=None, spl_id=None):
 		# Instantiate the form
 		form = cls()
 		form.oda_number.data = obj.oda_number
@@ -128,10 +148,10 @@ class FormOda(FlaskForm):
 
 		# Update the choices
 		form.plant_id.choices = list_plants()
-		form.plant_site_id.choices = list_plant_sites()
+		form.plant_site_id.choices = list_plant_sites(pl_id)
 
 		form.supplier_id.choices = list_partners()
-		form.supplier_site_id.choices = list_partner_sites()
+		form.supplier_site_id.choices = list_partner_sites(spl_id)
 
 		form.note.data = obj.note
 		return form

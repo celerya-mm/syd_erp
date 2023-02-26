@@ -175,6 +175,7 @@ def partner_update(_id):
 
 	# recupero i dati
 	partner = Partner.query.get(_id)
+	session['partner_id'] = _id
 	form = FormPartner(obj=partner)
 
 	if request.method == 'POST' and form.validate():
@@ -207,7 +208,6 @@ def partner_update(_id):
 		_event = event_create(_event, partner_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
-		session['partner_id'] = _id
 		_info = {
 			'created_at': partner.created_at,
 			'updated_at': partner.updated_at,

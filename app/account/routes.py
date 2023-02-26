@@ -241,10 +241,13 @@ def user_update(_id):
 	from app.event_db.routes import event_create
 
 	# recupero i dati
-	user = User.query.filter_by(id=_id) \
-		.options(joinedload(User.plant_user), joinedload(User.plant_site_user)).one()
+	user = User.query.filter_by(id=_id).options(
+		joinedload(User.plant_user),
+		joinedload(User.plant_site_user)
+	).one()
+
 	form = FormUserUpdate.update(obj=user)
-	print(json.dumps(user.to_dict(), indent=2, default=serialize_dict))
+	# print(json.dumps(user.to_dict(), indent=2, default=serialize_dict))
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormUserUpdate(request.form).to_dict()

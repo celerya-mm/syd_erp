@@ -3,7 +3,7 @@ import json
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
-from app.app import db
+from app.app import db, session
 from .forms import FormRole, FormRoleAddUser
 from .models import Role, UserRoles
 from ..account.models import User
@@ -48,7 +48,10 @@ def role_view():
 
 	# Estraggo la lista dei permessi
 	_list = Role.query.all()
-	_list = [r.to_dict() for r in _list]
+	if 'superuser' in session['user_roles']:
+		_list = [r.to_dict() for r in _list]
+	else:
+		_list = [r.to_dict() for r in _list if r.name != 'superuser']
 
 	db.session.close()
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, detail=DETAIL_FOR)
