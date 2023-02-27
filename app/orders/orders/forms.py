@@ -10,9 +10,10 @@ from app.functions import list_currency, list_payments, list_order_types
 
 def list_partners():
 	from app.organizations.partners.models import Partner
+
 	_list = ["-"]
 	try:
-		records = Partner.query.all()
+		records = Partner.query.order_by(Partner.id.asc()).all()
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
 
@@ -21,18 +22,18 @@ def list_partners():
 		pass
 
 	db.session.close()
-	_list.sort()
 	return _list
 
 
 def list_partner_sites(spl_id=None):
 	from app.organizations.partner_sites.models import PartnerSite
+
 	_list = ["-"]
 	try:
 		if spl_id:
-			records = PartnerSite.query.filter_by(partner_id=spl_id).all()
+			records = PartnerSite.query.filter_by(partner_id=spl_id).order_by(PartnerSite.id.asc()).all()
 		else:
-			records = PartnerSite.query.all()
+			records = PartnerSite.query.order_by(PartnerSite.id.asc()).all()
 
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
@@ -42,15 +43,15 @@ def list_partner_sites(spl_id=None):
 		pass
 
 	db.session.close()
-	_list.sort()
 	return _list
 
 
 def list_plants():
 	from app.organizations.plant.models import Plant
+
 	_list = ["-"]
 	try:
-		records = Plant.query.all()
+		records = Plant.query.order_by(Plant.id.asc()).all()
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
 
@@ -59,18 +60,18 @@ def list_plants():
 		pass
 
 	db.session.close()
-	_list.sort()
 	return _list
 
 
 def list_plant_sites(pl_id=None):
 	from app.organizations.plant_site.models import PlantSite
+
 	_list = ["-"]
 	try:
 		if pl_id:
-			records = PlantSite.query.filter_by(plant_id=pl_id).all()
+			records = PlantSite.query.filter_by(plant_id=pl_id).order_by(PlantSite.id.asc()).all()
 		else:
-			records = PlantSite.query.all()
+			records = PlantSite.query.order_by(PlantSite.id.asc()).all()
 
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
@@ -80,7 +81,6 @@ def list_plant_sites(pl_id=None):
 		pass
 
 	db.session.close()
-	_list.sort()
 	return _list
 
 

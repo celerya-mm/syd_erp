@@ -17,31 +17,20 @@ def list_plant_sites():
 		else:
 			_list = [x.to_dict() for x in records]
 
-		_plant = [d["organization"] for d in _list]
-		_email = [d["email"] for d in _list]
-		_pec = [d["email"] for d in _list]
-		_vat = [d["vat_number"] for d in _list]
-		_sdi_code = [d["sdi_code"] for d in _list]
+		_list = [d["organization"] for d in _list]
 
 		db.session.close()
-
-		_plant.sort()
-		_email.sort()
-		_pec.sort()
-		_vat.sort()
-		_sdi_code.sort()
-
-		return _plant, _email, _pec, _vat, _sdi_code
+		return _list
 	except Exception as err:
 		print('ERROR_LIST_PLANT_SITES', err)
-		return [], [], [], [], []
+		return []
 
 
 def list_plants():
 	from app.organizations.plant.models import Plant
 	_list = ["-"]
 	try:
-		records = Plant.query.all()
+		records = Plant.query.order_by(Plant.id.asc()).all()
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
 	except Exception as err:
@@ -49,7 +38,6 @@ def list_plants():
 		pass
 
 	db.session.close()
-	_list.sort()
 	return _list
 
 

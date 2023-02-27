@@ -21,9 +21,6 @@ def list_user():
 		_user = [d["username"] for d in _list if "username" in d]
 		_email = [d["email"] for d in _list if "email" in d]
 
-		_user.sort()
-		_email.sort()
-
 		return _user, _email
 	except Exception as err:
 		print('ERROR_LIST_USERS:', err)
@@ -35,7 +32,7 @@ def list_plant_sites():
 
 	_list = ["-"]
 	try:
-		records = PlantSite.query.all()
+		records = PlantSite.query.order_by(PlantSite.id.asc()).all()
 		_dict = [x.to_dict() for x in records if x.active]
 		db.session.close()
 		for d in _dict:
@@ -45,7 +42,6 @@ def list_plant_sites():
 		print('ERROR_LIST_PLANT_SITES:', err)
 		pass
 
-	_list.sort()
 	return _list
 
 
@@ -54,7 +50,7 @@ def list_plants():
 
 	_list = ["-"]
 	try:
-		records = Plant.query.all()
+		records = Plant.query.order_by(Plant.id.asc()).all()
 		_dict = [x.to_dict() for x in records if x.active]
 		db.session.close()
 		for d in _dict:
@@ -64,7 +60,6 @@ def list_plants():
 		print('ERROR_LIST_PLANTS:', err)
 		pass
 
-	_list.sort()
 	return _list
 
 
@@ -171,6 +166,10 @@ class FormUserUpdate(FlaskForm):
 	def update(cls, obj):
 		# Instantiate the form
 		form = cls()
+		# Update the choices
+		form.plant_id.choices = list_plants()
+		form.plant_site_id.choices = list_plant_sites()
+
 		form.username.data = obj.username
 		form.active.data = obj.active
 
@@ -183,10 +182,6 @@ class FormUserUpdate(FlaskForm):
 		form.address.data = obj.address if obj.address else None
 		form.cap.data = obj.cap if obj.cap else None
 		form.city.data = obj.city if obj.city else None
-
-		# Update the choices
-		form.plant_id.choices = list_plants()
-		form.plant_site_id.choices = list_plant_sites()
 
 		form.note.data = obj.note if obj.note else None
 		return form

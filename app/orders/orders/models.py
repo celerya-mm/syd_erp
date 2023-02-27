@@ -16,7 +16,7 @@ class Oda(db.Model):
 	oda_date = db.Column(db.Date, index=False, unique=False, nullable=False)
 	oda_description = db.Column(db.String(255), index=False, unique=False, nullable=False)
 	oda_delivery_date = db.Column(db.Date, index=False, unique=False, nullable=False)
-	oda_amount = db.Column(db.Float, index=False, unique=False, nullable=True)
+	oda_amount = db.Column(db.Float, index=False, unique=False, nullable=True, default=None)
 	oda_currency = db.Column(db.String(3), index=False, unique=False, nullable=False)
 	oda_payment = db.Column(db.String(50), index=False, unique=False, nullable=False)
 	oda_status = db.Column(db.String(25), index=False, unique=False, nullable=False)

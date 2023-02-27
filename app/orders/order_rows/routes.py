@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 
 from app.app import session, db
 from app.functions import token_user_validate, access_required, serialize_dict, timer_func
-from .forms import FormOdaRowUpdate, FormOdaRowCreate, list_partner_sites
+from .forms import FormOdaRowUpdate, FormOdaRowCreate
 from .models import OdaRow
 
 oda_rows_bp = Blueprint(
@@ -64,8 +64,6 @@ def oda_rows_create(o_id, p_id, s_id=None):
 
 				item_quantity=_item.item_quantity_min if _item.item_quantity_min else None,
 				item_quantity_um=_item.item_quantity_um if _item.item_quantity_um else None,
-
-				item_amount=_item.item_quantity_min * _item.item_price if _item.item_quantity_min else None,
 
 				oda_id=o_id,
 
@@ -153,20 +151,21 @@ def oda_rows_update(_id):
 	if request.method == 'POST' and form.validate():
 		new_data = FormOdaRowUpdate(request.form).to_dict()
 
-		if new_data["item_price_discount"] == 100:
-			new_data["item_amount"] = 0
-
-		elif new_data["item_price_discount"] is not None and new_data["item_price_discount"] > 0:
-			_tot = round(float(new_data["item_price"]) * float(new_data["item_quantity"]), 2)
-			_discount = (100 - float(new_data["item_price_discount"])) / 100
-			new_data["item_amount"] = round(float(_tot) * _discount, 2) if _discount else _tot
-
-		else:
-			new_data["item_amount"] = round(float(new_data["item_price"]) * float(new_data["item_quantity"]), 2)
-			# print("NEW_DATA_ROW:", json.dumps(new_data, indent=2, default=serialize_dict))
-
 		previous_data = oda_row.to_dict()
 		previous_data.pop("updated_at")
+
+		# lavoro cambio codice articolo
+		if oda_row.item_code != new_data["item_code"]:
+			from app.orders.items.models import Item
+
+			flash("Cambiato codice Articolo. Controlla la riga d'ordine.")
+
+			_item = Item.query.filter_by(item_code=new_data["item_code"]).first()
+			new_data['item_code_supplier'] = _item.item_code_supplier
+			new_data['item_description'] = _item.item_description
+			new_data['item_price'] = _item.item_price
+			new_data['item_price_discount'] = _item.item_price_discount
+			new_data['item_quantity_um'] = _item.item_quantity_um
 
 		try:
 			OdaRow.update(_id, new_data)
@@ -192,8 +191,6 @@ def oda_rows_update(_id):
 	else:
 		if oda_row.supplier_site:
 			form.supplier_site_id.data = f'{oda_row.supplier_site.id} - {oda_row.supplier_site.site}'
-
-		list_partner_sites(oda_row.supplier_id)
 
 		_info = {
 			'created_at': oda_row.created_at,

@@ -10,3 +10,20 @@ Verifica DB:
 
 Downgrade: flask db downgrade
 Storia: flask db history
+
+Per modificare una colonna nel db come calcolata (non funziona):
+
+Crea una migrazione alembic utilizzando il comando:
+flask db migrate -m "Aggiungi colonna calcolata item_amount"
+
+Questo comando crea una nuova migrazione alembic nella cartella "migrations".
+Modifica il file di migrazione generato nella cartella "migrations".
+Aggiungi una definizione di colonna per la colonna calcolata es "item_amount", utilizzando la sintassi SQL
+sotto la funzione upgrade():
+
+op.execute(
+	"UPDATE oda_rows SET item_amount = (item_price * item_quantity) * (CASE WHEN item_price_discount IS NULL THEN 1 ELSE ((100 - item_price_discount) / 100) END)"
+)
+
+Esegui la migrazione del database utilizzando il comando:
+flask db upgrade

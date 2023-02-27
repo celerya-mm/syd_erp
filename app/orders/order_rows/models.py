@@ -11,12 +11,11 @@ class OdaRow(db.Model):
 	# Columns
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-	item_code = db.Column(
-		db.String(8), db.ForeignKey('items.item_code', ondelete='CASCADE'), index=True, unique=False, nullable=False)
+	item_code = db.Column(db.String(8), db.ForeignKey('items.item_code'), index=True, unique=False, nullable=False)
 	item_code_supplier = db.Column(db.String(25), index=True, unique=False, nullable=True)
 	item_description = db.Column(db.String(500), index=True, unique=False, nullable=False)
 
-	item_price = db.Column(db.Float, index=False, unique=False, nullable=False)
+	item_price = db.Column(db.Float, index=False, unique=False, nullable=True)
 	item_price_discount = db.Column(db.Float, index=False, unique=False, nullable=True)  # considerato in %
 	item_currency = db.Column(db.String(3), index=False, unique=False, nullable=True)
 
@@ -46,13 +45,35 @@ class OdaRow(db.Model):
 	def __str__(self):
 		return f'<ORDER_ROW_CLASS: [{self.item_code}] - {self.item_description}>'
 
+	def calculate_item_amount(self):
+		if self.item_price and self.item_quantity and self.item_price_discount:
+			item_amount = (self.item_price * self.item_quantity) * ((100 - self.item_price_discount) / 100)
+		elif self.item_price and self.item_quantity:
+			item_amount = (self.item_price * self.item_quantity)
+		else:
+			item_amount = 0
+
+		self.item_amount = item_amount
+
+	def update_item_amount(self):
+		if self["item_price"] and self['item_quantity'] and self['item_price_discount']:
+			item_amount = (self["item_price"] * self['item_quantity']) * ((100 - self['item_price_discount']) / 100)
+		elif self["item_price"] and self['item_quantity']:
+			item_amount = (self["item_price"] * self['item_quantity'])
+		else:
+			item_amount = 0
+
+		self['item_amount'] = item_amount
+
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""
+		self.calculate_item_amount()
 		db.session.add(self)
 		db.session.commit()
 
 	def update(_id, data):  # noqa
 		"""Salva le modifiche a un record."""
+		OdaRow.update_item_amount(data)
 		OdaRow.query.filter_by(id=_id).update(data)
 		db.session.commit()
 

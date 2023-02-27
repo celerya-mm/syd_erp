@@ -8,25 +8,27 @@ from app.app import db
 from app.functions import list_currency, list_um
 
 
-def list_items(p_id=None):
+def list_items(p_id=None, upd=None):
 	from app.orders.items.models import Item
 
 	_list = ["-"]
 	try:
 		if p_id:
-			records = Item.query.filter_by(supplier_id=int(p_id)).all()
+			records = Item.query.filter_by(supplier_id=int(p_id)).order_by(Item.item_code.asc()).all()
 		else:
-			records = Item.query.all()
+			records = Item.query.order_by(Item.item_code.asc()).all()
 
 		for r in records:
-			_list.append(f"{r.item_code.strip()} - {r.item_description.strip()}")
+			if upd:
+				_list.append(r.item_code)
+			else:
+				_list.append(f"{r.item_code} - {r.item_description}")
 
 	except Exception as err:
 		print('ERROR_LIST_ITEMS:', err)
 		pass
 
 	db.session.close()
-	_list.sort()
 	return _list
 
 
@@ -35,7 +37,7 @@ def list_partners():
 
 	_list = ["-"]
 	try:
-		records = Partner.query.all()
+		records = Partner.query.order_by(Partner.id.asc()).all()
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
 
@@ -44,7 +46,6 @@ def list_partners():
 		pass
 
 	db.session.close()
-	_list.sort()
 	return _list
 
 
@@ -54,9 +55,9 @@ def list_partner_sites(p_id=None):
 	_list = ["-"]
 	try:
 		if p_id:
-			records = PartnerSite.query.filter_by(partner_id=p_id).all()
+			records = PartnerSite.query.filter_by(partner_id=p_id).order_by(PartnerSite.id.asc()).all()
 		else:
-			records = PartnerSite.query.all()
+			records = PartnerSite.query.order_by(PartnerSite.id.asc()).all()
 
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
@@ -67,7 +68,6 @@ def list_partner_sites(p_id=None):
 
 	# print("LIST:", _list)
 	db.session.close()
-	_list.sort()
 	return _list
 
 
@@ -129,10 +129,10 @@ class FormOdaRowUpdate(FlaskForm):
 		form = cls()
 
 		# Update the choices
-		form.item_code.choices = list_items(p_id)
+		form.item_code.choices = list_items(p_id, upd=True)
 		form.supplier_site_id.choices = list_partner_sites(p_id)
 
-		form.item_code.data = f'{obj.item_code.strip()} - {obj.item_description.strip()}'
+		form.item_code.data = obj.item_code
 		form.item_code_supplier.data = obj.item_code_supplier or None
 
 		form.item_description.data = obj.item_description

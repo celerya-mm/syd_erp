@@ -12,12 +12,11 @@ from ..account.models import User
 def list_roles():
     _list = []
     try:
-        records = Role.query.all()
+        records = Role.query.order_by(Role.name.asc()).all()
         for r in records:
             _list.append(r.name)
 
         db.session.close()
-        _list.sort()
         return _list
     except Exception as err:
         print('ERROR_LIST_ROLES', err)
@@ -27,7 +26,7 @@ def list_roles():
 def list_Users():
     _list = []
     try:
-        records = User.query.all()
+        records = User.query.order_by(User.username.asc()).all()
         for r in records:
             if r.username == 'celerya_superuser':
                 pass
@@ -35,7 +34,6 @@ def list_Users():
                 _list.append(f'{r.id} - {r.username}')
 
         db.session.close()
-        _list.sort()
         return _list
     except Exception as err:
         print('ERROR_LIST_USERS', err)

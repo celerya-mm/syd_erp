@@ -24,13 +24,6 @@ def list_plants():
 		_sdi_code = [d["sdi_code"] for d in _list]
 
 		db.session.close()
-
-		_plant.sort()
-		_email.sort()
-		_pec.sort()
-		_vat.sort()
-		_sdi_code.sort()
-
 		return _plant, _email, _pec, _vat, _sdi_code
 	except Exception as err:
 		print('ERROR_LIST_PLANTS', err)

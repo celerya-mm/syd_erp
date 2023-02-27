@@ -15,10 +15,10 @@
 			{{ form.csrf_token }}
 			<div class="row no-gutters justify-content-center rounded"
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="col-md-10 order-first">
+				<div class="col-md-3 order-first">
 					<div class="form-group">
 						{{ form.item_code.label(style="font-size: 1.2rem;") }}
-						{{ form.item_code(class="form-control emphasis") }}
+						{{ form.item_code(class="form-control emphasis", style="text-align: center;") }}
 						{% if form.item_code.errors %}
 						{% for error in form.item_code.errors %}
 						<span class="text-danger">{{ error }}</span>
@@ -27,7 +27,19 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-2 order-first">
+				<div class="col-md-3 order-second">
+					<div class="form-group">
+						{{ form.item_code_supplier.label(style="font-size: 1.2rem;") }}
+						{{ form.item_code_supplier(class="form-control emphasis") }}
+						{% if form.item_code_supplier.errors %}
+						{% for error in form.item_code_supplier.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-3 order-third">
 					<div class="form-group">
 						{{ form.supplier_id.label(style="font-size: 1.2rem;") }}
 						{{ form.supplier_id(class="form-control") }}
@@ -42,19 +54,7 @@
 			</div>
 			<div class="row no-gutters justify-content-center rounded"
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="col-md-3 order-second">
-					<div class="form-group">
-						{{ form.item_code_supplier.label(style="font-size: 1.2rem;") }}
-						{{ form.item_code_supplier(class="form-control emphasis") }}
-						{% if form.item_code_supplier.errors %}
-						{% for error in form.item_code_supplier.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-				<div class="col-md-2 order-third">
+				<div class="col-md-2 order-first">
 					<div class="form-group">
 						{{ form.item_price.label(style="font-size: 1.2rem;") }}
 						{{ form.item_price(class="form-control emphasis") }}
@@ -66,7 +66,7 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-2 order-fourth">
+				<div class="col-md-2 order-second">
 					<div class="form-group">
 						{{ form.item_price_discount.label(style="font-size: 1.2rem;") }}
 						{{ form.item_price_discount(class="form-control") }}
@@ -78,7 +78,7 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-1 order-fifth">
+				<div class="col-md-1 order-third">
 					<div class="form-group">
 						{{ form.item_currency.label(style="font-size: 1.2rem;") }}
 						{{ form.item_currency(class="form-control") }}
@@ -90,10 +90,10 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-2 order-sixth">
+				<div class="col-md-2 order-fourth">
 					<div class="form-group">
 						{{ form.item_quantity.label(style="font-size: 1.2rem;") }}
-						{{ form.item_quantity(class="form-control") }}
+						{{ form.item_quantity(class="form-control emphasis") }}
 						{% if form.item_quantity.errors %}
 						{% for error in form.item_quantity.errors %}
 						<span class="text-danger">{{ error }}</span>
@@ -102,7 +102,7 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-2 order-seventh">
+				<div class="col-md-2 order-fifth">
 					<div class="form-group">
 						{{ form.item_quantity_um.label(style="font-size: 1.2rem;") }}
 						{{ form.item_quantity_um(class="form-control", style="text-align: center;") }}

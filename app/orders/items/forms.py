@@ -13,7 +13,7 @@ def list_partners():
 
 	_list = ["-"]
 	try:
-		records = Partner.query.all()
+		records = Partner.query.order_by(Partner.id.asc()).all()
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
 
@@ -22,7 +22,6 @@ def list_partners():
 		pass
 
 	db.session.close()
-	_list.sort()
 	return _list
 
 
@@ -32,9 +31,9 @@ def list_partner_sites(p_id=None):
 	_list = ["-"]
 	try:
 		if p_id:
-			records = PartnerSite.query.filter_by(partner_id=p_id).all()
+			records = PartnerSite.query.filter_by(partner_id=p_id).order_by(PartnerSite.id.asc()).all()
 		else:
-			records = PartnerSite.query.all()
+			records = PartnerSite.query.order_by(PartnerSite.id.asc()).all()
 
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
@@ -44,7 +43,6 @@ def list_partner_sites(p_id=None):
 		pass
 
 	db.session.close()
-	_list.sort()
 	return _list
 
 

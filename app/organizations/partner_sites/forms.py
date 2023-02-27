@@ -17,16 +17,12 @@ def list_partner_sites():
 		else:
 			_list = [x.to_dict() for x in records]
 
-		_partner_site = [d["site"].lower() for d in _list]
-		_id = [d["id"] for d in _list]
+		_list = [d["site"].lower() for d in _list]
 
 		db.session.close()
-
-		_partner_site.sort()
-		_id.sort()
-
-		return _partner_site, _id
+		return _list
 	except Exception as err:
+		db.session.close()
 		print('ERROR_LIST_PARTNER_SITES', err)
 		return [], []
 
@@ -36,7 +32,7 @@ def list_partners():
 
 	_list = ["-"]
 	try:
-		records = Partner.query.all()
+		records = Partner.query.order_by(Partner.id.asc()).all()
 		_dict = [x.to_dict() for x in records]
 		for d in _dict:
 			_list.append(f"{str(d['id'])} - {d['organization']}")
@@ -45,7 +41,6 @@ def list_partners():
 		pass
 
 	db.session.close()
-	_list.sort()
 	return _list
 
 
@@ -90,7 +85,7 @@ class FormPartnerSite(FlaskForm):
 
 	def validate_site(self, field):  # noqa
 		"""Verifica presenza organization nella tabella del DB."""
-		if field.data.strip().replace('  ', ' ').lower() in list_partner_sites()[0]:
+		if field.data.strip().replace('  ', ' ').lower() in list_partner_sites():
 			raise ValidationError("Sito già presente in tabella.")
 
 	@classmethod

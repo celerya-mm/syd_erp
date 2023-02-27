@@ -24,13 +24,6 @@ def list_partners():
 		_sdi_code = [d["sdi_code"].lower() for d in _list]
 
 		db.session.close()
-
-		_partner.sort()
-		_email.sort()
-		_pec.sort()
-		_vat.sort()
-		_sdi_code.sort()
-
 		return _partner, _email, _pec, _vat, _sdi_code
 	except Exception as err:
 		print('ERROR_LIST_PARTNERS', err)

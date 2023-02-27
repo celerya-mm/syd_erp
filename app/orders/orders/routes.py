@@ -77,7 +77,6 @@ def oda_create(p_id, s_id=None):
 				oda_date=form_data['oda_date'],
 				oda_description=form_data['oda_description'],
 				oda_delivery_date=form_data['oda_delivery_date'],
-				oda_amount=None,
 				oda_currency=form_data['oda_currency'],
 				oda_payment=form_data['oda_payment'],
 				oda_status=form_data['oda_status'],
@@ -166,7 +165,7 @@ def oda_view_detail(_id):
 		.options(joinedload(Oda.supplier_site)) \
 		.get(_id)
 
-	_item = oda.to_dict()
+	_oda = oda.to_dict()
 
 	# Estraggo la storia delle modifiche per l'articolo
 	history_list = oda.events
@@ -175,6 +174,22 @@ def oda_view_detail(_id):
 	else:
 		history_list = []
 
+	# Organizzazione
+	_oda["plant_id"] = f'{oda.plant.id} - {oda.plant.organization}'
+
+	if oda.plant_site:
+		_oda["plant_site_id"] = f'{oda.plant_site.id} - {oda.plant_site.organization}'
+
+	# Fornitore
+	_oda["supplier_id"] = f'{oda.supplier.id} - {oda.supplier.organization}'
+	p_id = oda.supplier.id
+
+	if oda.supplier_site:
+		_oda["supplier_site_id"] = f'{oda.supplier_site.id} - {oda.supplier_site.site}'
+		s_id = oda.supplier_site.id
+	else:
+		s_id = None
+
 	# Estraggo la lista delle righe ordine
 	rows_list = oda.oda_rows
 	if rows_list:
@@ -182,32 +197,16 @@ def oda_view_detail(_id):
 	else:
 		rows_list = []
 
-	# Organizzazione
-	_item["plant_id"] = f'{oda.plant.id} - {oda.plant.organization}'
-
-	if oda.plant_site:
-		_item["plant_site_id"] = f'{oda.plant_site.id} - {oda.plant_site.organization}'
-
-	# Fornitore
-	_item["supplier_id"] = f'{oda.supplier.id} - {oda.supplier.organization}'
-	p_id = oda.supplier.id
-
-	if oda.supplier_site:
-		_item["supplier_site_id"] = f'{oda.supplier_site.id} - {oda.supplier_site.site}'
-		s_id = oda.supplier_site.id
-	else:
-		s_id = None
-
 	amount = oda.oda_amount
 	if rows_list:
-		_item["oda_amount"] = 0
+		_oda["oda_amount"] = 0
 		for row in rows_list:
-			_item["oda_amount"] = round(_item["oda_amount"] + row["item_amount"], 2)
+			_oda["oda_amount"] = round(_oda["oda_amount"] + row["item_amount"], 2)
 	else:
-		_item["oda_amount"] = None
+		_oda["oda_amount"] = None
 
-	if amount != _item["oda_amount"]:
-		oda.oda_amount = _item["oda_amount"]
+	if amount != _oda["oda_amount"]:
+		oda.oda_amount = _oda["oda_amount"]
 		Oda.update(_id, oda.to_dict())
 		flash("TOTALE ORDINE aggiornato.")
 
@@ -222,7 +221,7 @@ def oda_view_detail(_id):
 
 	db.session.close()
 	return render_template(
-		DETAIL_HTML, form=_item, view=VIEW_FOR, update=UPDATE_FOR,
+		DETAIL_HTML, form=_oda, view=VIEW_FOR, update=UPDATE_FOR,
 		event_detail=EVENT_DETAIL, history_list=history_list, h_len=len(history_list),
 		partner_detail=PARTNER_DETAIL, p_id=p_id,
 		partner_site_detail=PARTNER_SITE_DETAIL, s_id=s_id,
