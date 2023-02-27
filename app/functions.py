@@ -221,6 +221,8 @@ list_payments = [
 ]
 
 list_order_types = [
+	'Lavorazione',
+	'Generato',
 	'Emesso',
 	'Ricevuto OK',
 	'Ricevuto NC (note)',

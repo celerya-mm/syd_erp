@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<style>
+        @page {
+          size: A4;
+          margin: 0;
+        }
+	</style>
+	
+	<!-- CSS only boostrap -->
+	<link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+		  integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" rel="stylesheet">
+	
+	<!-- FONT -->
+	<link href="https://fonts.googleapis.com" rel="preconnect">
+	<link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+	<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet">
+	
+	<!-- link a file .css -->
+	<link href="{{ url_for('static', filename='app.css') }}" rel="stylesheet">
+	<link href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css" rel="stylesheet" type="text/css">
+	
+	<meta http-equiv="Content-type" content="text/html; charset=ascii" />
+	
+	<div style="padding-left: 75%">
+		<img alt="" src="{{ logo }}" height="125" width="250"/>
+	</div>
+	
+	<div style="font-family: 'Jost', sans-serif !important;
+			font-size: 1rem !important;
+			color: #2B4692 !important;
+			text-align: center;
+			padding-top: 20px; padding-bottom: 20px;">
+		<h2>Ordine Di Acquisto (ODA): <strong>{{ oda.oda_number }}</strong> del <strong>{{ oda.oda_date }}</strong></h2>
+	</div>
+</head>
+<body>
+<div class="sheet-outer.A4" style="width-max: 95%; padding-bottom: 0px">
+	<div class="table table-bordered" style="border-radius: 5px;">
+		<table class="table table-bordered table-hover" id="data" style="width:100%; border: 1px #2B4692;">
+			<thead>
+			<tr style="font-family: 'Jost', sans-serif; font-size: 0.75rem; background-color: #2B4692;
+					  vertical-align: center; color: white; line-height: 0.8;">
+				<th class="title" id="h1" scope="col">
+					Cod.
+				</th>
+				<th class="title" id="h2" scope="col">
+					For.
+				</th>
+				<th class="title" id="h3" scope="col">
+					Descrizione articolo (modello, ecc...)
+				</th>
+				<th class="title" id="h4" scope="col">
+					Q
+				</th>
+				<th class="title" id="h5" scope="col">
+					U.M.
+				</th>
+				<th class="title" id="h6" scope="col">
+					Prezzo {{ oda.oda_currency}}
+				</th>
+				<th class="title" id="h7" scope="col">
+					Sconto %
+				</th>
+				<th class="title" id="h8" scope="col">
+					Totale {{ oda.oda_currency}}
+				</th>
+				<th class="title" id="h9" scope="col">
+					Note
+				</th>
+			</tr>
+			</thead>
+			<tbody>
+			{% for row in oda_rows %}
+			<tr style="border: 0.75px #2B4692; font-family: 'Inter', sans-serif; font-size: 0.85rem;
+				vertical-align: top">
+				<td style="color: #2B4692; font-weight: bold; text-align: center;">
+					{{ row.item_code|e }}
+				</td>
+				<td style="color: #2B4692; font-weight: bold; text-align: center;">
+					{% if row.item_code_supplier %}
+					{{ row.item_code_supplier|e }}
+					{% endif %}
+				</td>
+				<td style="text-align: justify">
+					{{ row.item_description|e }}
+				</td>
+				<td style="text-align: center;">
+					{{ row.item_quantity|e }}
+				</td>
+				<td style="text-align: center;">
+					{{ row.item_quantity_um|e }}
+				</td>
+				<td style="text-align: center;">
+					{{ row.item_price|e }}
+				</td>
+				<td style="text-align: center;">
+					{% if row.item_price_discount %}
+					{{ row.item_price_discount|e }}
+					{% endif %}
+				</td>
+				<td style="color: #2B4692; font-weight: bold; text-align: center;">
+					{{ row.item_amount|e }}
+				</td>
+				<td style="font-size: 0.7rem;">
+					{% if row.note %}
+					{{ row.note|e }}
+					{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+</body>
+<footer>
+	<div class="footer-oda">
+		<p style="margin: 0px; padding-top: 0px; padding-bottom: 10px; padding-left: 70%;">
+			<strong style="color: #2B4692; font-style: italic;">
+				TOTALE ORDINE: {{ oda.oda_amount }} {{ oda.oda_currency }}</strong></p>
+	</div>
+	<div class="footer-oda">
+		<p style="margin: 0px; padding-top: 0px; padding-bottom: 7px;">
+			<strong style="color: #2B4692; font-style: italic; text-align: justify">
+				Descrizione:</strong> {{ oda.oda_description }}</p>
+	</div>
+	
+	{% if oda.note %}
+	<div class="footer-oda">
+		<p style="margin: 0px; padding-top: 0px; padding-bottom: 7px;">
+			<strong style="color: #2B4692; font-style: italic; text-align: justify">
+				Note:</strong> {{ oda.note }}</p>
+	</div>
+	{% endif %}
+	
+	<div class="footer-oda">
+		<p style="margin: 0px; padding-top: 0px; padding-bottom: 7px;">
+			<strong style="color: #2B4692; font-style: italic; text-align: justify">
+				Fornitore:</strong> {{ oda.supplier.organization }}</p>
+	</div>
+	
+	<div class="footer-oda">
+		<p style="margin: 0px; padding-top: 0px; padding-bottom: 7px;">
+			<strong style="color: #2B4692; font-style: italic; text-align: justify">
+				Offerta:</strong> {{ oda.supplier_offer }} del {{ oda.supplier_offer_date }}</p>
+	</div>
+	
+	<div class="footer-oda">
+		<p style="margin: 0px; padding-top: 0px; padding-bottom: 7px;">
+			<strong style="color: #2B4692; font-style: italic; text-align: justify">
+				Condizioni pagamento:</strong> {{ oda.oda_payment }}</p>
+	</div>
+	
+	<div class="footer-oda">
+		<p style="margin: 0px; padding-top: 0px; padding-bottom: 7px;">
+			<strong style="color: #2B4692; font-style: italic; text-align: justify">
+				Osservazioni:</strong> Il prezzo si intende al netto di IVA.</p>
+	</div>
+	
+	<div class="footer-oda">
+		<p style="margin: 0px; padding-top: 0px; padding-bottom: 7px;">
+			<strong style="color: #2B4692; font-style: italic; text-align: justify">
+				Allegati:</strong> Condizioni Generali di Fornitura(CG_Celerya_XX/XXXX).</p>
+		<p style="margin: 0px; padding-top: 0px; padding-bottom: 7px;">
+			Si prega di rimandare firmate per accettazione le condizioni di fornitura.</p>
+	</div>
+	
+	<div style="padding-left: 65%; margin: 0px;">
+		<p>Timbro e firma</p>
+		<img alt="" src="{{ sign }}" height="150" width="190"/>
+	</div>
+	<br>
+	<div style="font-style: italic; font-size: 0.65rem; text-align: center;">
+		<th class="footer-oda" >
+			Celerya S.r.l. - Copyright 2021 - Tutti i diritti riservati - www.celerya.com - info@celerya.com.
+		</th>
+	</div>
+</footer>
+</html>

@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from app.app import session, db
+from app.app import session, db, PATH_PROJECT as _path
 from app.functions import token_user_validate, access_required, timer_func
 
 from .forms import FormOda
@@ -31,6 +31,12 @@ DETAIL_HTML = "oda_view_detail.html"
 UPDATE = "/update/<int:_id>"
 UPDATE_FOR = "oda_bp.oda_update"
 UPDATE_HTML = "oda_update.html"
+
+GENERATE = "/generate/<int:_id>"
+GENERATE_FOR = "oda_bp.oda_generate"
+
+DOWNLOAD = "/download/<int:_id>/"
+DOWNLOAD_FOR = "oda_bp.oda_download"
 
 
 @oda_bp.route(VIEW, methods=["GET", "POST"])
@@ -221,7 +227,7 @@ def oda_view_detail(_id):
 
 	db.session.close()
 	return render_template(
-		DETAIL_HTML, form=_oda, view=VIEW_FOR, update=UPDATE_FOR,
+		DETAIL_HTML, form=_oda, view=VIEW_FOR, update=UPDATE_FOR, oda_generate=GENERATE_FOR, oda_download=DOWNLOAD_FOR,
 		event_detail=EVENT_DETAIL, history_list=history_list, h_len=len(history_list),
 		partner_detail=PARTNER_DETAIL, p_id=p_id,
 		partner_site_detail=PARTNER_SITE_DETAIL, s_id=s_id,
@@ -251,7 +257,7 @@ def oda_update(_id):
 		new_data = FormOda(request.form).to_dict()
 
 		previous_data = oda.to_dict()
-		previous_data.pop("updated_at")
+		[previous_data.pop(key) for key in ["updated_at", "oda_pdf"]]
 
 		try:
 			Oda.update(_id, new_data)
@@ -289,3 +295,129 @@ def oda_update(_id):
 		}
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=DETAIL_FOR)
+
+
+@oda_bp.route("/<form>/<form_rows>/", methods=["GET", "POST"])
+@timer_func
+@token_user_validate
+def html_to_pdf(oda, oda_rows):  # , _qrcode):
+	"""Genera pdf da template html."""
+	import pdfkit
+	import os
+	from .functions import folder_temp_pdf  # , folder_temp_qrcode
+
+	# _img = os.path.join(_path, "static", "qrcode_temp", _qrcode)
+	logo = os.path.join(_path, "static", "Logo_colore.png")
+	sign = os.path.join(_path, "static", "TimbroFirma.png")
+
+	# PDF options
+	options = {
+		"orientation": "portrait",
+		"page-size": "A4",
+		"margin-top": "0.5cm",
+		"margin-right": "0.5cm",
+		"margin-bottom": "0.5cm",
+		"margin-left": "0.5cm",
+		"encoding": "ascii",
+		"enable-local-file-access": "",
+		"print-media-type": True
+	}
+
+	try:
+		# Build PDF from HTML
+		_file = os.path.join(folder_temp_pdf, "report.pdf")
+		html = render_template('oda_to_pdf.html', oda=oda, oda_rows=oda_rows, logo=logo, sign=sign)  # , qrcode=_img)
+		_html = os.path.join(folder_temp_pdf, "temp.html")
+
+		print("WRITE_HTML")
+		with open(_html.encode('utf-8'), 'w') as f:
+			f.write(html)
+
+		print("WRITE_PDF_1")
+		_pdf = pdfkit.from_file(_html, False, options=options)
+
+		print("WRITE_PDF_2")
+		with open(_file, "wb") as f:
+			f.write(_pdf)
+
+		# rimuovo il qrcode
+		# for f in os.listdir(folder_temp_qrcode):
+		# 	_f = os.path.join(folder_temp_qrcode, f)
+		# 	os.remove(_f)
+
+		return _file
+	except Exception as err:
+		print("ERRORE_CREAZIONE_PDF_DA_HTML:", err)
+		return False
+
+
+@oda_bp.route(GENERATE, methods=["GET", "POST"])
+@timer_func
+@token_user_validate
+@access_required(roles=['orders_admin', 'orders_write'])
+def oda_generate(_id):
+	"""Genera il pdf di un ODA."""
+	from app.orders.order_rows.models import OdaRow
+	from .functions import pdf_to_byte
+	from app.event_db.routes import event_create
+
+	oda = Oda.query.options(joinedload(Oda.supplier)).get(_id)
+	oda_row = OdaRow.query.filter_by(oda_id=_id).order_by(OdaRow.id.asc()).all()
+
+	pdf = html_to_pdf(oda, oda_row)
+
+	if pdf:
+		pdf_byte = pdf_to_byte(pdf)
+	else:
+		db.session.close()
+		flash(f"ERRORE CREAZIONE FILE PDF.")
+		return redirect(url_for(DETAIL_FOR, _id=_id))
+
+	if pdf_byte not in [False, None]:
+		previous_data = oda.to_dict()
+		# assegno stringa in byte
+		oda.oda_pdf = pdf_byte
+		oda.oda_status = 'Generato'
+
+		try:
+			Oda.update(_id, oda.to_dict())
+			flash("ODA CREATO correttamente.")
+			[previous_data.pop(key) for key in ["updated_at", "oda_pdf"]]
+
+		except IntegrityError as err:
+			db.session.rollback()
+			db.session.close()
+			flash(f"ERRORE: {str(err.orig)}")
+			return redirect(url_for(DETAIL_FOR, _id=_id))
+
+		_event = {
+			"username": session["user"]["username"],
+			"table": Oda.__tablename__,
+			"Modification": f"Update ODA whit id: {_id}",
+			"Previous_data": previous_data
+		}
+		_event = event_create(_event, order_id=_id)
+		return redirect(url_for(DETAIL_FOR, _id=_id))
+	else:
+		flash(f"ERRORE CREAZIONE BYTE PDF.")
+		db.session.close()
+		return redirect(url_for(DETAIL_FOR, _id=_id))
+
+
+@oda_bp.route(DOWNLOAD, methods=["GET", "POST"])
+@timer_func
+@token_user_validate
+@access_required(roles=['orders_admin', 'orders_read'])
+def oda_download(_id):
+	"""Genera file pdf da stringa in byte."""
+	from flask import send_file
+	from .functions import byte_to_pdf
+
+	oda = Oda.query.get(_id)
+	db.session.close()
+	if oda.oda_pdf and len(oda.oda_pdf) > 100:
+		_pdf = byte_to_pdf(oda.oda_pdf, oda.oda_number)
+		return send_file(_pdf, as_attachment=True)
+	else:
+		flash("Errore generazione certificato. ")
+		return redirect(url_for(DETAIL_FOR, _id=_id))

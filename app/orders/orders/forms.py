@@ -95,7 +95,7 @@ class FormOda(FlaskForm):
 	oda_payment = SelectField(
 		'Pagamento', choices=list_payments, default='BB + 60gg DFFM', validators=[DataRequired("Campo obbligatorio!")])
 	oda_status = SelectField(
-		'Stato', choices=list_order_types, default='Emesso', validators=[DataRequired("Campo obbligatorio!")])
+		'Stato', choices=list_order_types, default='Lavorazione', validators=[DataRequired("Campo obbligatorio!")])
 
 	plant_id = SelectField('Sede Legale', validators=[DataRequired("Campo obbligatorio!")])
 	plant_site_id = SelectField('Sede Consegna', validators=[DataRequired("Campo obbligatorio!")])

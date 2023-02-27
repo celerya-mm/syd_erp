@@ -21,6 +21,8 @@ class Oda(db.Model):
 	oda_payment = db.Column(db.String(50), index=False, unique=False, nullable=False)
 	oda_status = db.Column(db.String(25), index=False, unique=False, nullable=False)
 
+	oda_pdf = db.Column(db.LargeBinary, index=False, nullable=True)
+
 	plant_id = db.Column(db.Integer, db.ForeignKey('plants.id'), nullable=False)
 	plant_site_id = db.Column(db.Integer, db.ForeignKey('plant_sites.id'), nullable=True)
 	plant = db.relationship('Plant', backref='p_orders', viewonly=True)
@@ -77,6 +79,8 @@ class Oda(db.Model):
 			'oda_currency': self.oda_currency,
 			'oda_payment': self.oda_payment,
 			'oda_status': self.oda_status,
+
+			'oda_pdf': self.oda_pdf,
 
 			'plant_id': self.plant_id,
 			'plant_site_id': self.plant_site_id or None,

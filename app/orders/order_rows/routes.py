@@ -161,11 +161,18 @@ def oda_rows_update(_id):
 			flash("Cambiato codice Articolo. Controlla la riga d'ordine.")
 
 			_item = Item.query.filter_by(item_code=new_data["item_code"]).first()
-			new_data['item_code_supplier'] = _item.item_code_supplier
-			new_data['item_description'] = _item.item_description
-			new_data['item_price'] = _item.item_price
-			new_data['item_price_discount'] = _item.item_price_discount
-			new_data['item_quantity_um'] = _item.item_quantity_um
+			if _item:
+				new_data['item_code_supplier'] = _item.item_code_supplier
+				new_data['item_description'] = _item.item_description
+				new_data['item_price'] = _item.item_price
+				new_data['item_price_discount'] = _item.item_price_discount
+				new_data['item_quantity_um'] = _item.item_quantity_um
+			else:
+				new_data['item_code_supplier'] = None
+				new_data['item_description'] = None
+				new_data['item_price'] = None
+				new_data['item_price_discount'] = None
+				new_data['item_quantity_um'] = None
 
 		try:
 			OdaRow.update(_id, new_data)

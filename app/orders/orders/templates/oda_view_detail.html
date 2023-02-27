@@ -27,11 +27,38 @@
 			or 'oda_rows_admin' in session['user_roles']
 			or 'oda_rows_write' in session['user_roles']
 			%}
-			<a class="btn btn-update" href="{{ url_for(oda_row_create, o_id=form.id, p_id=p_id, s_id=0) }}"
-			   title="Aggiungi riga Ordine"
-			   type="button">
-				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/shopping_cart_add.svg') }}"/>
-			</a>
+			{% if form.oda_status == "Lavorazione" %}
+				<a class="btn btn-update" href="{{ url_for(oda_row_create, o_id=form.id, p_id=p_id, s_id=0) }}"
+				   title="Aggiungi riga Ordine"
+				   type="button">
+					<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/shopping_cart_add.svg') }}"/>
+				</a>
+				
+				<a class="btn btn-update" href="{{ url_for(oda_generate, _id=form.id) }}"
+				   title="Genera pdf ODA"
+				   type="button">
+					<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/print_blue.svg') }}"/>
+				</a>
+				{% else %}
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/shopping_cart_grey.svg') }}"/>
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/print_grey.svg') }}"/>
+				{% endif %}
+			{% endif %}
+			
+			{%
+			if 'superuser' in session['user_roles']
+			or 'oda_rows_admin' in session['user_roles']
+			or 'oda_rows_read' in session['user_roles']
+			%}
+				{% if form.oda_pdf %}
+				<a class="btn btn-update" href="{{ url_for(oda_download, _id=form.id) }}"
+				   title="Download pdf ODA"
+				   type="button">
+					<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/visibility.svg') }}"/>
+				</a>
+				{% else %}
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"/>
+				{% endif %}
 			{% endif %}
 		</h5>
 	</div>

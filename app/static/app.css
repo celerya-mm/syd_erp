@@ -168,6 +168,13 @@ body {
     font-family: 'Jost', sans-serif;
 }
 
+.footer-oda {
+	padding-left: 12px;
+	font-family: 'Inter', sans-serif;
+	font-size: 0.9rem;
+	margin: 0px;
+}
+
 .form-control {
     border-color: #DEDEDE;
     box-shadow: #9BB5E8;
@@ -396,6 +403,27 @@ page[size="A4"] {
     margin-bottom: 30px;
 }
 
+.oda-title {
+	font-family: 'Jost', sans-serif !important;
+	font-size: 1.2rem !important;
+	color: #2B4692 !important;
+	padding-left: 30% !important;
+}
+
+.table-oda {
+	border: 1px solid #5B5A5B;
+	font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+}
+
+.table-oda-tr {
+	font-family: 'Inter', sans-serif;
+	font-size: 1rem;
+	background-color: #2B4692;
+	vertical-align: center;
+	color: white;
+}
+
 .tab-link {
     font-size: 0.7rem;
     font-weight: bold;
@@ -432,6 +460,7 @@ th.sorting_asc,th.sorting_desc{
 .sheet-outer {
     margin: 0;
 }
+
 .sheet {
     margin: 0;
     overflow: hidden;
@@ -452,12 +481,16 @@ th.sorting_asc,th.sorting_desc{
     width: 210mm;
     height: 296mm
 }
-.sheet.padding-5mm { padding: 5mm }
+
+.sheet.padding-5mm {
+	padding: 5mm;
+}
 
 @page {
     size: A4;
     margin: 0
 }
+
 @media print {
     .sheet-outer.A4, .sheet-outer.A5.landscape {
         width: 210mm
