@@ -410,13 +410,35 @@ def oda_generate(_id):
 @access_required(roles=['orders_admin', 'orders_read'])
 def oda_download(_id):
 	"""Genera file pdf da stringa in byte."""
+	import os
 	from flask import send_file
 	from .functions import byte_to_pdf
+	from PyPDF2 import PdfReader, PdfMerger
 
 	oda = Oda.query.get(_id)
 	db.session.close()
 	if oda.oda_pdf and len(oda.oda_pdf) > 100:
 		_pdf = byte_to_pdf(oda.oda_pdf, oda.oda_number)
+		_payment_condition = os.path.join(_path, "orders", "orders", "attachments", "CG_Celerya_Rev_12_2020.pdf")
+		_merged = os.path.join(_path, "orders", "orders", "temp_pdf", "_merged.pdf")
+
+		merger = PdfMerger()
+		with open(_pdf, 'rb') as f:
+			merger.append(PdfReader(f))
+
+		with open(_payment_condition, 'rb') as f:
+			merger.append(PdfReader(f))
+
+		with open(_merged, 'wb') as f:
+			merger.write(f)
+		try:
+			os.remove(_pdf)
+			os.rename(_merged, _pdf)
+		except Exception as err:
+			print(f"Errore durante la generazione del pdf: {err}")
+			msg = f"Errore durante la generazione del pdf: {err}"
+			return msg
+
 		return send_file(_pdf, as_attachment=True)
 	else:
 		flash("Errore generazione certificato. ")
