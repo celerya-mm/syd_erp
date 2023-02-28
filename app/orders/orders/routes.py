@@ -6,6 +6,7 @@ from sqlalchemy.orm import joinedload
 
 from app.app import session, db, PATH_PROJECT as _path
 from app.functions import token_user_validate, access_required, timer_func
+from .functions import dict_group_by
 
 from .forms import FormOda
 from .models import Oda
@@ -52,9 +53,20 @@ def oda_view():
 	_list = Oda.query.all()
 	_list = [r.to_dict() for r in _list]
 
+	# raggruppo per anno ordine (5 anni max)
+	g_year = dict_group_by(_list, 'oda_date', amount='oda_amount', year=True)
+	y_labels = [sub['oda_date'] for sub in g_year]
+	y_values = [sub['oda_amount'] for sub in g_year]
+
+	# raggruppa per fornitore
+	g_supplier = dict_group_by(_list, 'oda_date', group_f="supplier_id", amount='oda_amount', year=True)
+	s_labels = [sub["supplier_id"] for sub in g_supplier]
+	s_values = [sub['oda_amount'] for sub in g_supplier]
+
 	db.session.close()
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, detail=DETAIL_FOR, partner_detail=PARTNER_DETAIL,
-						   site_detail=SITE_DETAIL)
+						   site_detail=SITE_DETAIL, y_labels=json.dumps(y_labels), y_values=json.dumps(y_values),
+						   s_labels=json.dumps(s_labels), s_values=json.dumps(s_values))
 
 
 @oda_bp.route(CREATE, methods=["GET", "POST"])
@@ -161,7 +173,9 @@ def oda_view_detail(_id):
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as PARTNER_SITE_DETAIL
 
-	from app.orders.order_rows.routes import CREATE_FOR as ODA_ROW_CREATE, DETAIL_FOR as ODA_ROW_DETAIL
+	from app.orders.order_rows.routes import (CREATE_FOR as ODA_ROW_CREATE,
+											  DETAIL_FOR as ODA_ROW_DETAIL,
+											  DELETE_FOR as ODA_ROW_DELETE)
 
 	# Interrogo il DB
 	oda = Oda.query \
@@ -216,12 +230,16 @@ def oda_view_detail(_id):
 		Oda.update(_id, oda.to_dict())
 		flash("TOTALE ORDINE aggiornato.")
 
+		previous_data = oda.to_dict()
+		previous_data.pop('updated_at')
+		previous_data.pop('oda_pdf')
+
 		from app.event_db.routes import event_create
 		_event = {
 			"username": session["user"]["username"],
 			"table": Oda.__tablename__,
 			"Modification": f"Update ODA whit id: {_id}",
-			"Previous_data": oda.to_dict()
+			"Previous_data": previous_data
 		}
 		_event = event_create(_event, order_id=_id)
 
@@ -231,7 +249,8 @@ def oda_view_detail(_id):
 		event_detail=EVENT_DETAIL, history_list=history_list, h_len=len(history_list),
 		partner_detail=PARTNER_DETAIL, p_id=p_id,
 		partner_site_detail=PARTNER_SITE_DETAIL, s_id=s_id,
-		oda_row_create=ODA_ROW_CREATE, row_detail=ODA_ROW_DETAIL, rows_list=rows_list, r_len=len(rows_list),
+		oda_row_create=ODA_ROW_CREATE, row_detail=ODA_ROW_DETAIL, row_delete=ODA_ROW_DELETE,
+		rows_list=rows_list, r_len=len(rows_list),
 	)
 
 

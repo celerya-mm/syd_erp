@@ -77,6 +77,12 @@ class OdaRow(db.Model):
 		OdaRow.query.filter_by(id=_id).update(data)
 		db.session.commit()
 
+	def remove(_id):  # noqa
+		"""Cancella un record per id."""
+		x = OdaRow.query.filter_by(id=_id).first()
+		db.session.delete(x)
+		db.session.commit()
+
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
 		from app.functions import date_to_str

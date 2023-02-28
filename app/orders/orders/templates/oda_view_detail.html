@@ -262,12 +262,13 @@
 							<th class="title" id="r6">Sconto</th>
 							<th class="title" id="r7">Q.</th>
 							<th class="title" id="r8">Tot</th>
+							<th class="title" id="r9" data-sortable="false"></th>
 						</tr>
 						</thead>
 						<tbody>
 						{% for row in rows_list %}
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
-							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz; width: 20px !important;">
 								{%
 								if 'superuser' in session['user_roles']
 								or 'oda_rows_admin' in session['user_roles']
@@ -302,6 +303,21 @@
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{{ row.item_amount|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles'] and form.oda_status == "Lavorazione"
+								or 'oda_rows_admin' in session['user_roles'] and form.oda_status == "Lavorazione"
+								or 'oda_rows_write' in session['user_roles'] and form.oda_status == "Lavorazione"
+								%}
+								<a class="btn-table" href="{{ url_for(row_delete, _id=row.id, o_id=form.id) }}"
+								   title="Rimuovi riga ordine"
+								   type="button">
+									<img alt="" class="icon-table" src="{{ url_for('static', filename='icons/trash-fill.svg') }}"/>
+								</a>
+								{% else %}
+								<img alt="" class="icon-table" src="{{ url_for('static', filename='icons/trash-disable.svg') }}"/>
+								{% endif %}
 							</td>
 						</tr>
 						{% endfor %}

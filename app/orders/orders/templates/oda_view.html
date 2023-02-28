@@ -7,6 +7,39 @@
 			<div class="col-md-12 shadow rounded">
 				<h3 style="padding-top: 10px;">
 					Elenco Ordini:</h3>
+				<div class="accordion" id="head_accordion">
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="1">
+							<button aria-controls="collapse1" aria-expanded="true"
+									class="accordion-button"
+									data-bs-target="#collapse1"
+									data-bs-toggle="collapse"
+									type="button">
+								Grafici andamento ordini
+							</button>
+						</h2>
+						<div aria-labelledby="heading1" class="accordion-collapse collapse"
+							 data-bs-parent="#accordion"
+							 id="collapse1">
+							<div class="row no-gutters justify-content-center">
+								<!-- GRAFICO PER ANNO ORDINE -->
+								<div class="col-md-4 order-first">
+									<div class="card chart-container">
+										<canvas id="chart_years"></canvas>
+									</div>
+								</div>
+								<!-- GRAFICO PER FORNITORE -->
+								<div class="col-md-4 order-second">
+									<div class="card chart-container">
+										<canvas id="chart_suppliers"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<!--	Tabella elenco Ordini-->
 				<div class="table-responsive" style="padding: 10px">
 					<table class="table table-striped" id="data" style="width:100%">
 						<thead>
@@ -60,32 +93,32 @@
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'partners_admin' in session['user_roles']
-									or 'partners_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'partners_admin' in session['user_roles']
+								or 'partners_read' in session['user_roles']
 								%}
 								<a class="tab-link" href="{{ url_for(partner_detail, _id=row.supplier_id) }}" style=""
 								   title="Visualizza">
 									{{ row.supplier_id|e }}
 								</a>
 								{% else %}
-									{{ row.supplier_id|e }}
+								{{ row.supplier_id|e }}
 								{% endif %}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-									if 'superuser' in session['user_roles']
-									or 'partner_sites_admin' in session['user_roles']
-									or 'partner_sites_read' in session['user_roles']
+								if 'superuser' in session['user_roles']
+								or 'partner_sites_admin' in session['user_roles']
+								or 'partner_sites_read' in session['user_roles']
 								%}
 								{% if row.supplier_site_id %}
-									<a class="tab-link" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}" style=""
-									   title="Visualizza">
-										{{ row.supplier_site_id|e }}
-									</a>
-									{% else %}
-										{{ row.supplier_site_id|e }}
-									{% endif %}
+								<a class="tab-link" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}" style=""
+								   title="Visualizza">
+									{{ row.supplier_site_id|e }}
+								</a>
+								{% else %}
+								{{ row.supplier_site_id|e }}
+								{% endif %}
 								{% else %}
 								{{ row.supplier_site_id|e }}
 								{% endif %}
@@ -105,6 +138,64 @@
 
 {% block scripts %}
 <script>
+	// Impostazioni grafico ANNO ORDINE
+    let y_labels = JSON.parse({{ y_labels | tojson }})
+    // console.log("LABELS: ", y_labels)
+    let y_values = JSON.parse({{ y_values | tojson }})
+    // console.log("VALUES: ", y_values)
+    const data = {
+        labels: y_labels,
+        datasets: [
+        {
+            label: "Ordini 5 anni",
+            data: y_values,
+            fill: false,
+            backgroundColor: "#ED6666", //red
+            borderRadius: 2,
+        }]
+    };
+    const config = {
+        type: 'bar',
+        data: data,
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    };
+    const ctx = document.getElementById('chart_years').getContext('2d');
+    const myChart = new Chart(ctx, config);
+
+
+    // Impostazioni grafico FORNITORE
+    let s_labels = JSON.parse({{ s_labels | tojson }})
+    console.log("LABELS: ", s_labels)
+    let s_values = JSON.parse({{ s_values | tojson }})
+    // console.log("VALUES: ", s_values)
+    const data1 = {
+        labels: s_labels,
+        datasets: [{
+            label: "Ordini per fornitore (5 anni)",
+            data: s_values,
+            fill: false,
+            backgroundColor: "#2B4692", //blue
+            borderRadius: 2,
+        }]
+    };
+    const config1 = {
+        type: 'bar',
+        data: data1,
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    };
+    const ctx1 = document.getElementById('chart_suppliers').getContext('2d');
+    const myChart1 = new Chart(ctx1, config1);
+
     $(document).ready(function () {
         $('#data').DataTable({
             responsive: {
@@ -122,5 +213,6 @@
             }
         });
     });
+
 </script>
 {% endblock %}

@@ -50,14 +50,15 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 	except IntegrityError as err:
 		db.session.close()
 		if "duplicate key value violates unique constraint" in str(err):
+			print("EVENT_DUPLICATED.")
 			return True
 		else:
-			print("INTEGRITY_ERROR_EVENT:", str(err))
+			print("EVENT_INTEGRITY_ERROR:", str(err))
 			flash(err)
 			return str(err)
 	except Exception as err:
 		db.session.close()
-		print("ERROR_REGISTR_EVENT:", str(err))
+		print("EVENT_CREATE_ERROR:", str(err))
 		flash(err)
 		return str(err)
 

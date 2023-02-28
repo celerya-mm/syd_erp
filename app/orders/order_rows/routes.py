@@ -29,6 +29,9 @@ UPDATE = "/update/<int:_id>"
 UPDATE_FOR = "oda_rows_bp.oda_rows_update"
 UPDATE_HTML = "oda_rows_update.html"
 
+DELETE = "/delete/<int:_id>/<int:o_id>/"
+DELETE_FOR = "oda_rows_bp.oda_rows_delete"
+
 
 @oda_rows_bp.route(CREATE, methods=["GET", "POST"])
 @timer_func
@@ -205,3 +208,19 @@ def oda_rows_update(_id):
 		}
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=DETAIL_FOR, o_id=form.oda_id.data)
+
+
+@oda_rows_bp.route(DELETE, methods=["GET", "POST"])
+@timer_func
+@token_user_validate
+@access_required(roles=['oda_rows_admin', 'oda_rows_write'])
+def oda_rows_delete(_id, o_id):
+	"""Aggiorna dati Item."""
+	from app.orders.orders.routes import DETAIL_FOR as ODA_DETAIL
+	try:
+		OdaRow.remove(_id)
+		flash(f'RIGA id [{_id}] ORDINE id [{o_id}] rimossa correttamente.')
+		return redirect(url_for(ODA_DETAIL, _id=o_id))
+	except Exception as err:
+		flash(f'RIGA id [{_id}] ORDINE id [{o_id}] NON rimossa: {err}.')
+		return redirect(url_for(ODA_DETAIL, _id=o_id))

@@ -204,6 +204,13 @@ hr {
     padding: 2px;
 }
 
+.icon-table {
+    height: 24px;
+    width: 24px;
+    margin: 0px;
+    padding: 2px;
+}
+
 .icon-disable {
     fill: #DEDEDE;
 }
