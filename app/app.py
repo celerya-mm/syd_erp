@@ -52,7 +52,7 @@ with app.app_context():
 	from app.account.routes import account_bp
 	from app.roles.routes import role_bp
 
-	from app.orders.orders.routes import oda_bp
+	from app.orders.order.routes import oda_bp
 	from app.orders.order_rows.routes import oda_rows_bp
 	from app.orders.items.routes import item_bp
 

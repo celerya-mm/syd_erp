@@ -89,8 +89,8 @@ def event_view_detail(_id):
 	from app.orders.items.models import Item
 	from app.orders.items.routes import DETAIL_FOR as ITEM_DETAIL
 
-	from app.orders.orders.models import Oda
-	from app.orders.orders.routes import DETAIL_FOR as ORDER_DETAIL
+	from app.orders.order.models import Oda
+	from app.orders.order.routes import DETAIL_FOR as ORDER_DETAIL
 
 	from app.orders.order_rows.models import OdaRow
 	from app.orders.order_rows.routes import DETAIL_FOR as ORDER_ROW_DETAIL

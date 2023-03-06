@@ -1,0 +1,231 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<form enctype="multipart/form-data" method="POST">
+	{{ form.csrf_token }}
+	<div class="container text-center mt-2">
+		<h5 class="card-title">
+			<a class="btn btn-update" href="{{ url_for(view) }}" title="Vai a lista records"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/list_blue.svg') }}"/>
+			</a>
+			Dettaglio ARTICOLO [ {{ form.id }} ]
+			{%
+			if 'superuser' in session['user_roles']
+			or 'items_admin' in session['user_roles']
+			or 'items_write' in session['user_roles']
+			%}
+			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
+			   title="Modifica Articolo"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
+			</a>
+			{% endif %}
+		</h5>
+	</div>
+	
+	<div class="container text-center mt-2">
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="col-md-2 order-first">
+				<div class="form-group">
+					<h6> Cod. ITM </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.item_code }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-2 order-second">
+				<div class="form-group">
+					<h6> Cod. F. </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.item_code_supplier }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-2 order-third">
+				<div class="form-group">
+					<h6> Prezzo </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.item_price }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-2 order-fourth">
+				<div class="form-group">
+					<div class="form-group">
+						<h6> Sconto </h6>
+						<p class="form-control emphasis" style="font-weight: bold; color: white">
+							{{ form.item_price_discount }}
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-1 order-fifth">
+				<div class="form-group">
+					<div class="form-group">
+						<h6> Valuta </h6>
+						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+							{{ form.item_currency }}
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-1 order-sixth">
+				<div class="form-group">
+					<div class="form-group">
+						<h6> Q. Min. </h6>
+						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+							{{ form.item_quantity_min }}
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-2 order-seventh">
+				<div class="form-group">
+					<div class="form-group">
+						<h6> U.M. </h6>
+						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+							{{ form.item_quantity_um }}
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="form-group">
+				<div class="form-group">
+					<h6> Descrizione </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.item_description }}
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="col-md-6 order-first">
+				<div class="form-group">
+					<a href="{{ url_for(partner_detail, _id=p_id) }}" title="Vai all'azienda">
+						Fornitore
+					</a>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.supplier_id }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-6 order-second">
+				<div class="form-group">
+					{% if form.supplier_site_id != "-" and form.supplier_site_id != None %}
+					<a href="{{ url_for(site_detail, _id=s_id) }}" title="Vai al sito">
+						Sito Fornitore
+					</a>
+					{% else %}
+					<h6> Sito Fornitore </h6>
+					{% endif %}
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.supplier_site_id }}
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="form-group">
+				<h6> Note </h6>
+				<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+					{{ form.note }}
+				</p>
+			</div>
+		</div>
+	</div>
+</form>
+<div class="container text-center mt-2 mx-auto" style="margin: 0px;">
+	<div class="accordion" id="accordion">
+		<!--	Modifiche Record-->
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="1">
+				<button aria-controls="collapseOne"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse1"
+						data-bs-toggle="collapse"
+						type="button">
+					Elenco Modifiche al Record [ {{ h_len }} ]
+				</button>
+			</h2>
+			<div aria-labelledby="heading1"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse1">
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="events" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" data-defaultsort="desc" id="h1">ID</th>
+							<th class="title" id="h2">Modifica</th>
+							<th class="title" id="h3">Data</th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in history_list %}
+						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'partner_contacts_admin' in session['user_roles']
+								or 'partner_contacts_write' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(event_detail, _id=row.id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.id|e }}
+								</a>
+								{% else %}
+								{{ row.id|e }}
+								{% endif %}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.5rem;">
+								{{ row.event|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.created_at|e }}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<br>
+<p class="info">Data Creazione: {{ form.created_at }}</p>
+<p class="info">Ultima modifica: {{ form.updated_at }}</p>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#events').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            },
+        });
+    });
+</script>
+{% endblock %}

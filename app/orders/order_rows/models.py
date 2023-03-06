@@ -15,14 +15,14 @@ class OdaRow(db.Model):
 	item_code_supplier = db.Column(db.String(25), index=True, unique=False, nullable=True)
 	item_description = db.Column(db.String(500), index=True, unique=False, nullable=False)
 
-	item_price = db.Column(db.Float, index=False, unique=False, nullable=True)
+	item_price = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True)
 	item_price_discount = db.Column(db.Float, index=False, unique=False, nullable=True)  # considerato in %
 	item_currency = db.Column(db.String(3), index=False, unique=False, nullable=True)
 
 	item_quantity = db.Column(db.Float, index=False, unique=False, nullable=True)
 	item_quantity_um = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
-	item_amount = db.Column(db.Float, index=False, unique=False, nullable=True)
+	item_amount = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True)
 
 	oda_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='CASCADE'), nullable=False)
 

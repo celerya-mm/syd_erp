@@ -16,7 +16,7 @@ class Item(db.Model):
 
 	item_description = db.Column(db.String(500), index=True, unique=False, nullable=False)
 
-	item_price = db.Column(db.Float, index=False, unique=False, nullable=True)
+	item_price = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True)
 	item_price_discount = db.Column(db.Float, index=False, unique=False, nullable=True)  # considerato in %
 	item_currency = db.Column(db.String(3), index=False, unique=False, nullable=True)
 

@@ -1,6 +1,6 @@
-from time import time
 from datetime import datetime, date
 from functools import wraps
+from time import time
 
 from flask import url_for, redirect
 from sqlalchemy import Null
@@ -71,6 +71,7 @@ def access_required(roles='ANY'):
 				return msg
 
 		return check_rule
+
 	return wrapper
 
 
@@ -96,6 +97,7 @@ def access_required_update_psw(roles='ANY'):
 				return msg
 
 		return check_rule
+
 	return wrapper
 
 
@@ -107,9 +109,10 @@ def timer_func(fn):
 		t1 = time()
 		# chiama la funzione
 		result = fn(*args, **kwargs)
-		print(f'Function {fn.__name__!r} executed in {(time()-t1):.4f}s')
+		print(f'Function {fn.__name__!r} executed in {(time() - t1):.4f}s')
 		# ritorna il risultato della funzione
 		return result
+
 	return wrapper
 
 

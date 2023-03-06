@@ -39,7 +39,7 @@ DELETE_FOR = "oda_rows_bp.oda_rows_delete"
 @access_required(roles=['oda_rows_admin', 'oda_rows_write'])
 def oda_rows_create(o_id, p_id, s_id=None):
 	"""Creazione Item."""
-	from app.orders.orders.routes import DETAIL_FOR as ORDER_DETAIL
+	from app.orders.order.routes import DETAIL_FOR as ORDER_DETAIL
 	from app.orders.items.models import Item
 
 	form = FormOdaRowCreate.new(p_id=p_id)
@@ -101,7 +101,7 @@ def oda_rows_view_detail(_id):
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
-	from app.orders.orders.routes import DETAIL_FOR as ORDER_DETAIL
+	from app.orders.order.routes import DETAIL_FOR as ORDER_DETAIL
 
 	# Interrogo il DB
 	oda_row = OdaRow.query \
@@ -156,6 +156,8 @@ def oda_rows_update(_id):
 
 		previous_data = oda_row.to_dict()
 		previous_data.pop("updated_at")
+		previous_data['item_price'] = str(previous_data['item_price'])
+		previous_data['item_amount'] = str(previous_data['item_amount'])
 
 		# lavoro cambio codice articolo
 		if oda_row.item_code != new_data["item_code"]:
@@ -216,7 +218,7 @@ def oda_rows_update(_id):
 @access_required(roles=['oda_rows_admin', 'oda_rows_write'])
 def oda_rows_delete(_id, o_id):
 	"""Aggiorna dati Item."""
-	from app.orders.orders.routes import DETAIL_FOR as ODA_DETAIL
+	from app.orders.order.routes import DETAIL_FOR as ODA_DETAIL
 	try:
 		OdaRow.remove(_id)
 		flash(f'RIGA id [{_id}] ORDINE id [{o_id}] rimossa correttamente.')

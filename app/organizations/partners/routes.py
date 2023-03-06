@@ -111,7 +111,7 @@ def partner_view_detail(_id):
 	from app.organizations.partner_contacts.routes import DETAIL_FOR as CONTACT_DETAIL, CREATE_FOR as CONTACT_CREATE_FOR
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL, CREATE_FOR as SITE_CREATE_FOR
 
-	from app.orders.orders.routes import DETAIL_FOR as ODA_DETAIL, CREATE_FOR as ODA_CREATE_FOR
+	from app.orders.order.routes import DETAIL_FOR as ODA_DETAIL, CREATE_FOR as ODA_CREATE_FOR
 	from app.orders.items.routes import DETAIL_FOR as ITEM_DETAIL, CREATE_FOR as ITEM_CREATE_FOR
 
 	# Interrogo il DB

@@ -1,4 +1,5 @@
-import json
+# import json
+import simplejson as json
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
@@ -173,8 +174,7 @@ def oda_view_detail(_id):
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as PARTNER_SITE_DETAIL
 
-	from app.orders.order_rows.routes import (CREATE_FOR as ODA_ROW_CREATE,
-											  DETAIL_FOR as ODA_ROW_DETAIL,
+	from app.orders.order_rows.routes import (CREATE_FOR as ODA_ROW_CREATE, DETAIL_FOR as ODA_ROW_DETAIL,
 											  DELETE_FOR as ODA_ROW_DELETE)
 
 	# Interrogo il DB
@@ -231,8 +231,8 @@ def oda_view_detail(_id):
 		flash("TOTALE ORDINE aggiornato.")
 
 		previous_data = oda.to_dict()
-		previous_data.pop('updated_at')
-		previous_data.pop('oda_pdf')
+		[previous_data.pop(key) for key in ["updated_at", "oda_pdf"]]
+		previous_data['oda_amount'] = str(previous_data['oda_amount'])
 
 		from app.event_db.routes import event_create
 		_event = {
@@ -277,6 +277,7 @@ def oda_update(_id):
 
 		previous_data = oda.to_dict()
 		[previous_data.pop(key) for key in ["updated_at", "oda_pdf"]]
+		previous_data['oda_amount'] = str(previous_data['oda_amount'])
 
 		try:
 			Oda.update(_id, new_data)
@@ -345,17 +346,20 @@ def html_to_pdf(oda, oda_rows):  # , _qrcode):
 	try:
 		# Build PDF from HTML
 		_file = os.path.join(folder_temp_pdf, "report.pdf")
+
+		if oda.oda_currency == '€':
+			oda.oda_currency = 'Euro'
+
 		html = render_template('oda_to_pdf.html', oda=oda, oda_rows=oda_rows, logo=logo, sign=sign)  # , qrcode=_img)
 		_html = os.path.join(folder_temp_pdf, "temp.html")
 
-		print("WRITE_HTML")
-		with open(_html.encode('utf-8'), 'w') as f:
+		db.session.close()
+
+		with open(_html.encode('ascii'), 'w') as f:
 			f.write(html)
 
-		print("WRITE_PDF_1")
 		_pdf = pdfkit.from_file(_html, False, options=options)
 
-		print("WRITE_PDF_2")
 		with open(_file, "wb") as f:
 			f.write(_pdf)
 
@@ -394,15 +398,18 @@ def oda_generate(_id):
 
 	if pdf_byte not in [False, None]:
 		previous_data = oda.to_dict()
+		[previous_data.pop(key) for key in ["updated_at", "oda_pdf"]]
+		previous_data['oda_amount'] = str(previous_data['oda_amount'])
+
 		# assegno stringa in byte
 		oda.oda_pdf = pdf_byte
 		oda.oda_status = 'Generato'
+		if oda.oda_currency == 'Euro':
+			oda.oda_currency = '€'
 
 		try:
 			Oda.update(_id, oda.to_dict())
 			flash("ODA CREATO correttamente.")
-			[previous_data.pop(key) for key in ["updated_at", "oda_pdf"]]
-
 		except IntegrityError as err:
 			db.session.rollback()
 			db.session.close()
@@ -438,7 +445,7 @@ def oda_download(_id):
 	db.session.close()
 	if oda.oda_pdf and len(oda.oda_pdf) > 100:
 		_pdf = byte_to_pdf(oda.oda_pdf, oda.oda_number)
-		_payment_condition = os.path.join(_path, "orders", "orders", "attachments", "CG_Celerya_Rev_12_2020.pdf")
+		_payment_condition = os.path.join(_path, "orders", "order", "attachments", "CG_Celerya_Rev_12_2020.pdf")
 		_merged = os.path.join(_path, "orders", "orders", "temp_pdf", "_merged.pdf")
 
 		merger = PdfMerger()
@@ -450,6 +457,7 @@ def oda_download(_id):
 
 		with open(_merged, 'wb') as f:
 			merger.write(f)
+
 		try:
 			os.remove(_pdf)
 			os.rename(_merged, _pdf)

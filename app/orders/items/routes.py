@@ -185,6 +185,7 @@ def item_update(_id):
 
 		previous_data = item.to_dict()
 		previous_data.pop("updated_at")
+		previous_data['item_price'] = str(previous_data['item_price'])
 
 		try:
 			Item.update(_id, new_data)

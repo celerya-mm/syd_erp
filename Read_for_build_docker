@@ -7,7 +7,6 @@
 ### docker classico
 cd ../../Multimedia/05_Documenti/Flask/syd_erp
 
-
 ### app
 docker build --force-rm -t syd_erp:latest .
 
