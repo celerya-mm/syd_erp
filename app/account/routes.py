@@ -6,14 +6,15 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from ..app import session, db
+from app.app import session, db
+from app.auth_token.models import AuthToken
+from app.auth_token.functions import __save_auth_token
+from app.functions import (token_user_validate, access_required, access_required_update_psw, status_true_false,  # noqa
+						   mount_full_address, mount_full_name, timer_func, not_empty, serialize_dict)
+from app.roles.models import Role
 from .forms import FormUserLogin, FormUserCreate, FormUserUpdate, FormUserPswChange
 from .functions import psw_hash
 from .models import User
-from ..auth_token.functions import __save_auth_token
-from ..functions import (token_user_validate, access_required, access_required_update_psw, status_true_false,
-						 mount_full_address, mount_full_name, timer_func, not_empty, serialize_dict)
-from ..roles.models import Role
 
 account_bp = Blueprint(
 	'account_bp', __name__,
@@ -51,9 +52,20 @@ def login():
 		_user = User.query.filter_by(username=form.username.data, password=psw_hash(str(form.password.data))).first()
 		if _user:
 			try:
-				_token = _user.auth_tokens.first()
-				if _token and _token.expires_at > datetime.now():
-					token = _token.token
+				_token = _user.auth_tokens.all()
+				if _token:
+					count = len(_token)
+					token = None
+					for t in _token:
+						if t.expires_at > datetime.now():
+							token = t.token
+						else:
+							count -= 1
+							AuthToken.remove(t)
+
+					if count == 0 and token is None:
+						token = uuid4()
+						_auth_token = __save_auth_token(token, _user.id)
 				else:
 					token = uuid4()
 					_auth_token = __save_auth_token(token, _user.id)

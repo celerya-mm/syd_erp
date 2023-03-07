@@ -17,7 +17,9 @@ def __save_auth_token(token, user_id=None):
 			created_at=_time,
 			expires_at=_expires,
 		)
+
 		AuthToken.create(auth_token)
 		return True
 	except Exception as err:
+		print('ERRORE creazione token:', err)
 		return err

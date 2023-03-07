@@ -36,6 +36,12 @@ class AuthToken(db.Model):
 		"""Salva le modifiche a un record."""
 		db.session.commit()
 
+	def remove(self):  # noqa
+		"""Cancella un record per id."""
+		# x = AuthToken.query.filter_by(id=_id).first()
+		db.session.delete(self)
+		db.session.commit()
+
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
 		from app.functions import date_to_str

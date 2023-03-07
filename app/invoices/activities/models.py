@@ -21,9 +21,13 @@ class Activity(db.Model):
 	activity_quantity = db.Column(db.Float, index=False, unique=False, nullable=True)  # min unità di acquisto
 	activity_quantity_um = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
+	activity_estimated_time = db.Column(db.Float, index=False, unique=False, nullable=True)
+
 	plant_id = db.Column(db.Integer, db.ForeignKey('plants.id', ondelete='CASCADE'), nullable=False)
 	plant_site_id = db.Column(db.Integer, db.ForeignKey('plant_sites.id', ondelete='CASCADE'), nullable=True)
 
+	plant = db.relationship('Plant', backref='p_activities', viewonly=True)
+	plant_site = db.relationship('PlantSite', backref='ps_activities', viewonly=True)
 	# invoice_rows = db.relationship('InvoiceRow', backref='activity', viewonly=True, lazy='dynamic')
 
 	events = db.relationship('EventDB', backref='items', order_by='EventDB.id.desc()', lazy='dynamic')
@@ -57,17 +61,18 @@ class Activity(db.Model):
 			'id': self.id,
 
 			'activity_code': self.activity_code,
-			'item_description': self.item_description,
+			'activity_description': self.activity_description,
 
-			'item_price': self.item_price,
-			'item_price_discount': self.item_price_discount,
-			'item_currency': self.item_currency,
+			'activity_price': self.activity_price,
+			'activity_currency': self.activity_currency,
 
-			'item_quantity_min': self.item_quantity_min,
-			'item_quantity_um': self.item_quantity_um,
+			'activity_quantity': self.activity_quantity,
+			'activity_quantity_um': self.activity_quantity_um,
 
-			'supplier_id': self.supplier_id,
-			'supplier_site_id': self.supplier_site_id or None,
+			'activity_estimated_time': self.activity_estimated_time,
+
+			'plant_id': self.plant_id,
+			'plant_site_id': self.plant_site_id or None,
 
 			'note': self.note,
 			'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),

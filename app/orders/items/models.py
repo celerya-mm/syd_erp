@@ -29,9 +29,9 @@ class Item(db.Model):
 	supplier = db.relationship('Partner', backref='s_items', viewonly=True)
 	supplier_site = db.relationship('PartnerSite', backref='ss_items', viewonly=True)
 
-	oda_rows = db.relationship('OdaRow', backref='items', viewonly=True, lazy='dynamic')
+	oda_rows = db.relationship('OdaRow', backref='or_items', viewonly=True, lazy='dynamic')
 
-	events = db.relationship('EventDB', backref='items', order_by='EventDB.id.desc()', lazy='dynamic')
+	events = db.relationship('EventDB', backref='e_items', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 

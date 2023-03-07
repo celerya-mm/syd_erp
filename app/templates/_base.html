@@ -204,6 +204,51 @@
 							{% endif %}
 						</ul>
 					</li>
+					<li class="nav-item dropdown" style="background-color: #2B4692 !important;" title="Invoices">
+						<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+						   href="#Invoices"
+						   id="DropdownMenuFatture" role="button">
+							Invoices
+						</a>
+						<ul aria-labelledby="DropdownMenuOrders" class="dropdown-menu">
+							<!--  Fatture-->
+							{%
+							if 'superuser' in session['user_roles']
+							or 'orders_admin' in session['user_roles']
+							or 'orders_read' in session['user_roles']
+							%}
+							<li class="nav-item">
+								<a class="nav-item nav-link {% if request.path == '/oda/view/' %} active {% endif %}"
+								   href="{{ url_for('oda_bp.oda_view') }}" title="Ordini">
+									{% if request.path == '/oda/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/shopping_cart_active.svg') }}">
+									{% else %}
+									<img alt="" src="{{ url_for('static', filename='icons/shopping_cart_white.svg') }}">
+									{% endif %}
+									Invoices
+								</a>
+							</li>
+							{% endif %}
+							<!--  Attività-->
+							{%
+							if 'superuser' in session['user_roles']
+							or 'activities_admin' in session['user_roles']
+							or 'activities_read' in session['user_roles']
+							%}
+							<li class="nav-item">
+								<a class="nav-item nav-link {% if request.path == '/activity/view/' %} active {% endif %}"
+								   href="{{ url_for('activity_bp.activity_view') }}" title="Articoli">
+									{% if request.path == '/activity/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/invoice_active.svg') }}">
+									{% else %}
+									<img alt="" src="{{ url_for('static', filename='icons/invoice_white.svg') }}">
+									{% endif %}
+									Activities
+								</a>
+							</li>
+							{% endif %}
+						</ul>
+					</li>
 					<li class="nav-item dropdown" style="background-color: #2B4692 !important;" title="Partners">
 						<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 						   href="#Partners"

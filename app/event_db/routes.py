@@ -27,7 +27,7 @@ RESTORE_FOR = "event_bp.event_restore"
 
 @timer_func
 def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None, item_id=None,
-				 order_id=None, plant_id=None, plant_site_id=None, oda_row_id=None):
+				 order_id=None, plant_id=None, plant_site_id=None, oda_row_id=None, activity_id=None):
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
@@ -41,6 +41,7 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 			plant_id=plant_id,
 			plant_site_id=plant_site_id,
 			oda_row_id=oda_row_id,
+			activity_id=activity_id,
 			created_at=datetime.now()
 		)
 
@@ -94,6 +95,9 @@ def event_view_detail(_id):
 
 	from app.orders.order_rows.models import OdaRow
 	from app.orders.order_rows.routes import DETAIL_FOR as ORDER_ROW_DETAIL
+
+	from app.invoices.activities.models import Activity
+	from app.invoices.activities.routes import DETAIL_FOR as ACTIVITY_DETAIL
 
 	# Interrogo il DB
 	event = EventDB.query.get(_id)
@@ -182,6 +186,15 @@ def event_view_detail(_id):
 			id_related = related["id"]
 			type_related = "Order_Row"
 			view_related = ORDER_ROW_DETAIL
+		# Attività
+		elif event.activity_id:
+			related = Activity.query.get(event.activity_id)
+			related = related.to_dict()
+			field = "activity_id"
+			table = Activity.__tablename__
+			id_related = related["id"]
+			type_related = "Activity"
+			view_related = ACTIVITY_DETAIL
 		else:
 			db.session.close()
 			msg = "Nessun record trovato"
@@ -208,14 +221,23 @@ def event_view_detail(_id):
 @token_user_validate
 def event_restore(_id, id_record, table, view_for):
 	from app.account.models import User
+
 	from app.organizations.plant.models import Plant
 	from app.organizations.plant_site.models import PlantSite
+
 	from app.organizations.partners.models import Partner
 	from app.organizations.partner_contacts.models import PartnerContact
 	from app.organizations.partner_sites.models import PartnerSite
+
 	from app.orders.items.models import Item
+
+	from app.orders.order.models import Oda
+	from app.orders.order_rows.models import OdaRow
+
+	from app.invoices.activities.models import Activity
+
 	try:
-		models = [User, Plant, PlantSite, Partner, PartnerContact, PartnerSite, Item]
+		models = [User, Plant, PlantSite, Partner, PartnerContact, PartnerSite, Item, Oda, OdaRow, Activity]
 		model = next((m for m in models if m.__tablename__ == table), None)
 		# print("TABLE_DB:", model, "ID:", id_record)
 		if model:
@@ -254,6 +276,7 @@ def event_restore(_id, id_record, table, view_for):
 				flash('Nessun dato da ripristinare.')
 				return redirect(url_for(view_for, _id=id_record))
 		else:
+			flash('Nessun dato da ripristinare.')
 			return redirect(url_for(view_for, _id=id_record))
 	except Exception as err:
 		db.session.close()

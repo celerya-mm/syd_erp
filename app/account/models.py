@@ -38,7 +38,7 @@ class User(db.Model):
 	plant_user = db.relationship('Plant', backref='user_plant', viewonly=True)
 	plant_site_user = db.relationship('PlantSite', backref='user_plant_site', viewonly=True)
 
-	auth_tokens = db.relationship('AuthToken', backref='users', order_by='AuthToken.id.desc()', lazy='dynamic')
+	auth_tokens = db.relationship('AuthToken', backref='users', order_by='AuthToken.id.asc()', lazy='dynamic')
 	roles = db.relationship('Role', secondary='user_roles', backref='users', viewonly=True, lazy='dynamic')
 	events = db.relationship('EventDB', backref='users', order_by='EventDB.id.desc()', lazy='dynamic')
 

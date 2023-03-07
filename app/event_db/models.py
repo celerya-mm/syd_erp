@@ -11,14 +11,19 @@ class EventDB(db.Model):
     event = db.Column(JSONB, index=True, unique=True, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
+
     partner_id = db.Column(db.Integer, db.ForeignKey('partners.id', ondelete='CASCADE'), nullable=True)
     partner_contact_id = db.Column(db.Integer, db.ForeignKey('partner_contacts.id', ondelete='CASCADE'), nullable=True)
     partner_site_id = db.Column(db.Integer, db.ForeignKey('partner_sites.id', ondelete='CASCADE'), nullable=True)
+
     item_id = db.Column(db.Integer, db.ForeignKey('items.id', ondelete='CASCADE'), nullable=True)
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='CASCADE'), nullable=True)
+    oda_row_id = db.Column(db.Integer, db.ForeignKey('oda_rows.id', ondelete='CASCADE'), nullable=True)
+
     plant_id = db.Column(db.Integer, db.ForeignKey('plants.id', ondelete='CASCADE'), nullable=True)
     plant_site_id = db.Column(db.Integer, db.ForeignKey('plant_sites.id', ondelete='CASCADE'), nullable=True)
-    oda_row_id = db.Column(db.Integer, db.ForeignKey('oda_rows.id', ondelete='CASCADE'), nullable=True)
+
+    activity_id = db.Column(db.Integer, db.ForeignKey('activities.id', ondelete='CASCADE'), nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
 
