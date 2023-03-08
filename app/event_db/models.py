@@ -24,6 +24,8 @@ class EventDB(db.Model):
     plant_site_id = db.Column(db.Integer, db.ForeignKey('plant_sites.id', ondelete='CASCADE'), nullable=True)
 
     activity_id = db.Column(db.Integer, db.ForeignKey('activities.id', ondelete='CASCADE'), nullable=True)
+    invoice_id = db.Column(db.Integer, db.ForeignKey('invoices.id', ondelete='CASCADE'), nullable=True)
+    invoice_row_id = db.Column(db.Integer, db.ForeignKey('invoice_rows.id', ondelete='CASCADE'), nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
 
@@ -51,14 +53,21 @@ class EventDB(db.Model):
             'event': self.event,
 
             'user_id': self.user_id,
+
             'partner_id': self.partner_id,
             'partner_contact_id': self.partner_contact_id,
             'partner_site_id': self.partner_site_id,
+
             'item_id': self.item_id,
             'order_id': self.order_id,
+            'oda_row_id': self.oda_row_id,
+
             'plant_id': self.plant_id,
             'plant_site_id': self.plant_site_id,
-            'oda_row_id': self.oda_row_id,
+
+            'activity_id': self.activity_id,
+            'invoice_id': self.invoice_id,
+            'invoice_row_id': self.invoice_row_id,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

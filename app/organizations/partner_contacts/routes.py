@@ -1,4 +1,4 @@
-import json
+import json  # noqa
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError

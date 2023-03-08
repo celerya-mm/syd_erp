@@ -2,7 +2,6 @@ from app.app import db
 
 # importazioni per creare relazioni in tabella
 from app.event_db.models import EventDB  # noqa
-from app.organizations.partners.models import Partner  # noqa
 from app.organizations.partner_sites.models import PartnerSite  # noqa
 
 
@@ -49,10 +48,10 @@ class Oda(db.Model):
 	updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
 	def __repr__(self):
-		return f'<ODA_CLASS: [{self.item_code}] - {self.item_description}>'
+		return f'<ODA_CLASS: [{self.oda_number}] - {self.oda_description}>'
 
 	def __str__(self):
-		return f'<ODA_CLASS: [{self.item_code}] - {self.item_description}>'
+		return f'<ODA_CLASS: [{self.oda_number}] - {self.oda_description}>'
 
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""

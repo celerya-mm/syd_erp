@@ -214,16 +214,16 @@
 							<!--  Fatture-->
 							{%
 							if 'superuser' in session['user_roles']
-							or 'orders_admin' in session['user_roles']
-							or 'orders_read' in session['user_roles']
+							or 'invoices_admin' in session['user_roles']
+							or 'invoices_read' in session['user_roles']
 							%}
 							<li class="nav-item">
-								<a class="nav-item nav-link {% if request.path == '/oda/view/' %} active {% endif %}"
-								   href="{{ url_for('oda_bp.oda_view') }}" title="Ordini">
-									{% if request.path == '/oda/view/' %}
-									<img alt="" src="{{ url_for('static', filename='icons/shopping_cart_active.svg') }}">
+								<a class="nav-item nav-link {% if request.path == '/invoice/view/' %} active {% endif %}"
+								   href="{{ url_for('invoice_bp.invoice_view') }}" title="Fatture">
+									{% if request.path == '/invoice/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/invoice_active.svg') }}">
 									{% else %}
-									<img alt="" src="{{ url_for('static', filename='icons/shopping_cart_white.svg') }}">
+									<img alt="" src="{{ url_for('static', filename='icons/invoice_white.svg') }}">
 									{% endif %}
 									Invoices
 								</a>

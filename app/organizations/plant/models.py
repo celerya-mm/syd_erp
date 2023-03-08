@@ -5,6 +5,7 @@ from app.organizations.plant_site.models import PlantSite  # noqa
 from app.event_db.models import EventDB  # noqa
 from app.account.models import User  # noqa
 from app.invoices.activities.models import Activity  # noqa
+from app.invoices.invoice.models import Invoice  # noqa
 
 
 class Plant(db.Model):
@@ -33,6 +34,8 @@ class Plant(db.Model):
 	users = db.relationship('User', backref='plants', order_by='User.last_name.asc()', lazy='dynamic')
 	plant_site = db.relationship('PlantSite', backref='plants', lazy='dynamic')
 	activities = db.relationship('Activity', backref='plants', lazy='dynamic')
+	invoices = db.relationship('Invoice', backref='plants', lazy='dynamic')
+
 	events = db.relationship('EventDB', backref='plants', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)

@@ -61,6 +61,8 @@ with app.app_context():
 	from app.organizations.partners.routes import partner_bp
 
 	from app.invoices.activities.routes import activity_bp
+	from app.invoices.invoice.routes import invoice_bp
+	from app.invoices.invoice_rows.routes import invoice_rows_bp
 
 	# registro i blueprints
 	app.register_blueprint(event_bp, url_prefix='/event')
@@ -80,3 +82,5 @@ with app.app_context():
 	app.register_blueprint(partner_bp, url_prefix='/partner')
 
 	app.register_blueprint(activity_bp, url_prefix='/activity')
+	app.register_blueprint(invoice_bp, url_prefix='/invoice')
+	app.register_blueprint(invoice_rows_bp, url_prefix='/invoice_row')

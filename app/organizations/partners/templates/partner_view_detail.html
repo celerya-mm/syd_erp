@@ -75,6 +75,20 @@
 		</a>
 		{% endif %}
 		{% endif %}
+		<!--	Crea Fattura-->
+		{% if form.client %}
+		{%
+		if 'superuser' in session['user_roles']
+		or 'invoices_admin' in session['user_roles']
+		or 'invoices_write' in session['user_roles']
+		%}
+		<a class="btn btn-update" href="{{ url_for(invoice_create, p_id=form.id, s_id=0) }}"
+		   title="Crea Fattura Cliente"
+		   type="button">
+			<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/invoice_blue.svg') }}"/>
+		</a>
+		{% endif %}
+		{% endif %}
 	</div>
 	
 	<div class="container text-center mt-2">
@@ -524,6 +538,106 @@
 			</div>
 		</div>
 		{% endif %}
+		<!--	Fatture collegate-->
+		{% if inv_len != 0 %}
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="7">
+				<button aria-controls="collapse7"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse7"
+						data-bs-toggle="collapse"
+						type="button">
+					Fatture Cliente [ {{ inv_len }} ]
+				</button>
+			</h2>
+			<div aria-labelledby="heading7"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse7">
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="invoices" data-sort-order="desc" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" id="inv1">ID</th>
+							<th class="title" id="inv2">Invoice</th>
+							<th class="title" id="inv3">Data</th>
+							<th class="title" id="inv5">Descrizione</th>
+							<th class="title" id="inv6">Totale</th>
+							<th class="title" id="inv7">Stato</th>
+							<th class="title" id="inv8">Scadenza</th>
+							<th class="title" id="inv9">C.S.</th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in oda_list %}
+						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'invoices_admin' in session['user_roles']
+								or 'invoices_read' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(invoice_detail, _id=row.id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.id|e }}
+								</a>
+								{% else %}
+								{{ row.id|e }}
+								{% endif %}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.invoice_number|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.invoice_date|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.invoice_description|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.invoice_amount|e }}
+							</td>
+							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{% if row.invoice_status == "Pagata_OK" or row.oda_status == "Pagata_Ritardo" %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
+								{% elif row.oda_status == "Scaduta" %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
+								{% elif row.oda_status == "Emessa" %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_pending.svg') }}">
+								{% else %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_emitted.svg') }}">
+								{% endif %}
+								{{ row.oda_status }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'partner_sites_admin' in session['user_roles']
+								or 'partner_sites_read' in session['user_roles']
+								%}
+								{% if row.client_site_id %}
+									<a class="btn-table" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}"
+									   title="Visualizza Record"
+									   type="button">
+										{{ row.client_site_id|e }}
+									</a>
+									{% else %}
+									{{ row.client_site_id|e }}
+									{% endif %}
+								{% else %}
+								{{ row.client_site_id|e }}
+								{% endif %}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		{% endif %}
 		<!--	Articoli collegati-->
 		{% if i_len != 0 %}
 		<div class="accordion-item">
@@ -739,6 +853,24 @@
     
     $(document).ready(function () {
         $('#items').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            },
+        });
+    });
+    
+    $(document).ready(function () {
+        $('#invoices').DataTable({
             responsive: {
                 breakpoints: [
                     { name: 'bigdesktop', width: 1920 },

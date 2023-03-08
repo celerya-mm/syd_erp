@@ -8,7 +8,7 @@
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
 			</a>
-			Modifica l'Ordine [ {{ id }} ]:
+			Modifica l'OFFERTA [ {{ id }} ]:
 		</h5>
 		<form class="shadow rounded" enctype="multipart/form-data" method="POST"
 			  style="border: solid 2px #ED6666 !important;">
@@ -17,16 +17,16 @@
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 				<div class="col-md-2 order-first">
 					<div class="form-group">
-						{{ form.oda_number.label(style="font-size: 1.2rem;") }}
-						{{ form.oda_number(class="form-control emphasis") }}
+						{{ form.invoice_number.label(style="font-size: 1.2rem;") }}
+						{{ form.invoice_number(class="form-control emphasis") }}
 					</div>
 				</div>
 				<div class="col-md-2 order-second">
 					<div class="form-group">
-						{{ form.oda_date.label(style="font-size: 1.2rem;") }}
-						{{ form.oda_date(class="form-control emphasis") }}
-						{% if form.oda_date.errors %}
-						{% for error in form.oda_date.errors %}
+						{{ form.invoice_date.label(style="font-size: 1.2rem;") }}
+						{{ form.invoice_date(class="form-control emphasis") }}
+						{% if form.invoice_date.errors %}
+						{% for error in form.invoice_date.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
@@ -35,10 +35,49 @@
 				</div>
 				<div class="col-md-8 order-third">
 					<div class="form-group">
-						{{ form.oda_description.label(style="font-size: 1.2rem;") }}
-						{{ form.oda_description(class="form-control emphasis") }}
-						{% if form.oda_description.errors %}
-						{% for error in form.oda_description.errors %}
+						{{ form.invoice_description.label(style="font-size: 1.2rem;") }}
+						{{ form.invoice_description(class="form-control emphasis") }}
+						{% if form.invoice_description.errors %}
+						{% for error in form.invoice_description.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-1 order-second">
+					<div class="form-group">
+						{{ form.invoice_currency.label(style="font-size: 1.2rem;") }}
+						{{ form.invoice_currency(class="form-control") }}
+						{% if form.invoice_currency.errors %}
+						{% for error in form.invoice_currency.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-6 order-third">
+					<div class="form-group">
+						{{ form.invoice_payment.label(style="font-size: 1.2rem;") }}
+						{{ form.invoice_payment(class="form-control", style="text-align: center;") }}
+						{% if form.invoice_payment.errors %}
+						{% for error in form.invoice_payment.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-3 order-fourth">
+					<div class="form-group">
+						{{ form.invoice_status.label(style="font-size: 1.2rem;") }}
+						{{ form.invoice_status(class="form-control", style="text-align: center;") }}
+						{% if form.invoice_status.errors %}
+						{% for error in form.invoice_status.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
@@ -50,124 +89,46 @@
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 				<div class="col-md-2 order-first">
 					<div class="form-group">
-						{{ form.oda_delivery_date.label(style="font-size: 1.2rem;") }}
-						{{ form.oda_delivery_date(class="form-control emphasis") }}
-						{% if form.oda_delivery_date.errors %}
-						{% for error in form.oda_delivery_date.errors %}
+						{{ form.client_order_nr.label(style="font-size: 1.2rem;") }}
+						{{ form.client_order_nr(class="form-control emphasis") }}
+						{% if form.client_order_nr.errors %}
+						{% for error in form.client_order_nr.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-1 order-second">
+				<div class="col-md-2 order-second">
 					<div class="form-group">
-						{{ form.oda_currency.label(style="font-size: 1.2rem;") }}
-						{{ form.oda_currency(class="form-control") }}
-						{% if form.oda_currency.errors %}
-						{% for error in form.oda_currency.errors %}
+						{{ form.client_order_date.label(style="font-size: 1.2rem;") }}
+						{{ form.client_order_date(class="form-control") }}
+						{% if form.client_order_date.errors %}
+						{% for error in form.client_order_date.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-6 order-third">
+				<div class="col-md-4 order-third">
 					<div class="form-group">
-						{{ form.oda_payment.label(style="font-size: 1.2rem;") }}
-						{{ form.oda_payment(class="form-control", style="text-align: center;") }}
-						{% if form.oda_payment.errors %}
-						{% for error in form.oda_payment.errors %}
+						{{ form.client_id.label(style="font-size: 1.2rem;") }}
+						{{ form.client_id(class="form-control emphasis", style="text-align: center;") }}
+						{% if form.client_id.errors %}
+						{% for error in form.client_id.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-3 order-fourth">
+				<div class="col-md-4 order-fourth">
 					<div class="form-group">
-						{{ form.oda_status.label(style="font-size: 1.2rem;") }}
-						{{ form.oda_status(class="form-control", style="text-align: center;") }}
-						{% if form.oda_status.errors %}
-						{% for error in form.oda_status.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-			</div>
-			<div class="row no-gutters justify-content-center rounded"
-				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="col-md-3 order-first">
-					<div class="form-group">
-						{{ form.supplier_offer.label(style="font-size: 1.2rem;") }}
-						{{ form.supplier_offer(class="form-control emphasis") }}
-						{% if form.supplier_offer.errors %}
-						{% for error in form.supplier_offer.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-				<div class="col-md-3 order-second">
-					<div class="form-group">
-						{{ form.supplier_offer_date.label(style="font-size: 1.2rem;") }}
-						{{ form.supplier_offer_date(class="form-control") }}
-						{% if form.supplier_offer_date.errors %}
-						{% for error in form.supplier_offer_date.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-				<div class="col-md-3 order-third">
-					<div class="form-group">
-						{{ form.supplier_invoice.label(style="font-size: 1.2rem;") }}
-						{{ form.supplier_invoice(class="form-control") }}
-						{% if form.supplier_invoice.errors %}
-						{% for error in form.supplier_invoice.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-				<div class="col-md-3 order-fourth">
-					<div class="form-group">
-						{{ form.supplier_invoice_date.label(style="font-size: 1.2rem;") }}
-						{{ form.supplier_invoice_date(class="form-control") }}
-						{% if form.supplier_invoice_date.errors %}
-						{% for error in form.supplier_invoice_date.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-			</div>
-			<div class="row no-gutters justify-content-center rounded"
-				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="col-md-6 order-first">
-					<div class="form-group">
-						{{ form.supplier_id.label(style="font-size: 1.2rem;") }}
-						{{ form.supplier_id(class="form-control emphasis", style="text-align: center;") }}
-						{% if form.supplier_id.errors %}
-						{% for error in form.supplier_id.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-				<div class="col-md-6 order-second">
-					<div class="form-group">
-						{{ form.supplier_site_id.label(style="font-size: 1.2rem;") }}
-						{{ form.supplier_site_id(class="form-control", style="text-align: center;") }}
-						{% if form.supplier_site_id.errors %}
-						{% for error in form.supplier_site_id.errors %}
+						{{ form.client_site_id.label(style="font-size: 1.2rem;") }}
+						{{ form.client_site_id(class="form-control", style="text-align: center;") }}
+						{% if form.client_site_id.errors %}
+						{% for error in form.client_site_id.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}

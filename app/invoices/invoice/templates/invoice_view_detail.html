@@ -9,20 +9,20 @@
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/list_blue.svg') }}"/>
 			</a>
-			Dettaglio ORDINE [ {{ form.id }} ]
+			Dettaglio FATTURA [ {{ form.id }} ]
 			{%
 			if 'superuser' in session['user_roles']
-			or 'orders_admin' in session['user_roles']
-			or 'orders_write' in session['user_roles']
+			or 'invoices_admin' in session['user_roles']
+			or 'invoices_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
 			   title="Modifica Ordine"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
 			</a>
-				{% if form.oda_pdf %}
-				<a class="btn btn-update" href="{{ url_for(oda_download, _id=form.id) }}"
-				   title="Download pdf ODA"
+				{% if form.invoice_pdf %}
+				<a class="btn btn-update" href="{{ url_for(invoice_download, _id=form.id) }}"
+				   title="Download pdf INVOICE"
 				   type="button">
 					<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/visibility.svg') }}"/>
 				</a>
@@ -33,18 +33,18 @@
 			
 			{%
 			if 'superuser' in session['user_roles']
-			or 'oda_rows_admin' in session['user_roles']
-			or 'oda_rows_write' in session['user_roles']
+			or 'invoice_rows_admin' in session['user_roles']
+			or 'invoice_rows_write' in session['user_roles']
 			%}
-			{% if form.oda_status == "Lavorazione" %}
-				<a class="btn btn-update" href="{{ url_for(oda_row_create, o_id=form.id, p_id=p_id, s_id=0) }}"
-				   title="Aggiungi riga Ordine"
+				{% if form.invoice_status == "Lavorazione" %}
+				<a class="btn btn-update" href="{{ url_for(invoice_row_create, inv_id=form.id, p_id=p_id, s_id=0) }}"
+				   title="Aggiungi riga Fattura"
 				   type="button">
 					<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/shopping_cart_add.svg') }}"/>
 				</a>
 				
-				<a class="btn btn-update" href="{{ url_for(oda_generate, _id=form.id) }}"
-				   title="Genera pdf ODA"
+				<a class="btn btn-update" href="{{ url_for(invoice_generate, _id=form.id) }}"
+				   title="Genera pdf Fattura"
 				   type="button">
 					<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/print_blue.svg') }}"/>
 				</a>
@@ -59,9 +59,9 @@
 	<div class="container text-center mt-2">
 		<div class="row no-gutters justify-content-center">
 			<div class="col-md-2 order-first">
-				<h6> Totale Ordine: </h6>
+				<h6> Totale Fattura: </h6>
 				<p class="form-control emphasis" style="font-weight: bold; color: white;">
-					{{ form.oda_amount }}
+					{{ form.invoice_amount }}
 				</p>
 			</div>
 		</div>
@@ -69,9 +69,9 @@
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="col-md-2 order-first">
 				<div class="form-group">
-					<h6> ODA </h6>
+					<h6> INVOICE </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.oda_number }}
+						{{ form.invoice_number }}
 					</p>
 				</div>
 			</div>
@@ -79,7 +79,7 @@
 				<div class="form-group">
 					<h6> Data </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.oda_date }}
+						{{ form.invoice_date }}
 					</p>
 				</div>
 			</div>
@@ -87,26 +87,18 @@
 				<div class="form-group">
 					<h6> Descrizione </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.oda_description }}
+						{{ form.invoice_description }}
 					</p>
 				</div>
 			</div>
 		</div>
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="col-md-3 order-first">
-				<div class="form-group">
-					<h6> Consegna </h6>
-					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.oda_delivery_date }}
-					</p>
-				</div>
-			</div>
 			<div class="col-md-1 order-second">
 				<div class="form-group">
 					<h6> Valuta </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.oda_currency }}
+						{{ form.invoice_currency }}
 					</p>
 				</div>
 			</div>
@@ -114,7 +106,7 @@
 				<div class="form-group">
 					<h6> Pagamento </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.oda_payment }}
+						{{ form.invoice_payment }}
 					</p>
 				</div>
 			</div>
@@ -122,8 +114,26 @@
 				<div class="form-group">
 					<h6> Stato </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.oda_status }}
+						{{ form.invoice_status }}
 					</p>
+				</div>
+			</div>
+			<div class="col-md-2 order-fifth">
+				<div class="form-group">
+					<h6> Scadenza </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.invoice_expiration_date }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-1 order-sixth">
+				<div class="form-group">
+					<h6> Scaduta </h6>
+					{% if form.invoice_expired == False %}
+					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
+					{% else %}
+					<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
+					{% endif %}
 				</div>
 			</div>
 		</div>
@@ -152,62 +162,43 @@
 						<div class="container text-center mt-2">
 							<div class="row no-gutters justify-content-center rounded"
 								 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-								<div class="col-md-3 order-first">
+								<div class="col-md-2 order-first">
 									<div class="form-group">
-										<h6> Offerta </h6>
+										<h6> Ordine Cliente </h6>
 										<p class="form-control emphasis" style="font-weight: bold; color: white">
-											{{ form.supplier_offer }}
+											{{ form.client_order_nr }}
 										</p>
 									</div>
 								</div>
-								<div class="col-md-3 order-second">
+								<div class="col-md-2 order-second">
 									<div class="form-group">
-										<h6> Data Off. </h6>
+										<h6> Data ODA </h6>
 										<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-											{{ form.supplier_offer_date }}
+											{{ form.client_order_date }}
 										</p>
 									</div>
 								</div>
-								<div class="col-md-3 order-third">
-									<div class="form-group">
-										<h6> Fattura </h6>
-										<p class="form-control emphasis" style="font-weight: bold; color: white">
-											{{ form.supplier_invoice }}
-										</p>
-									</div>
-								</div>
-								<div class="col-md-3 order-fourth">
-									<div class="form-group">
-										<h6> Data Fat. </h6>
-										<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-											{{ form.supplier_invoice_date }}
-										</p>
-									</div>
-								</div>
-							</div>
-							<div class="row no-gutters justify-content-center rounded"
-								 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-								<div class="col-md-6 order-first">
+								<div class="col-md-4 order-third">
 									<div class="form-group">
 										<a href="{{ url_for(partner_detail, _id=p_id) }}" title="Vai all'azienda">
-											Fornitore
+											Cliente
 										</a>
 										<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-											{{ form.supplier_id }}
+											{{ form.client_id }}
 										</p>
 									</div>
 								</div>
-								<div class="col-md-6 order-second">
+								<div class="col-md-4 order-fourth">
 									<div class="form-group">
-										{% if form.supplier_site_id %}
+										{% if form.client_site_id %}
 										<a href="{{ url_for(partner_site_detail, _id=s_id) }}" title="Vai all'azienda">
-											Sito Fornitore
+											Sito Cliente
 										</a>
 										{% else %}
-										<h6> Sito Fornitore </h6>
+										<h6> Sito Cliente </h6>
 										{% endif %}
 										<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-											{{ form.supplier_site_id }}
+											{{ form.client_site_id }}
 										</p>
 									</div>
 								</div>
@@ -226,7 +217,7 @@
 				</div>
 			</div>
 		</div>
-		<!--	Righe ordine-->
+		<!--	Righe Fattura-->
 		{% if r_len %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="2">
@@ -236,7 +227,7 @@
 						data-bs-target="#collapse2"
 						data-bs-toggle="collapse"
 						type="button">
-					Righe ordine [ {{ r_len }} ]
+					Righe Fattura [ {{ r_len }} ]
 				</button>
 			</h2>
 			<div aria-labelledby="heading1"
@@ -264,8 +255,8 @@
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz; width: 20px !important;">
 								{%
 								if 'superuser' in session['user_roles']
-								or 'oda_rows_admin' in session['user_roles']
-								or 'oda_rows_write' in session['user_roles']
+								or 'invoice_rows_admin' in session['user_roles']
+								or 'invoice_rows_write' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(row_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -352,8 +343,8 @@
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
 								if 'superuser' in session['user_roles']
-								or 'orders_admin' in session['user_roles']
-								or 'orders_write' in session['user_roles']
+								or 'invoices_admin' in session['user_roles']
+								or 'invoices_write' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(event_detail, _id=row.id) }}"
 								   title="Visualizza Record"

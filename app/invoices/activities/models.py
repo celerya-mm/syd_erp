@@ -3,6 +3,7 @@ from app.app import db
 
 # importazioni per creare relazioni in tabella
 from app.event_db.models import EventDB  # noqa
+from app.invoices.invoice_rows.models import InvoiceRow  # noqa
 
 
 class Activity(db.Model):
@@ -28,9 +29,10 @@ class Activity(db.Model):
 
 	plant = db.relationship('Plant', backref='p_activities', viewonly=True)
 	plant_site = db.relationship('PlantSite', backref='ps_activities', viewonly=True)
-	# invoice_rows = db.relationship('InvoiceRow', backref='activity', viewonly=True, lazy='dynamic')
 
-	events = db.relationship('EventDB', backref='items', order_by='EventDB.id.desc()', lazy='dynamic')
+	invoice_rows = db.relationship('InvoiceRow', backref='inv_activities', viewonly=True)
+
+	events = db.relationship('EventDB', backref='activities', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 

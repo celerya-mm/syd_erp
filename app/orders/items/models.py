@@ -3,6 +3,7 @@ from app.app import db
 
 # importazioni per creare relazioni in tabella
 from app.event_db.models import EventDB  # noqa
+from app.orders.order_rows.models import OdaRow  # noqa
 
 
 class Item(db.Model):

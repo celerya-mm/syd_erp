@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required, serialize_dict, timer_func
+from app.functions import token_user_validate, access_required, serialize_dict, timer_func  # noqa
 from .forms import FormOdaRowUpdate, FormOdaRowCreate
 from .models import OdaRow
 

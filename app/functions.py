@@ -209,7 +209,7 @@ def serialize_dict(obj):
 		raise TypeError(f"{obj} is not JSON serializable")
 
 
-list_currency = ['€', '$', 'unit']
+list_currency = ['€', '$']
 
 list_um = ['kg', 'pz', 'unit']
 
@@ -223,6 +223,13 @@ list_payments = [
 	'Come da Offerta'
 ]
 
+list_payments_invoice = [
+	'Rimessa diretta ricevimento Fattura',
+	'BB + 30gg DFFM',
+	'BB + 60gg DFFM',
+	'BB + 90gg DFFM'
+]
+
 list_order_types = [
 	'Lavorazione',
 	'Generato',
@@ -230,6 +237,15 @@ list_order_types = [
 	'Ricevuto OK',
 	'Ricevuto NC (note)',
 	'Pagato/Chiuso'
+]
+
+list_invoice_types = [
+	'Lavorazione',
+	'Generata',
+	'Emessa',
+	'Pagata_OK',
+	'Pagata_Ritardo',
+	'Scaduta'
 ]
 
 list_roles = [

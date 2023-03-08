@@ -1,4 +1,6 @@
 # import json
+from datetime import datetime
+
 import simplejson as json
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
@@ -91,6 +93,8 @@ def oda_create(p_id, s_id=None):
 			form_data = FormOda(request.form).to_dict()
 			# print('NEW_CONTACT:', json.dumps(form_data, indent=2))
 
+			_time = datetime.now()
+
 			new_oda = Oda(
 				oda_number=form_data['oda_number'],
 				oda_date=form_data['oda_date'],
@@ -112,8 +116,8 @@ def oda_create(p_id, s_id=None):
 				supplier_site_id=form_data["supplier_site_id"],
 
 				note=form_data["note"],
-				created_at=form_data["updated_at"],
-				updated_at=form_data["updated_at"]
+				created_at=_time,
+				updated_at=_time
 			)
 
 			Oda.create(new_oda)
@@ -324,7 +328,7 @@ def html_to_pdf(oda, oda_rows):  # , _qrcode):
 	"""Genera pdf da template html."""
 	import pdfkit
 	import os
-	from .functions import folder_temp_pdf  # , folder_temp_qrcode
+	from app.functions_pdf import folder_temp_pdf  # , folder_temp_qrcode
 
 	# _img = os.path.join(_path, "static", "qrcode_temp", _qrcode)
 	logo = os.path.join(_path, "static", "Logo_colore.png")
@@ -381,7 +385,7 @@ def html_to_pdf(oda, oda_rows):  # , _qrcode):
 def oda_generate(_id):
 	"""Genera il pdf di un ODA."""
 	from app.orders.order_rows.models import OdaRow
-	from .functions import pdf_to_byte
+	from app.functions_pdf import pdf_to_byte
 	from app.event_db.routes import event_create
 
 	oda = Oda.query.options(joinedload(Oda.supplier)).get(_id)
@@ -438,7 +442,7 @@ def oda_download(_id):
 	"""Genera file pdf da stringa in byte."""
 	import os
 	from flask import send_file
-	from .functions import byte_to_pdf
+	from app.functions_pdf import byte_to_pdf
 	from PyPDF2 import PdfReader, PdfMerger
 
 	oda = Oda.query.get(_id)
@@ -462,11 +466,11 @@ def oda_download(_id):
 			os.remove(_pdf)
 			os.rename(_merged, _pdf)
 		except Exception as err:
-			print(f"Errore durante la generazione del pdf: {err}")
-			msg = f"Errore durante la generazione del pdf: {err}"
+			msg = f"ERRORE durante la generazione dell'ordine pdf: {err}"
+			print(msg)
 			return msg
 
 		return send_file(_pdf, as_attachment=True)
 	else:
-		flash("Errore generazione certificato. ")
+		flash("ERRORE generazione ORDINE pdf. ")
 		return redirect(url_for(DETAIL_FOR, _id=_id))

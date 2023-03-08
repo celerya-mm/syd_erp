@@ -8,7 +8,7 @@
 cd ../../Multimedia/05_Documenti/Flask/syd_erp
 
 ### app
-docker build --force-rm -t syd_erp:latest .
+docker build --force-rm -t syd_erp:latest --progress=plain .
 
 # Lanciare il docker usando l'immagine appena creata (fare attenzione a lanciare gunicorn con la porta 5000)
 docker run -d -p 8008:5000 --name syd-erp --restart=always syd_erp:latest

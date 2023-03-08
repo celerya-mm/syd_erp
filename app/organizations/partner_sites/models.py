@@ -38,6 +38,9 @@ class PartnerSite(db.Model):
 	contacts = db.relationship(
 		'PartnerContact', backref='partner_sites', order_by='PartnerContact.last_name.asc()', lazy='dynamic')
 	items = db.relationship('Item', backref='partner_sites', lazy='dynamic')
+
+	invoices = db.relationship('Invoice', backref='client_sites', lazy='dynamic')
+
 	events = db.relationship('EventDB', backref='partner_sites', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)

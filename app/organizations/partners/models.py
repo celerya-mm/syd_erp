@@ -5,6 +5,7 @@ from app.organizations.partner_contacts.models import PartnerContact  # noqa
 from app.organizations.partner_sites.models import PartnerSite  # noqa
 from app.orders.items.models import Item  # noqa
 from app.event_db.models import EventDB  # noqa
+from app.orders.order.models import Oda  # noqa
 
 
 class Partner(db.Model):
@@ -43,6 +44,9 @@ class Partner(db.Model):
 	sites = db.relationship('PartnerSite', backref='partners', lazy='dynamic')
 	orders = db.relationship('Oda', backref='partners', lazy='dynamic')
 	items = db.relationship('Item', backref='partners', lazy='dynamic')
+
+	invoices = db.relationship('Invoice', backref='clients', lazy='dynamic')
+
 	events = db.relationship('EventDB', backref='partners', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)

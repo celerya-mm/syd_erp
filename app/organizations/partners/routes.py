@@ -1,10 +1,10 @@
-import json
+import json  # noqa
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
 from app.app import session, db
-from app.functions import token_user_validate, access_required, serialize_dict, timer_func
+from app.functions import token_user_validate, access_required, serialize_dict, timer_func  # noqa
 from .forms import FormPartner
 from .models import Partner
 
@@ -114,6 +114,8 @@ def partner_view_detail(_id):
 	from app.orders.order.routes import DETAIL_FOR as ODA_DETAIL, CREATE_FOR as ODA_CREATE_FOR
 	from app.orders.items.routes import DETAIL_FOR as ITEM_DETAIL, CREATE_FOR as ITEM_CREATE_FOR
 
+	from app.invoices.invoice.routes import DETAIL_FOR as INVOICE_DETAIL, CREATE_FOR as INVOICE_CREATE_FOR
+
 	# Interrogo il DB
 	partner = Partner.query.get(_id)
 	_partner = partner.to_dict()
@@ -142,7 +144,7 @@ def partner_view_detail(_id):
 	# Estraggo la lista degli ordini
 	oda_list = partner.orders
 	if oda_list:
-		oda_list = [item.to_dict() for item in oda_list]
+		oda_list = [oda.to_dict() for oda in oda_list]
 	else:
 		oda_list = []
 
@@ -153,6 +155,13 @@ def partner_view_detail(_id):
 	else:
 		items_list = []
 
+	# Estraggo la lista delle offerte
+	invoice_list = partner.invoices
+	if invoice_list:
+		invoice_list = [inv.to_dict() for inv in invoice_list]
+	else:
+		invoice_list = []
+
 	db.session.close()
 	return render_template(
 		DETAIL_HTML, form=_partner, view=VIEW_FOR, update=UPDATE_FOR,
@@ -162,6 +171,8 @@ def partner_view_detail(_id):
 		site_create=SITE_CREATE_FOR, site_detail=SITE_DETAIL, sites_list=sites_list, s_len=len(sites_list),
 		oda_create=ODA_CREATE_FOR, oda_detail=ODA_DETAIL, oda_list=oda_list, o_len=len(oda_list),
 		item_create=ITEM_CREATE_FOR, item_detail=ITEM_DETAIL, items_list=items_list, i_len=len(items_list),
+		invoice_create=INVOICE_CREATE_FOR, invoice_detail=INVOICE_DETAIL, invoice_list=invoice_list,
+		inv_len=len(invoice_list),
 	)
 
 
