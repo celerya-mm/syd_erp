@@ -5,7 +5,9 @@ from wtforms import StringField, SubmitField, SelectField, DecimalField, TextAre
 from wtforms.validators import DataRequired, Length, Optional
 
 from app.app import db
-from app.functions import list_currency, list_um
+from app.support_lists import list_currency, list_um, list_activity_categories
+
+list_activity_categories.sort()
 
 
 def list_plant_sites(p_id=None):
@@ -35,6 +37,7 @@ class FormActivity(FlaskForm):
 
 	activity_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"),
 																	Length(max=500)])
+	activity_category = SelectField('Categoria', choices=list_activity_categories)
 
 	activity_price = DecimalField('Prezzo', validators=[DataRequired("Campo obbligatorio!")], places=2)
 	activity_currency = SelectField('Valuta', choices=list_currency)
@@ -71,6 +74,7 @@ class FormActivity(FlaskForm):
 		form.activity_code.data = obj.activity_code
 
 		form.activity_description.data = obj.activity_description
+		form.activity_category.data = obj.activity_category
 
 		form.activity_price.data = obj.activity_price
 		form.activity_currency.data = obj.activity_currency
@@ -99,6 +103,7 @@ class FormActivity(FlaskForm):
 			'activity_code': self.activity_code.data,
 
 			'activity_description': self.activity_description.data.strip().replace('  ', ' '),
+			'activity_category': self.activity_category.data,
 
 			'activity_price': self.activity_price.data,
 			'activity_currency': self.activity_currency.data,
@@ -126,6 +131,7 @@ class FormActivity(FlaskForm):
 			'activity_code': self.activity_code.data,
 
 			'activity_description': self.activity_description.data.strip().replace('  ', ' '),
+			'activity_category': self.activity_category.data,
 
 			'activity_price': self.activity_price.data,
 			'activity_currency': not_empty(self.activity_currency.data),

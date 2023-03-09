@@ -38,7 +38,7 @@ DELETE_FOR = "oda_rows_bp.oda_rows_delete"
 @token_user_validate
 @access_required(roles=['oda_rows_admin', 'oda_rows_write'])
 def oda_rows_create(o_id, p_id, s_id=None):
-	"""Creazione Item."""
+	"""Creazione Riga Ordine."""
 	from app.orders.order.routes import DETAIL_FOR as ORDER_DETAIL
 	from app.orders.items.models import Item
 
@@ -60,6 +60,7 @@ def oda_rows_create(o_id, p_id, s_id=None):
 				item_code_supplier=_item.item_code_supplier if _item.item_code_supplier else None,
 
 				item_description=_item.item_description if _item.item_description else None,
+				item_category=_item.item_category,
 
 				item_price=_item.item_price,
 				item_price_discount=_item.item_price_discount if _item.item_price_discount else None,
@@ -103,12 +104,19 @@ def oda_rows_view_detail(_id):
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 	from app.orders.order.routes import DETAIL_FOR as ORDER_DETAIL
 
+	from app.orders.items.models import Item
+	from app.orders.items.routes import DETAIL_FOR as ITEM_DETAIL
+
 	# Interrogo il DB
 	oda_row = OdaRow.query \
 		.options(joinedload(OdaRow.supplier)) \
 		.options(joinedload(OdaRow.supplier_site)).get(_id)
 
 	_oda_row = oda_row.to_dict()
+
+	# Cerco l'Articolo
+	itm_id = Item.query.filter_by(item_code=oda_row.item_code).first()
+	itm_id = itm_id.id
 
 	# Estraggo la storia delle modifiche per l'articolo
 	history_list = oda_row.events
@@ -132,7 +140,7 @@ def oda_rows_view_detail(_id):
 		history_list=history_list, 		h_len=len(history_list),
 		partner_detail=PARTNER_DETAIL, 	p_id=p_id,
 		site_detail=SITE_DETAIL, s_id=s_id,
-		order_detail=ORDER_DETAIL
+		order_detail=ORDER_DETAIL, item_detail=ITEM_DETAIL, itm_id=itm_id
 	)
 
 
@@ -141,7 +149,7 @@ def oda_rows_view_detail(_id):
 @token_user_validate
 @access_required(roles=['oda_rows_admin', 'oda_rows_write'])
 def oda_rows_update(_id):
-	"""Aggiorna dati Item."""
+	"""Aggiorna dati Riga Ordine."""
 	from app.event_db.routes import event_create
 
 	# recupero i dati
@@ -169,12 +177,14 @@ def oda_rows_update(_id):
 			if _item:
 				new_data['item_code_supplier'] = _item.item_code_supplier
 				new_data['item_description'] = _item.item_description
+				new_data['item_category'] = _item.item_category
 				new_data['item_price'] = _item.item_price
 				new_data['item_price_discount'] = _item.item_price_discount
 				new_data['item_quantity_um'] = _item.item_quantity_um
 			else:
 				new_data['item_code_supplier'] = None
 				new_data['item_description'] = None
+				new_data['item_category'] = None
 				new_data['item_price'] = None
 				new_data['item_price_discount'] = None
 				new_data['item_quantity_um'] = None
@@ -217,7 +227,7 @@ def oda_rows_update(_id):
 @token_user_validate
 @access_required(roles=['oda_rows_admin', 'oda_rows_write'])
 def oda_rows_delete(_id, o_id):
-	"""Aggiorna dati Item."""
+	"""Cancella Riga Ordine."""
 	from app.orders.order.routes import DETAIL_FOR as ODA_DETAIL
 	try:
 		OdaRow.remove(_id)

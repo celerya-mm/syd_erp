@@ -5,8 +5,9 @@ from wtforms import StringField, SubmitField, EmailField, BooleanField, SelectFi
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 from app.app import session, db
+from app.functions import mount_full_address, not_empty, status_true_false
+from app.support_lists import site_type
 from .models import Plant
-from app.functions import mount_full_address, not_empty, status_true_false, site_type
 
 
 def list_plants():

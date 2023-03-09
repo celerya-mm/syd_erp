@@ -5,7 +5,9 @@ from wtforms import StringField, SubmitField, SelectField, DecimalField, TextAre
 from wtforms.validators import DataRequired, Length, Optional
 
 from app.app import db
-from app.functions import list_currency, list_um
+from app.support_lists import list_currency, list_um, list_item_categories
+
+list_item_categories.sort()
 
 
 def list_partners():
@@ -52,6 +54,7 @@ class FormItem(FlaskForm):
 	item_code_supplier = StringField('Cod. F.', validators=[Optional(), Length(max=50)])
 
 	item_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"), Length(max=500)])
+	item_category = SelectField('Categoria', choices=list_item_categories)
 
 	item_price = DecimalField('Prezzo', validators=[DataRequired("Campo obbligatorio!")], places=2)
 	item_price_discount = DecimalField('Sconto %', validators=[Optional()], places=2)
@@ -90,6 +93,7 @@ class FormItem(FlaskForm):
 		form.item_code_supplier.data = obj.item_code_supplier if obj.item_code_supplier else None
 
 		form.item_description.data = obj.item_description
+		form.item_category.data = obj.item_category
 
 		form.item_price.data = obj.item_price
 		form.item_price_discount.data = obj.item_price_discount if obj.item_price_discount else None
@@ -119,6 +123,7 @@ class FormItem(FlaskForm):
 			'item_code_supplier': not_empty(self.item_code_supplier.data.strip().replace('  ', ' ')),
 
 			'item_description': self.item_description.data.strip().replace('  ', ' '),
+			'item_category': self.item_category.data,
 
 			'item_price': self.item_price.data,
 			'item_price_discount': not_empty(self.item_price_discount.data),
@@ -147,6 +152,7 @@ class FormItem(FlaskForm):
 			'item_code_supplier': not_empty(self.item_code_supplier.data.strip().replace('  ', ' ')),
 
 			'item_description': self.item_description.data.strip().replace('  ', ' '),
+			'item_category': self.item_category.data,
 
 			'item_price': self.item_price.data,
 			'item_price_discount': not_empty(self.item_price_discount.data),

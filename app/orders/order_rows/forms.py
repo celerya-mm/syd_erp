@@ -5,7 +5,9 @@ from wtforms import StringField, SubmitField, SelectField, IntegerField, Decimal
 from wtforms.validators import Length, Optional, DataRequired
 
 from app.app import db
-from app.functions import list_currency, list_um
+from app.support_lists import list_currency, list_um, list_item_categories
+
+list_item_categories.sort()
 
 
 def list_items(p_id=None, upd=None):
@@ -98,6 +100,7 @@ class FormOdaRowUpdate(FlaskForm):
 	item_code_supplier = StringField('Cod. F.', validators=[Optional(), Length(max=50)])
 
 	item_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"), Length(max=500)])
+	item_category = SelectField('Categoria', choices=list_item_categories)
 
 	item_price = DecimalField('Prezzo', validators=[DataRequired("Campo obbligatorio!")], places=2)
 	item_price_discount = DecimalField('Sconto %', validators=[Optional()], places=2)
@@ -128,14 +131,11 @@ class FormOdaRowUpdate(FlaskForm):
 		# Instantiate the form
 		form = cls()
 
-		# Update the choices
-		form.item_code.choices = list_items(p_id, upd=True)
-		form.supplier_site_id.choices = list_partner_sites(p_id)
-
 		form.item_code.data = obj.item_code
 		form.item_code_supplier.data = obj.item_code_supplier or None
 
 		form.item_description.data = obj.item_description
+		form.item_category.data = obj.item_category
 
 		form.item_price.data = obj.item_price
 		form.item_price_discount.data = obj.item_price_discount or None
@@ -145,8 +145,12 @@ class FormOdaRowUpdate(FlaskForm):
 		form.item_quantity_um.data = obj.item_quantity_um or None
 
 		form.oda_id.data = obj.oda_id
+
 		form.supplier_id.data = obj.supplier_id
-		# form.supplier_site_id.data = obj.supplier_site
+
+		# Update the choices
+		form.item_code.choices = list_items(p_id, upd=True)
+		form.supplier_site_id.choices = list_partner_sites(p_id)
 
 		form.note.data = obj.note or None
 
@@ -166,6 +170,7 @@ class FormOdaRowUpdate(FlaskForm):
 			'item_code_supplier': not_empty(self.item_code_supplier.data.strip().replace('  ', ' ')),
 
 			'item_description': not_empty(self.item_description.data.strip().replace('  ', ' ')),
+			'item_category': self.item_category.data,
 
 			'item_price': float(self.item_price.data),
 			'item_price_discount': float(self.item_price_discount.data) if self.item_price_discount.data else None,

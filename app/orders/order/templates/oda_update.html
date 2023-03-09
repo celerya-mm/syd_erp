@@ -63,7 +63,7 @@
 				<div class="col-md-1 order-second">
 					<div class="form-group">
 						{{ form.oda_currency.label(style="font-size: 1.2rem;") }}
-						{{ form.oda_currency(class="form-control") }}
+						{{ form.oda_currency(class="form-control", style="text-align: center;") }}
 						{% if form.oda_currency.errors %}
 						{% for error in form.oda_currency.errors %}
 						<span class="text-danger">{{ error }}</span>
@@ -72,7 +72,7 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-6 order-third">
+				<div class="col-md-4 order-third">
 					<div class="form-group">
 						{{ form.oda_payment.label(style="font-size: 1.2rem;") }}
 						{{ form.oda_payment(class="form-control", style="text-align: center;") }}
@@ -84,12 +84,24 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-3 order-fourth">
+				<div class="col-md-2 order-fourth">
 					<div class="form-group">
 						{{ form.oda_status.label(style="font-size: 1.2rem;") }}
 						{{ form.oda_status(class="form-control", style="text-align: center;") }}
 						{% if form.oda_status.errors %}
 						{% for error in form.oda_status.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-3 order-fourth">
+					<div class="form-group">
+						{{ form.oda_category.label(style="font-size: 1.2rem;") }}
+						{{ form.oda_category(class="form-control", style="text-align: center;") }}
+						{% if form.oda_category.errors %}
+						{% for error in form.oda_category.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}

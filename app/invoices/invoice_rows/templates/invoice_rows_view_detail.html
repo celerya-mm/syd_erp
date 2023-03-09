@@ -31,18 +31,7 @@
 					</p>
 				</div>
 			</div>
-			<div class="col-md-10 order-second">
-				<div class="form-group">
-				<h6> Descrizione </h6>
-				<p class="form-control emphasis" style="font-weight: bold; color: white">
-					{{ form.activity_description }}
-				</p>
-			</div>
-			</div>
-		</div>
-		<div class="row no-gutters justify-content-center rounded"
-			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="col-md-1 order-first">
+			<div class="col-md-2 order-second">
 				<div class="form-group">
 					<a href="{{ url_for(invoice_detail, _id=form.invoice_id) }}" title="Vai alla fattura">
 						Fattura
@@ -52,9 +41,22 @@
 					</p>
 				</div>
 			</div>
+			<div class="col-md-4 order-third">
+				<div class="form-group">
+					<h6> Categoria </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.activity_category }}
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="col-md-2 order-first">
 				<div class="form-group">
-					<h6> Cod. Attività. </h6>
+					<a href="{{ url_for(activity_detail, _id=act_id) }}" title="Vai all' Attività">
+						Cod. Attività
+					</a>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
 						{{ form.activity_code }}
 					</p>
@@ -97,6 +99,17 @@
 					<h6> U.M. </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
 						{{ form.activity_quantity_um }}
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="col-md-12 order-second">
+				<div class="form-group">
+					<h6> Descrizione </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.activity_description }}
 					</p>
 				</div>
 			</div>
@@ -226,6 +239,7 @@
             },
         });
     });
+
 
 
 </script>

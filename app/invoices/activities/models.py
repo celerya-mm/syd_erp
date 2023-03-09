@@ -14,7 +14,8 @@ class Activity(db.Model):
 
 	activity_code = db.Column(db.String(8), index=True, unique=True, nullable=False)
 
-	activity_description = db.Column(db.String(500), index=True, unique=False, nullable=False)
+	activity_description = db.Column(db.String(500), index=False, unique=False, nullable=False)
+	activity_category = db.Column(db.String(50), index=True, unique=False, nullable=False)
 
 	activity_price = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True)
 	activity_currency = db.Column(db.String(3), index=False, unique=False, nullable=True)
@@ -61,9 +62,10 @@ class Activity(db.Model):
 
 		return {
 			'id': self.id,
-
 			'activity_code': self.activity_code,
+
 			'activity_description': self.activity_description,
+			'activity_category': self.activity_category,
 
 			'activity_price': self.activity_price,
 			'activity_currency': self.activity_currency,

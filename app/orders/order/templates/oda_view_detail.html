@@ -64,13 +64,19 @@
 					{{ form.oda_amount }}
 				</p>
 			</div>
+			<div class="col-md-4 order-second">
+				<h6> Categoria: </h6>
+				<p class="form-control" style="font-weight: bold; color: #5B5A5B;">
+					{{ form.oda_category }}
+				</p>
+			</div>
 		</div>
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="col-md-2 order-first">
 				<div class="form-group">
 					<h6> ODA </h6>
-					<p class="form-control emphasis" style="font-weight: bold; color: white">
+					<p class="form-control emphasis" style="font-weight: bold; color: white;">
 						{{ form.oda_number }}
 					</p>
 				</div>
@@ -78,7 +84,7 @@
 			<div class="col-md-2 order-second">
 				<div class="form-group">
 					<h6> Data </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B;">
 						{{ form.oda_date }}
 					</p>
 				</div>
@@ -251,11 +257,12 @@
 							<th class="title" id="r2">Codice</th>
 							<th class="title" id="r3">Codice F.</th>
 							<th class="title" id="r4">Descrizione</th>
-							<th class="title" id="r5">Prezzo</th>
-							<th class="title" id="r6">Sconto</th>
-							<th class="title" id="r7">Q.</th>
-							<th class="title" id="r8">Tot</th>
-							<th class="title" id="r9" data-sortable="false"></th>
+							<th class="title" id="r5">Categoria</th>
+							<th class="title" id="r6">Prezzo</th>
+							<th class="title" id="r7">Sconto</th>
+							<th class="title" id="r8">Q.</th>
+							<th class="title" id="r9">Tot</th>
+							<th class="title" id="r10" data-sortable="false"></th>
 						</tr>
 						</thead>
 						<tbody>
@@ -284,6 +291,9 @@
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.7rem;">
 								{{ row.item_description|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.7rem;">
+								{{ row.item_category|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{{ row.item_price|e }}

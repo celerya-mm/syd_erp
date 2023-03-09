@@ -5,7 +5,9 @@ from wtforms import StringField, SubmitField, SelectField, DateField, TextAreaFi
 from wtforms.validators import DataRequired, Length, Optional
 
 from app.app import db
-from app.functions import list_currency, list_payments, list_invoice_types
+from app.support_lists import list_currency, list_payments, list_invoice_status, list_activity_categories
+
+list_activity_categories.sort()
 
 
 def list_partners():
@@ -88,13 +90,17 @@ class FormInvoice(FlaskForm):
 	"""Form per creare un Articolo."""
 	invoice_number = StringField('Fattura', validators=[DataRequired("Campo obbligatorio!"), Length(min=8, max=8)])
 	invoice_date = DateField('Data', validators=[DataRequired("Campo obbligatorio!")])
-	invoice_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"), Length(max=255)])
+
+	invoice_description = TextAreaField('Descrizione',
+										validators=[DataRequired("Campo obbligatorio!"), Length(max=255)])
+	invoice_category = SelectField('Categoria', choices=list_activity_categories)
+
 	invoice_currency = SelectField(
 		'Valuta', choices=list_currency, default='€', validators=[DataRequired("Campo obbligatorio!")])
 	invoice_payment = SelectField(
 		'Pagamento', choices=list_payments, default='BB + 60gg DFFM', validators=[DataRequired("Campo obbligatorio!")])
 	invoice_status = SelectField(
-		'Stato', choices=list_invoice_types, default='Lavorazione', validators=[DataRequired("Campo obbligatorio!")])
+		'Stato', choices=list_invoice_status, default='Lavorazione', validators=[DataRequired("Campo obbligatorio!")])
 
 	plant_id = SelectField('Sede Legale', validators=[DataRequired("Campo obbligatorio!")])
 	plant_site_id = SelectField('Sede Operativa', validators=[DataRequired("Campo obbligatorio!")])
@@ -132,7 +138,10 @@ class FormInvoice(FlaskForm):
 		form = cls()
 		form.invoice_number.data = obj.invoice_number
 		form.invoice_date.data = obj.invoice_date
+
 		form.invoice_description.data = obj.invoice_description
+		form.invoice_category.data = obj.invoice_category
+
 		form.invoice_currency.data = obj.invoice_currency
 		form.invoice_payment.data = obj.invoice_payment
 		form.invoice_status.data = obj.invoice_status
@@ -193,6 +202,8 @@ class FormInvoice(FlaskForm):
 			'invoice_year': self.invoice_date.data.year,
 
 			'invoice_description': self.invoice_description.data.strip().replace('  ', ' '),
+			'invoice_category': self.invoice_category.data,
+
 			'invoice_currency': self.invoice_currency.data,
 			'invoice_payment': not_empty(self.invoice_payment.data),
 			'invoice_status': not_empty(self.invoice_status.data),

@@ -73,6 +73,7 @@ def activity_create(p_id, s_id=None):
 				activity_code=form_data['activity_code'],
 
 				activity_description=form_data['activity_description'],
+				activity_category=form_data['activity_category'],
 
 				activity_price=form_data['activity_price'],
 				activity_currency=form_data['activity_currency'],

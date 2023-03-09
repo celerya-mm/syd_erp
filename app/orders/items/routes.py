@@ -75,6 +75,7 @@ def item_create(p_id, s_id=None):
 				item_code_supplier=not_empty(form_data['item_code_supplier']),
 
 				item_description=form_data['item_description'],
+				item_category=form_data['item_category'],
 
 				item_price=form_data['item_price'],
 				item_price_discount=not_empty(form_data['item_price_discount']),

@@ -58,11 +58,12 @@ def invoice_rows_create(inv_id, c_id, s_id=None):
 			new_row = InvoiceRow(
 				activity_code=_activity.activity_code,
 
-				activity_description=_activity.activity_description if _activity.activity_description else None,
+				activity_description=_activity.activity_description,
+				activity_category=_activity.activity_category,
 
 				activity_price=_activity.activity_price,
 				activity_price_discount=None,
-				activity_currency=_activity.activity_currency if _activity.activity_currency else None,
+				activity_currency=_activity.activity_currency,
 
 				activity_quantity=_activity.activity_quantity if _activity.activity_quantity else None,
 				activity_quantity_um=_activity.activity_quantity_um if _activity.activity_quantity_um else None,
@@ -102,12 +103,19 @@ def invoice_rows_view_detail(_id):
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 	from app.invoices.invoice.routes import DETAIL_FOR as INVOICE_DETAIL
 
+	from app.invoices.activities.models import Activity
+	from app.invoices.activities.routes import DETAIL_FOR as ACTIVITY_DETAIL
+
 	# Interrogo il DB
 	invoice_row = InvoiceRow.query \
 		.options(joinedload(InvoiceRow.client)) \
 		.options(joinedload(InvoiceRow.client_site)).get(_id)
 
 	_invoice_row = invoice_row.to_dict()
+
+	# Estraggo l'Attività
+	act_id = Activity.query.filter_by(activity_code=invoice_row.activity_code).first()
+	act_id = act_id.id
 
 	# Estraggo la storia delle modifiche per l'articolo
 	history_list = invoice_row.events
@@ -128,9 +136,10 @@ def invoice_rows_view_detail(_id):
 	db.session.close()
 	return render_template(
 		DETAIL_HTML, form=_invoice_row, update=UPDATE_FOR, event_detail=EVENT_DETAIL,
-		history_list=history_list, 		h_len=len(history_list),
-		partner_detail=PARTNER_DETAIL, 	p_id=p_id,
-		site_detail=SITE_DETAIL, 		s_id=s_id,
+		history_list=history_list, 		 h_len=len(history_list),
+		partner_detail=PARTNER_DETAIL, 	 p_id=p_id,
+		site_detail=SITE_DETAIL, 		 s_id=s_id,
+		activity_detail=ACTIVITY_DETAIL, act_id=act_id,
 		invoice_detail=INVOICE_DETAIL
 	)
 
@@ -167,11 +176,13 @@ def invoice_rows_update(_id):
 			_activity = Activity.query.filter_by(activity_code=new_data["activity_code"]).first()
 			if _activity:
 				new_data['activity_description'] = _activity.activity_description
+				new_data['activity_category'] = _activity.activity_category
 				new_data['activity_price'] = _activity.activity_price
 				new_data['activity_quantity'] = _activity.activity_quantity
 				new_data['activity_quantity_um'] = _activity.activity_quantity_um
 			else:
 				new_data['activity_description'] = None
+				new_data['activity_category'] = None
 				new_data['activity_price'] = None
 				new_data['activity_quantity'] = None
 				new_data['activity_quantity_um'] = None

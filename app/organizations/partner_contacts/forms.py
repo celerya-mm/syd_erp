@@ -5,8 +5,9 @@ from wtforms import StringField, SubmitField, EmailField, SelectField, TextAreaF
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 from app.app import db, session
+from app.functions import not_empty, mount_full_name
+from app.support_lists import list_roles
 from .models import PartnerContact
-from app.functions import not_empty, mount_full_name, list_roles
 
 
 def list_partner_contacts():

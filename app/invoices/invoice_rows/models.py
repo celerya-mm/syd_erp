@@ -13,7 +13,8 @@ class InvoiceRow(db.Model):
 
 	activity_code = db.Column(db.String(8), db.ForeignKey('activities.activity_code'), index=True, unique=False,
 							  nullable=False)
-	activity_description = db.Column(db.String(500), index=True, unique=False, nullable=False)
+	activity_description = db.Column(db.String(500), index=False, unique=False, nullable=False)
+	activity_category = db.Column(db.String(50), index=True, unique=False, nullable=False)
 
 	activity_price = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True)
 	activity_price_discount = db.Column(db.Float, index=False, unique=False, nullable=True)  # considerato in %
@@ -45,39 +46,13 @@ class InvoiceRow(db.Model):
 	def __str__(self):
 		return f'<INVOICE_ROW_CLASS: [{self.activity_code}] - {self.activity_description}>'
 
-	def calculate_activity_amount(self):
-		if self.activity_price and self.activity_quantity and self.activity_price_discount:
-			activity_amount = (float(self.activity_price) * float(self.activity_quantity)) * (
-					(100 - float(self.activity_price_discount)) / 100
-			)
-		elif self.activity_price and self.activity_quantity:
-			activity_amount = (float(self.activity_price) * float(self.activity_quantity))
-		else:
-			activity_amount = 0
-
-		self.activity_amount = activity_amount
-
-	def update_activity_amount(self):
-		if self["activity_price"] and self['activity_quantity'] and self['activity_price_discount']:
-			activity_amount = (self["activity_price"] * self['activity_quantity']) * (
-					(100 - self['activity_price_discount']) / 100
-			)
-		elif self["activity_price"] and self['activity_quantity']:
-			activity_amount = (self["activity_price"] * self['activity_quantity'])
-		else:
-			activity_amount = 0
-
-		self['activity_amount'] = activity_amount
-
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""
-		self.calculate_activity_amount()
 		db.session.add(self)
 		db.session.commit()
 
 	def update(_id, data):  # noqa
 		"""Salva le modifiche a un record."""
-		InvoiceRow.update_activity_amount(data)
 		InvoiceRow.query.filter_by(id=_id).update(data)
 		db.session.commit()
 
@@ -92,9 +67,10 @@ class InvoiceRow(db.Model):
 		from app.functions import date_to_str
 		return {
 			'id': self.id,
-
 			'activity_code': self.activity_code,
+
 			'activity_description': self.activity_description,
+			'activity_category': self.activity_category,
 
 			'activity_price': self.activity_price,
 			'activity_price_discount': self.activity_price_discount,

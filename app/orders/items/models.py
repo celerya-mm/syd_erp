@@ -15,7 +15,8 @@ class Item(db.Model):
 	item_code = db.Column(db.String(8), index=True, unique=True, nullable=False)
 	item_code_supplier = db.Column(db.String(25), index=True, unique=False, nullable=True)
 
-	item_description = db.Column(db.String(500), index=True, unique=False, nullable=False)
+	item_description = db.Column(db.String(500), index=False, unique=False, nullable=False)
+	item_category = db.Column(db.String(50), index=True, unique=False, nullable=False)
 
 	item_price = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True)
 	item_price_discount = db.Column(db.Float, index=False, unique=False, nullable=True)  # considerato in %
@@ -64,7 +65,9 @@ class Item(db.Model):
 
 			'item_code': self.item_code,
 			'item_code_supplier': self.item_code_supplier,
+
 			'item_description': self.item_description,
+			'item_category': self.item_category,
 
 			'item_price': self.item_price,
 			'item_price_discount': self.item_price_discount,

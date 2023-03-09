@@ -51,10 +51,10 @@ RUN grep -v "pywin32" /home/app/src/requirements.txt | xargs $VIRTUAL_ENV/bin/py
 # clean package manager cache to reduce your custom image size...
 #RUN apt-get clean all \
 #    && rm -rvf /var/lib/apt/lists/*
-RUN apt remove -y \
+RUN apt-get remove -y \
         gcc \
-    && apt autoremove -y \
-    && apt clean all \
+    && apt-get autoremove -y \
+    && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
 # Add all files from current directory on host to dockerised directory in container

@@ -19,12 +19,6 @@
 					<div class="form-group">
 						{{ form.activity_code.label(style="font-size: 1.2rem;") }}
 						{{ form.activity_code(class="form-control emphasis") }}
-						{% if form.activity_code.errors %}
-						{% for error in form.activity_code.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
 					</div>
 				</div>
 				<div class="col-md-2 order-second">
@@ -42,7 +36,7 @@
 				<div class="col-md-1 order-third">
 					<div class="form-group">
 						{{ form.activity_currency.label(style="font-size: 1.2rem;") }}
-						{{ form.activity_currency(class="form-control") }}
+						{{ form.activity_currency(class="form-control", style="text-align: center;") }}
 						{% if form.activity_currency.errors %}
 						{% for error in form.activity_currency.errors %}
 						<span class="text-danger">{{ error }}</span>
@@ -63,7 +57,7 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-2 order-fifth">
+				<div class="col-md-1 order-fifth">
 					<div class="form-group">
 						{{ form.activity_quantity_um.label(style="font-size: 1.2rem;") }}
 						{{ form.activity_quantity_um(class="form-control", style="text-align: center;") }}
@@ -81,6 +75,18 @@
 						{{ form.activity_estimated_time(class="form-control") }}
 						{% if form.activity_estimated_time.errors %}
 						{% for error in form.activity_estimated_time.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-4 order-seventh">
+					<div class="form-group">
+						{{ form.activity_category.label(style="font-size: 1.2rem;") }}
+						{{ form.activity_category(class="form-control", style="text-align: center;") }}
+						{% if form.activity_category.errors %}
+						{% for error in form.activity_category.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}

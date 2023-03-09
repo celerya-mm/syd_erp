@@ -5,7 +5,9 @@ from wtforms import SubmitField, SelectField, IntegerField, DecimalField, TextAr
 from wtforms.validators import Length, Optional, DataRequired
 
 from app.app import db
-from app.functions import list_currency, list_um
+from app.support_lists import list_currency, list_um, list_activity_categories
+
+list_activity_categories.sort()
 
 
 def list_activities(upd=None):
@@ -87,10 +89,11 @@ class FormInvoiceRowCreate(FlaskForm):
 
 class FormInvoiceRowUpdate(FlaskForm):
 	"""Form per aggiornare riga Fattura."""
-	activity_code = SelectField('Codice Articolo', choices=list_activities)
+	activity_code = SelectField('Codice Attività', choices=list_activities)
 
 	activity_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"),
 																	Length(max=500)])
+	activity_category = SelectField('Categoria', choices=list_activity_categories)
 
 	activity_price = DecimalField('Prezzo', validators=[DataRequired("Campo obbligatorio!")], places=2)
 	activity_price_discount = DecimalField('Sconto %', validators=[Optional()], places=2)
@@ -121,13 +124,10 @@ class FormInvoiceRowUpdate(FlaskForm):
 		# Instantiate the form
 		form = cls()
 
-		# Update the choices
-		form.activity_code.choices = list_activities(upd=True)
-		form.client_site_id.choices = list_client_sites(p_id)
-
 		form.activity_code.data = obj.activity_code
 
 		form.activity_description.data = obj.activity_description
+		form.activity_category.data = obj.activity_category
 
 		form.activity_price.data = obj.activity_price
 		form.activity_price_discount.data = obj.activity_price_discount or None
@@ -139,7 +139,10 @@ class FormInvoiceRowUpdate(FlaskForm):
 		form.invoice_id.data = obj.invoice_id
 
 		form.client_id.data = obj.client_id
-		# form.client_site_id.data = obj.client_site_id or None
+
+		# Update the choices
+		form.activity_code.choices = list_activities(upd=True)
+		form.client_site_id.choices = list_client_sites(p_id)
 
 		form.note.data = obj.note or None
 
@@ -158,6 +161,7 @@ class FormInvoiceRowUpdate(FlaskForm):
 			'activity_code': self.activity_code.data.split(' - ')[0],
 
 			'activity_description': not_empty(self.activity_description.data.strip().replace('  ', ' ')),
+			'activity_category': self.activity_category.data,
 
 			'activity_price': float(self.activity_price.data),
 			'activity_price_discount': float(self.activity_price_discount.data) if self.activity_price_discount.data

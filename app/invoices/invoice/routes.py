@@ -82,13 +82,21 @@ def invoice_view():
 		g_supplier = dict_group_by(_list, 'invoice_date', group_f="client_id", amount='invoice_amount', year=True)
 		s_labels = [sub["client_id"] for sub in g_supplier]
 		s_values = [sub['invoice_amount'] for sub in g_supplier]
+
+		# raggruppa per categoria
+		g_category = dict_group_by(_list, 'invoice_date', group_f="invoice_category", amount='invoice_amount', year=True)
+		c_labels = [sub["invoice_category"] for sub in g_category]
+		c_values = [sub['invoice_amount'] for sub in g_category]
 	else:
-		y_labels, y_values, s_labels, s_values = [], [], [], []
+		y_labels, y_values, s_labels, s_values, c_labels, c_values = [], [], [], [], [], []
 
 	db.session.close()
-	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, detail=DETAIL_FOR, partner_detail=PARTNER_DETAIL,
-						   site_detail=SITE_DETAIL, y_labels=json.dumps(y_labels), y_values=json.dumps(y_values),
-						   s_labels=json.dumps(s_labels), s_values=json.dumps(s_values))
+	return render_template(
+		VIEW_HTML, form=_list, create=CREATE_FOR, detail=DETAIL_FOR, partner_detail=PARTNER_DETAIL,
+		site_detail=SITE_DETAIL, y_labels=json.dumps(y_labels), y_values=json.dumps(y_values),
+		s_labels=json.dumps(s_labels), s_values=json.dumps(s_values),
+		c_labels=json.dumps(c_labels), c_values=json.dumps(c_values)
+	)
 
 
 @invoice_bp.route(CREATE, methods=["GET", "POST"])
@@ -117,7 +125,9 @@ def invoice_create(p_id, s_id=None):
 			new_invoice = Invoice(
 				invoice_number=form_data['invoice_number'],
 				invoice_date=form_data['invoice_date'],
+
 				invoice_description=form_data['invoice_description'],
+				invoice_category=form_data['invoice_category'],
 
 				invoice_currency=form_data['invoice_currency'],
 				invoice_payment=form_data['invoice_payment'],

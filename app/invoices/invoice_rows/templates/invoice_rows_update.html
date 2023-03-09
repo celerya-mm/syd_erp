@@ -27,7 +27,22 @@
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-10 order-first">
+				<div class="col-md-4 order-second">
+					<div class="form-group">
+						{{ form.activity_category.label(style="font-size: 1.2rem;") }}
+						{{ form.activity_category(class="form-control emphasis", style="text-align: center;") }}
+						{% if form.activity_category.errors %}
+						{% for error in form.activity_category.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="row no-gutters justify-content-center rounded"
+				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+				<div class="col-md-12 order-first">
 					<div class="form-group">
 						{{ form.activity_description.label(style="font-size: 1.2rem;") }}
 						{{ form.activity_description(class="form-control emphasis") }}

@@ -16,9 +16,8 @@
 							<th class="title" id="h3">Codice F.</th>
 							<th class="title" id="h4">Descrizione</th>
 							<th class="title" id="h5">Prezzo</th>
-							<th class="title" id="h6">Sconto</th>
+							<th class="title" id="h6">Categoria</th>
 							<th class="title" id="h7">F.</th>
-							<th class="title" id="h8">F.S.</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -43,7 +42,7 @@
 								{{ row.item_price|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.item_price_discount|e }}
+								{{ row.item_category|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
@@ -57,24 +56,6 @@
 								</a>
 								{% else %}
 								{{ row.supplier_id|e }}
-								{% endif %}
-							</td>
-							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{%
-								if 'superuser' in session['user_roles']
-								or 'partner_sites_admin' in session['user_roles']
-								or 'partner_sites_read' in session['user_roles']
-								%}
-									{% if row.supplier_site_id %}
-									<a class="tab-link" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}" style=""
-									   title="Visualizza">
-										{{ row.supplier_site_id|e }}
-									</a>
-									{% else %}
-									{{ row.supplier_site_id|e }}
-									{% endif %}
-								{% else %}
-								{{ row.supplier_site_id|e }}
 								{% endif %}
 							</td>
 						</tr>

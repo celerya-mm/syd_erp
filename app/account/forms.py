@@ -5,9 +5,9 @@ from wtforms import PasswordField, StringField, SubmitField, EmailField, SelectF
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
 from app.app import db, session
+from app.functions import mount_full_address, mount_full_name, status_true_false, not_empty
 from .functions import psw_verify, psw_contain_usr
 from .models import User
-from ..functions import mount_full_address, mount_full_name, status_true_false, not_empty
 
 
 def list_user():
@@ -69,7 +69,7 @@ class FormUserCreate(FlaskForm):
 		'Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)], default=""
 	)
 
-	active = BooleanField("Attivo", false_values=(False, ))
+	active = BooleanField("Attivo", false_values=(False,))
 
 	syd_user = StringField('User SYD', validators=[Optional(), Length(min=3, max=25)])
 
@@ -215,7 +215,8 @@ class FormUserUpdate(FlaskForm):
 			'phone': not_empty(self.phone.data).strip(),
 
 			'plant_id': self.plant_id.data.split(' - ')[0] if self.plant_id.data not in ['-', None] else None,
-			'plant_site_id': self.plant_site_id.data.split(' - ')[0] if self.plant_site_id.data not in ['-', None] else None,
+			'plant_site_id': self.plant_site_id.data.split(' - ')[0] if self.plant_site_id.data not in ['-',
+																										None] else None,
 
 			'note': not_empty(self.note.data.strip()),
 			'updated_at': datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")

@@ -19,6 +19,8 @@ class Invoice(db.Model):
 	invoice_year = db.Column(db.Integer, index=True, unique=False, nullable=True)
 
 	invoice_description = db.Column(db.String(255), index=False, unique=False, nullable=False)
+	invoice_category = db.Column(db.String(50), index=True, unique=False, nullable=False)
+
 	invoice_amount = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True, default=None)
 	invoice_currency = db.Column(db.String(3), index=False, unique=False, nullable=False)
 	invoice_payment = db.Column(db.String(50), index=False, unique=False, nullable=False)
@@ -104,6 +106,8 @@ class Invoice(db.Model):
 			'invoice_year': self.invoice_date.year,
 
 			'invoice_description': self.invoice_description,
+			'invoice_category': self.invoice_category,
+
 			'invoice_amount': self.invoice_amount,
 			'invoice_currency': self.invoice_currency,
 			'invoice_payment': self.invoice_payment,

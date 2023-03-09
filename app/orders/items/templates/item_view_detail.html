@@ -94,11 +94,19 @@
 		</div>
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="form-group">
+			<div class="col-md-8 order-first">
 				<div class="form-group">
 					<h6> Descrizione </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
 						{{ form.item_description }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-4 order-first">
+				<div class="form-group">
+					<h6> Categoria </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.item_category }}
 					</p>
 				</div>
 			</div>

@@ -31,7 +31,7 @@
 					</p>
 				</div>
 			</div>
-			<div class="col-md-2 order-first">
+			<div class="col-md-2 order-second">
 				<div class="form-group">
 					<a href="{{ url_for(order_detail, _id=form.oda_id) }}" title="Vai al fornitore">
 						Ordine ID
@@ -41,12 +41,22 @@
 					</p>
 				</div>
 			</div>
+			<div class="col-md-4 order-third">
+				<div class="form-group">
+					<h6> categoria </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.item_category }}
+					</p>
+				</div>
+			</div>
 		</div>
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="col-md-2 order-first">
 				<div class="form-group">
-					<h6> Cod. Art. </h6>
+					<a href="{{ url_for(item_detail, _id=itm_id) }}" title="Vai all' Articolo">
+						Cod. Art.
+					</a>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
 						{{ form.item_code }}
 					</p>

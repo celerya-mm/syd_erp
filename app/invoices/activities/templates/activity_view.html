@@ -17,6 +17,7 @@
 						<tr style="background-color: #2B4692; vertical-align: center;">
 							<th class="title" id="h1">ID</th>
 							<th class="title" id="h2">Codice</th>
+							<th class="title" id="h3">Categoria</th>
 							<th class="title" id="h4">Descrizione</th>
 							<th class="title" id="h5">Prezzo</th>
 							<th class="title" id="h6">Impegno (h)</th>
@@ -33,6 +34,9 @@
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{{ row.activity_code|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.activity_category|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{{ row.activity_description|e }}

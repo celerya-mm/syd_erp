@@ -13,7 +13,9 @@ class OdaRow(db.Model):
 
 	item_code = db.Column(db.String(8), db.ForeignKey('items.item_code'), index=True, unique=False, nullable=False)
 	item_code_supplier = db.Column(db.String(25), index=True, unique=False, nullable=True)
-	item_description = db.Column(db.String(500), index=True, unique=False, nullable=False)
+
+	item_description = db.Column(db.String(500), index=False, unique=False, nullable=False)
+	item_category = db.Column(db.String(50), index=True, unique=False, nullable=False)
 
 	item_price = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True)
 	item_price_discount = db.Column(db.Float, index=False, unique=False, nullable=True)  # considerato in %
@@ -45,35 +47,13 @@ class OdaRow(db.Model):
 	def __str__(self):
 		return f'<ORDER_ROW_CLASS: [{self.item_code}] - {self.item_description}>'
 
-	def calculate_item_amount(self):
-		if self.item_price and self.item_quantity and self.item_price_discount:
-			item_amount = (self.item_price * self.item_quantity) * ((100 - self.item_price_discount) / 100)
-		elif self.item_price and self.item_quantity:
-			item_amount = (self.item_price * self.item_quantity)
-		else:
-			item_amount = 0
-
-		self.item_amount = item_amount
-
-	def update_item_amount(self):
-		if self["item_price"] and self['item_quantity'] and self['item_price_discount']:
-			item_amount = (self["item_price"] * self['item_quantity']) * ((100 - self['item_price_discount']) / 100)
-		elif self["item_price"] and self['item_quantity']:
-			item_amount = (self["item_price"] * self['item_quantity'])
-		else:
-			item_amount = 0
-
-		self['item_amount'] = item_amount
-
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""
-		self.calculate_item_amount()
 		db.session.add(self)
 		db.session.commit()
 
 	def update(_id, data):  # noqa
 		"""Salva le modifiche a un record."""
-		OdaRow.update_item_amount(data)
 		OdaRow.query.filter_by(id=_id).update(data)
 		db.session.commit()
 
@@ -91,7 +71,9 @@ class OdaRow(db.Model):
 
 			'item_code': self.item_code,
 			'item_code_supplier': self.item_code_supplier,
+
 			'item_description': self.item_description,
+			'item_category': self.item_category,
 
 			'item_price': self.item_price,
 			'item_price_discount': self.item_price_discount,

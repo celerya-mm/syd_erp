@@ -82,10 +82,19 @@ def oda_view():
 	s_labels = [sub["supplier_id"] for sub in g_supplier]
 	s_values = [sub['oda_amount'] for sub in g_supplier]
 
+	# raggruppa per categoria
+	g_category = dict_group_by(_list, 'oda_date', group_f="oda_category", amount='oda_amount', year=True)
+	c_labels = [sub["oda_category"] for sub in g_category]
+	c_values = [sub['oda_amount'] for sub in g_category]
+
 	db.session.close()
-	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, detail=DETAIL_FOR, partner_detail=PARTNER_DETAIL,
-						   site_detail=SITE_DETAIL, y_labels=json.dumps(y_labels), y_values=json.dumps(y_values),
-						   s_labels=json.dumps(s_labels), s_values=json.dumps(s_values))
+	return render_template(
+		VIEW_HTML, form=_list, create=CREATE_FOR, detail=DETAIL_FOR, partner_detail=PARTNER_DETAIL,
+		site_detail=SITE_DETAIL,
+		y_labels=json.dumps(y_labels), y_values=json.dumps(y_values),
+		s_labels=json.dumps(s_labels), s_values=json.dumps(s_values),
+		c_labels=json.dumps(c_labels), c_values=json.dumps(c_values),
+	)
 
 
 @oda_bp.route(CREATE, methods=["GET", "POST"])
@@ -115,6 +124,8 @@ def oda_create(p_id, s_id=None):
 				oda_number=form_data['oda_number'],
 				oda_date=form_data['oda_date'],
 				oda_description=form_data['oda_description'],
+				oda_category=form_data['oda_category'],
+
 				oda_delivery_date=form_data['oda_delivery_date'],
 				oda_currency=form_data['oda_currency'],
 				oda_payment=form_data['oda_payment'],

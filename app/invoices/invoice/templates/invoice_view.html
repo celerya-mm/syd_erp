@@ -34,6 +34,12 @@
 										<canvas id="chart_clients"></canvas>
 									</div>
 								</div>
+								<!-- GRAFICO PER CATEGORIA FATTURA -->
+								<div class="col-md-4 order-second">
+									<div class="card chart-container">
+										<canvas id="chart_categories"></canvas>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -58,13 +64,13 @@
 							<th class="title" id="h2">Invoice</th>
 							<th class="title" id="h3">Data</th>
 							<th class="title" id="h4">Anno</th>
-							<th class="title" id="h5">Descrizione</th>
-							<th class="title" id="h6">Totale</th>
-							<th class="title" id="h7">Stato</th>
-							<th class="title" id="h8">Scadenza</th>
-							<th class="title" id="h9">Sc.</th>
-							<th class="title" id="h10">C.</th>
-							<th class="title" id="h11">C.S.</th>
+							<th class="title" id="h5">Categoria</th>
+							<th class="title" id="h6">Descrizione</th>
+							<th class="title" id="h7">Totale</th>
+							<th class="title" id="h8">Stato</th>
+							<th class="title" id="h9">Scadenza</th>
+							<th class="title" id="h11">Sc.</th>
+							<th class="title" id="h12">C.</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -85,13 +91,16 @@
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{{ row.invoice_year|e }}
 							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.invoice_category|e }}
+							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{{ row.invoice_description|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{{ row.invoice_amount|e }}
 							</td>
-							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{% if row.invoice_status == "Pagata_OK" or row.invoice_status == "Pagata_Ritardo"%}
 								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
 								{% elif row.invoice_status == "Scaduta" %}
@@ -126,24 +135,6 @@
 								</a>
 								{% else %}
 								{{ row.client_id|e }}
-								{% endif %}
-							</td>
-							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{%
-								if 'superuser' in session['user_roles']
-								or 'partner_sites_admin' in session['user_roles']
-								or 'partner_sites_read' in session['user_roles']
-								%}
-									{% if row.client_site_id %}
-									<a class="tab-link" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}" style=""
-									   title="Visualizza">
-										{{ row.client_site_id|e }}
-									</a>
-									{% else %}
-									{{ row.client_site_id|e }}
-									{% endif %}
-								{% else %}
-								{{ row.client_site_id|e }}
 								{% endif %}
 							</td>
 						</tr>
@@ -218,6 +209,38 @@
     };
     const ctx1 = document.getElementById('chart_clients').getContext('2d');
     const myChart1 = new Chart(ctx1, config1);
+    
+	// Impostazioni grafico CATEGORIE
+    let c_labels = JSON.parse({{ c_labels | tojson }})
+    console.log("LABELS: ", c_labels)
+    let c_values = JSON.parse({{ c_values | tojson }})
+    // console.log("VALUES: ", c_values)
+    const data2 = {
+        labels: c_labels,
+        datasets: [{
+            label: "Fatture per Categoria (5 anni)",
+            data: c_values,
+            fill: false,
+            backgroundColor: "#5B5A5B", //grey
+            borderRadius: 2,
+        }]
+    };
+    const config2 = {
+        type: 'bar',
+        data: data2,
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                	ticks: {
+                    	font: { size: 8 }
+                	}
+                }
+            }
+        }
+    };
+    const ctx2 = document.getElementById('chart_categories').getContext('2d');
+    const myChart2 = new Chart(ctx2, config2);
 
     $(document).ready(function () {
         $('#data').DataTable({
