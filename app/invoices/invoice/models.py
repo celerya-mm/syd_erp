@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, date
 from app.app import db
 
 # importazioni per creare relazioni in tabella
@@ -16,6 +16,8 @@ class Invoice(db.Model):
 
 	invoice_number = db.Column(db.String(8), index=True, unique=True, nullable=False)
 	invoice_date = db.Column(db.Date, index=False, unique=False, nullable=False)
+	invoice_year = db.Column(db.Integer, index=True, unique=False, nullable=True)
+
 	invoice_description = db.Column(db.String(255), index=False, unique=False, nullable=False)
 	invoice_amount = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True, default=None)
 	invoice_currency = db.Column(db.String(3), index=False, unique=False, nullable=False)
@@ -57,56 +59,13 @@ class Invoice(db.Model):
 	def __str__(self):
 		return f'<INVOICE_CLASS: [{self.invoice_number}] - {self.invoice_description}>'
 
-	def calc_expiration(self):
-		"""Calcola data scadenza pagamento."""
-		if self.invoice_payment:
-			# calcola l'ultimo giorno del mese della data di fattura
-			fine_mese = (self.invoice_date + timedelta(days=32)).replace(day=1) - timedelta(days=1)
-
-			if '30' in self.invoice_payment:
-				self.invoice_expiration_date = fine_mese + timedelta(days=30)
-			elif '60' in self.invoice_payment:
-				self.invoice_expiration_date = fine_mese + timedelta(days=60)
-			elif '90' in self.invoice_payment:
-				self.invoice_expiration_date = fine_mese + timedelta(days=90)
-			else:
-				self.invoice_expiration_date = self.invoice_date
-		else:
-			self.invoice_expiration_date = None
-
-		return self
-
-	def update_expiration(self):
-		"""Calcola data scadenza pagamento."""
-		from datetime import datetime
-
-		if self['invoice_payment']:
-			# calcola l'ultimo giorno del mese della data di fattura
-			fine_mese = (datetime.strptime(self['invoice_date'], '%Y-%m-%d') + timedelta(days=32)).replace(day=1) - \
-						timedelta(days=1)
-
-			if '30' in self['invoice_payment']:
-				self['invoice_expiration_date'] = fine_mese + timedelta(days=30)
-			elif '60' in self['invoice_payment']:
-				self['invoice_expiration_date'] = fine_mese + timedelta(days=60)
-			elif '90' in self['invoice_payment']:
-				self['invoice_expiration_date'] = fine_mese + timedelta(days=90)
-			else:
-				self['invoice_expiration_date'] = self['invoice_date'] or None
-		else:
-			self['invoice_expiration_date'] = None
-
-		return self
-
 	def create(self):
 		"""Crea un nuovo record e lo salva nel db."""
-		self.calc_expiration()
 		db.session.add(self)
 		db.session.commit()
 
 	def update(_id, data):  # noqa
 		"""Salva le modifiche a un record."""
-		Invoice.update_expiration(data)
 		Invoice.query.filter_by(id=_id).update(data)
 		db.session.commit()
 
@@ -129,11 +88,21 @@ class Invoice(db.Model):
 		else:
 			expiration = None
 
+		if expiration not in [None, '']:
+			if self.invoice_status not in ['Pagata_OK', 'Pagata_Ritardo']:
+				expired = bool(expiration < date.today())
+			else:
+				expired = False
+		else:
+			expired = False
+
 		return {
 			'id': self.id,
 
 			'invoice_number': self.invoice_number,
 			'invoice_date': date_to_str(self.invoice_date, "%Y-%m-%d"),
+			'invoice_year': self.invoice_date.year,
+
 			'invoice_description': self.invoice_description,
 			'invoice_amount': self.invoice_amount,
 			'invoice_currency': self.invoice_currency,
@@ -141,6 +110,7 @@ class Invoice(db.Model):
 			'invoice_status': self.invoice_status,
 
 			'invoice_expiration_date': date_to_str(expiration),
+			'invoice_expired': expired,
 
 			'invoice_pdf': self.invoice_pdf,
 

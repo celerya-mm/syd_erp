@@ -22,8 +22,6 @@ class InvoiceRow(db.Model):
 	activity_quantity = db.Column(db.Float, index=False, unique=False, nullable=True)
 	activity_quantity_um = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
-	activity_estimated_time = db.Column(db.Float, index=False, unique=False, nullable=True)
-
 	activity_amount = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True)
 
 	invoice_id = db.Column(db.Integer, db.ForeignKey('invoices.id', ondelete='CASCADE'), nullable=False)
@@ -49,11 +47,11 @@ class InvoiceRow(db.Model):
 
 	def calculate_activity_amount(self):
 		if self.activity_price and self.activity_quantity and self.activity_price_discount:
-			activity_amount = (self.activity_price * self.activity_quantity) * (
-					(100 - self.activity_price_discount) / 100
+			activity_amount = (float(self.activity_price) * float(self.activity_quantity)) * (
+					(100 - float(self.activity_price_discount)) / 100
 			)
 		elif self.activity_price and self.activity_quantity:
-			activity_amount = (self.activity_price * self.activity_quantity)
+			activity_amount = (float(self.activity_price) * float(self.activity_quantity))
 		else:
 			activity_amount = 0
 
@@ -104,8 +102,6 @@ class InvoiceRow(db.Model):
 
 			'activity_quantity': self.activity_quantity,
 			'activity_quantity_um': self.activity_quantity_um,
-
-			'activity_estimated_time': self.activity_estimated_time,
 
 			'activity_amount': self.activity_amount,
 

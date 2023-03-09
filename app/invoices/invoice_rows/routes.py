@@ -17,7 +17,7 @@ invoice_rows_bp = Blueprint(
 )
 
 
-CREATE = "/create/<int:inv_id>/<int:p_id>/<int:s_id>/"
+CREATE = "/create/<int:inv_id>/<int:c_id>/<int:s_id>/"
 CREATE_FOR = "invoice_rows_bp.invoice_rows_create"
 CREATE_HTML = "invoice_rows_create.html"
 
@@ -37,12 +37,12 @@ DELETE_FOR = "invoice_rows_bp.invoice_rows_delete"
 @timer_func
 @token_user_validate
 @access_required(roles=['invoice_rows_admin', 'invoice_rows_write'])
-def invoice_rows_create(inv_id, p_id, s_id=None):
+def invoice_rows_create(inv_id, c_id, s_id=None):
 	"""Creazione Riga Fattura."""
 	from app.invoices.invoice.routes import DETAIL_FOR as INVOICE_DETAIL
 	from app.invoices.activities.models import Activity
 
-	form = FormInvoiceRowCreate.new(p_id=p_id)
+	form = FormInvoiceRowCreate.new()
 	if request.method == 'POST' and form.validate():
 		try:
 			form_data = json.loads(json.dumps(request.form))
@@ -66,11 +66,10 @@ def invoice_rows_create(inv_id, p_id, s_id=None):
 
 				activity_quantity=_activity.activity_quantity if _activity.activity_quantity else None,
 				activity_quantity_um=_activity.activity_quantity_um if _activity.activity_quantity_um else None,
-				activity_estimated_time=_activity.activity_estimated_time if _activity.activity_estimated_time else None,
 
 				invoice_id=inv_id,
 
-				client_id=p_id,
+				client_id=c_id,
 				client_site_id=s_id if s_id not in [0, None] else None,
 
 				note=None,
@@ -149,7 +148,7 @@ def invoice_rows_update(_id):
 		.options(joinedload(InvoiceRow.client)) \
 		.options(joinedload(InvoiceRow.client_site)).get(_id)
 
-	form = FormInvoiceRowUpdate.update(obj=invoice_row, p_id=invoice_row.supplier_id)
+	form = FormInvoiceRowUpdate.update(obj=invoice_row, p_id=invoice_row.client_id)
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormInvoiceRowUpdate(request.form).to_dict()
@@ -163,7 +162,7 @@ def invoice_rows_update(_id):
 		if invoice_row.activity_code != new_data["activity_code"]:
 			from app.invoices.activities.models import Activity
 
-			flash("Cambiato codice Articolo. Controlla la riga d'ordine.")
+			flash("Cambiato codice Attività. Controlla la riga della Fattura.")
 
 			_activity = Activity.query.filter_by(activity_code=new_data["activity_code"]).first()
 			if _activity:
@@ -171,13 +170,11 @@ def invoice_rows_update(_id):
 				new_data['activity_price'] = _activity.activity_price
 				new_data['activity_quantity'] = _activity.activity_quantity
 				new_data['activity_quantity_um'] = _activity.activity_quantity_um
-				new_data['activity_estimated_time'] = _activity.activity_estimated_time
 			else:
 				new_data['activity_description'] = None
 				new_data['activity_price'] = None
 				new_data['activity_quantity'] = None
 				new_data['activity_quantity_um'] = None
-				new_data['activity_estimated_time'] = None
 
 		try:
 			InvoiceRow.update(_id, new_data)

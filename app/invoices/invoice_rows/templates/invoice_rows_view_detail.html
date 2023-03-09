@@ -5,14 +5,14 @@
 	{{ form.csrf_token }}
 	<div class="container text-center mt-2">
 		<h5 class="card-title">
-			Dettaglio RIGA ORDINE ID: [ {{ form.id }} ]
+			Dettaglio RIGA id: [ {{ form.id }} ] FATTURA id: [ {{ form.invoice_id }} ]
 			{%
 			if 'superuser' in session['user_roles']
-			or 'oda_rows_admin' in session['user_roles']
-			or 'oda_rows_write' in session['user_roles']
+			or 'invoice_rows_admin' in session['user_roles']
+			or 'invoice_rows_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
-			   title="Modifica Articolo"
+			   title="Modifica Attività"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
 			</a>
@@ -27,36 +27,36 @@
 				<div class="form-group">
 					<h6> Totale riga </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.item_amount }}
+						{{ form.activity_amount }}
 					</p>
 				</div>
 			</div>
-			<div class="col-md-2 order-first">
+			<div class="col-md-10 order-second">
 				<div class="form-group">
-					<a href="{{ url_for(order_detail, _id=form.oda_id) }}" title="Vai al fornitore">
-						Ordine ID
-					</a>
-					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.oda_id }}
-					</p>
-				</div>
+				<h6> Descrizione </h6>
+				<p class="form-control emphasis" style="font-weight: bold; color: white">
+					{{ form.activity_description }}
+				</p>
+			</div>
 			</div>
 		</div>
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="col-md-2 order-first">
+			<div class="col-md-1 order-first">
 				<div class="form-group">
-					<h6> Cod. Art. </h6>
+					<a href="{{ url_for(invoice_detail, _id=form.invoice_id) }}" title="Vai alla fattura">
+						Fattura
+					</a>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.item_code }}
+						{{ form.invoice_id }}
 					</p>
 				</div>
 			</div>
-			<div class="col-md-2 order-second">
+			<div class="col-md-2 order-first">
 				<div class="form-group">
-					<h6> Cod. F. </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.item_code_supplier }}
+					<h6> Cod. Attività. </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.activity_code }}
 					</p>
 				</div>
 			</div>
@@ -64,58 +64,39 @@
 				<div class="form-group">
 					<h6> Prezzo </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.item_price }}
+						{{ form.activity_price }}
 					</p>
 				</div>
 			</div>
 			<div class="col-md-2 order-fourth">
 				<div class="form-group">
-					<div class="form-group">
-						<h6> Sconto </h6>
-						<p class="form-control emphasis" style="font-weight: bold; color: white">
-							{{ form.item_price_discount }}
-						</p>
-					</div>
+					<h6> Sconto </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.activity_price_discount }}
+					</p>
 				</div>
 			</div>
 			<div class="col-md-1 order-fifth">
 				<div class="form-group">
-					<div class="form-group">
-						<h6> Valuta </h6>
-						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-							{{ form.item_currency }}
-						</p>
-					</div>
+					<h6> Valuta </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.activity_currency }}
+					</p>
 				</div>
 			</div>
 			<div class="col-md-2 order-sixth">
 				<div class="form-group">
-					<div class="form-group">
-						<h6> Quantità </h6>
-						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-							{{ form.item_quantity }}
-						</p>
-					</div>
+					<h6> Quantità </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.activity_quantity }}
+					</p>
 				</div>
 			</div>
 			<div class="col-md-1 order-seventh">
 				<div class="form-group">
-					<div class="form-group">
-						<h6> U.M. </h6>
-						<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-							{{ form.item_quantity_um }}
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row no-gutters justify-content-center rounded"
-			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="form-group">
-				<div class="form-group">
-					<h6> Descrizione </h6>
-					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.item_description }}
+					<h6> U.M. </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.activity_quantity_um }}
 					</p>
 				</div>
 			</div>
@@ -125,10 +106,10 @@
 			<div class="col-md-12 order-first">
 				<div class="form-group">
 					<a href="{{ url_for(partner_detail, _id=p_id) }}" title="Vai al fornitore">
-						Fornitore
+						Cliente
 					</a>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.supplier_id }}
+						{{ form.client_id }}
 					</p>
 				</div>
 			</div>
@@ -139,10 +120,10 @@
 			<div class="col-md-12 order-first">
 				<div class="form-group">
 					<a href="{{ url_for(site_detail, _id=s_id) }}" title="Vai al sito del fornitore">
-						Sito Fornitore
+						Sito Cliente
 					</a>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.supplier_site_id }}
+						{{ form.client_site_id }}
 					</p>
 				</div>
 			</div>
@@ -192,8 +173,8 @@
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
 								if 'superuser' in session['user_roles']
-								or 'partner_contacts_admin' in session['user_roles']
-								or 'partner_contacts_write' in session['user_roles']
+								or 'invoice_rows_admin' in session['user_roles']
+								or 'invoice_rows_write' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(event_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -245,6 +226,7 @@
             },
         });
     });
+
 
 </script>
 {% endblock %}

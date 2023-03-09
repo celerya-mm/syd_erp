@@ -190,6 +190,8 @@ class FormInvoice(FlaskForm):
 		return {
 			'invoice_number': self.invoice_number.data,
 			'invoice_date': date_to_str(self.invoice_date.data),
+			'invoice_year': self.invoice_date.data.year,
+
 			'invoice_description': self.invoice_description.data.strip().replace('  ', ' '),
 			'invoice_currency': self.invoice_currency.data,
 			'invoice_payment': not_empty(self.invoice_payment.data),

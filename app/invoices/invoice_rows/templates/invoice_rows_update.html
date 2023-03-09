@@ -8,43 +8,31 @@
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
 			</a>
-			Modifica RIGA ORDINE ID: [ {{ id }} ] - ORDINE ID: [ {{ o_id }} ]:
+			Modifica RIGA id: [ {{ id }} ] - FATTURA id: [ {{ inv_id }} ]:
 		</h5>
 		<form class="shadow rounded" enctype="multipart/form-data" method="POST"
 			  style="border: solid 2px #ED6666 !important;">
 			{{ form.csrf_token }}
 			<div class="row no-gutters justify-content-center rounded"
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="col-md-3 order-first">
+				<div class="col-md-2 order-first">
 					<div class="form-group">
-						{{ form.item_code.label(style="font-size: 1.2rem;") }}
-						{{ form.item_code(class="form-control emphasis", style="text-align: center;") }}
-						{% if form.item_code.errors %}
-						{% for error in form.item_code.errors %}
+						{{ form.activity_code.label(style="font-size: 1.2rem;") }}
+						{{ form.activity_code(class="form-control emphasis", style="text-align: center;") }}
+						{% if form.activity_code.errors %}
+						{% for error in form.activity_code.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-3 order-second">
+				<div class="col-md-10 order-first">
 					<div class="form-group">
-						{{ form.item_code_supplier.label(style="font-size: 1.2rem;") }}
-						{{ form.item_code_supplier(class="form-control emphasis") }}
-						{% if form.item_code_supplier.errors %}
-						{% for error in form.item_code_supplier.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-				<div class="col-md-3 order-third">
-					<div class="form-group">
-						{{ form.supplier_id.label(style="font-size: 1.2rem;") }}
-						{{ form.supplier_id(class="form-control") }}
-						{% if form.supplier_id.errors %}
-						{% for error in form.supplier_id.errors %}
+						{{ form.activity_description.label(style="font-size: 1.2rem;") }}
+						{{ form.activity_description(class="form-control emphasis") }}
+						{% if form.activity_description.errors %}
+						{% for error in form.activity_description.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
@@ -56,10 +44,10 @@
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 				<div class="col-md-2 order-first">
 					<div class="form-group">
-						{{ form.item_price.label(style="font-size: 1.2rem;") }}
-						{{ form.item_price(class="form-control emphasis") }}
-						{% if form.item_price.errors %}
-						{% for error in form.item_price.errors %}
+						{{ form.client_id.label(style="font-size: 1.2rem;") }}
+						{{ form.client_id(class="form-control emphasis") }}
+						{% if form.client_id.errors %}
+						{% for error in form.client_id.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
@@ -68,34 +56,34 @@
 				</div>
 				<div class="col-md-2 order-second">
 					<div class="form-group">
-						{{ form.item_price_discount.label(style="font-size: 1.2rem;") }}
-						{{ form.item_price_discount(class="form-control") }}
-						{% if form.item_price_discount.errors %}
-						{% for error in form.item_price_discount.errors %}
+						{{ form.activity_price.label(style="font-size: 1.2rem;") }}
+						{{ form.activity_price(class="form-control emphasis") }}
+						{% if form.activity_price.errors %}
+						{% for error in form.activity_price.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-1 order-third">
+				<div class="col-md-2 order-third">
 					<div class="form-group">
-						{{ form.item_currency.label(style="font-size: 1.2rem;") }}
-						{{ form.item_currency(class="form-control") }}
-						{% if form.item_currency.errors %}
-						{% for error in form.item_currency.errors %}
+						{{ form.activity_price_discount.label(style="font-size: 1.2rem;") }}
+						{{ form.activity_price_discount(class="form-control") }}
+						{% if form.activity_price_discount.errors %}
+						{% for error in form.activity_price_discount.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
 						{% endif %}
 					</div>
 				</div>
-				<div class="col-md-2 order-fourth">
+				<div class="col-md-1 order-fourth">
 					<div class="form-group">
-						{{ form.item_quantity.label(style="font-size: 1.2rem;") }}
-						{{ form.item_quantity(class="form-control emphasis") }}
-						{% if form.item_quantity.errors %}
-						{% for error in form.item_quantity.errors %}
+						{{ form.activity_currency.label(style="font-size: 1.2rem;") }}
+						{{ form.activity_currency(class="form-control") }}
+						{% if form.activity_currency.errors %}
+						{% for error in form.activity_currency.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
@@ -104,10 +92,22 @@
 				</div>
 				<div class="col-md-2 order-fifth">
 					<div class="form-group">
-						{{ form.item_quantity_um.label(style="font-size: 1.2rem;") }}
-						{{ form.item_quantity_um(class="form-control", style="text-align: center;") }}
-						{% if form.item_quantity_um.errors %}
-						{% for error in form.item_quantity_um.errors %}
+						{{ form.activity_quantity.label(style="font-size: 1.2rem;") }}
+						{{ form.activity_quantity(class="form-control emphasis") }}
+						{% if form.activity_quantity.errors %}
+						{% for error in form.activity_quantity.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-md-2 order-sixth">
+					<div class="form-group">
+						{{ form.activity_quantity_um.label(style="font-size: 1.2rem;") }}
+						{{ form.activity_quantity_um(class="form-control", style="text-align: center;") }}
+						{% if form.activity_quantity_um.errors %}
+						{% for error in form.activity_quantity_um.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}
@@ -119,25 +119,10 @@
 				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 				<div class="col-md-12 order-first">
 					<div class="form-group">
-						{{ form.item_description.label(style="font-size: 1.2rem;") }}
-						{{ form.item_description(class="form-control emphasis") }}
-						{% if form.item_description.errors %}
-						{% for error in form.item_description.errors %}
-						<span class="text-danger">{{ error }}</span>
-						<br>
-						{% endfor %}
-						{% endif %}
-					</div>
-				</div>
-			</div>
-			<div class="row no-gutters justify-content-center rounded"
-				 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-				<div class="col-md-12 order-first">
-					<div class="form-group">
-						{{ form.supplier_site_id.label(style="font-size: 1.2rem;") }}
-						{{ form.supplier_site_id(class="form-control emphasis") }}
-						{% if form.supplier_site_id.errors %}
-						{% for error in form.supplier_site_id.errors %}
+						{{ form.client_site_id.label(style="font-size: 1.2rem;") }}
+						{{ form.client_site_id(class="form-control emphasis") }}
+						{% if form.client_site_id.errors %}
+						{% for error in form.client_site_id.errors %}
 						<span class="text-danger">{{ error }}</span>
 						<br>
 						{% endfor %}

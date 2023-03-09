@@ -24,7 +24,7 @@ app.config.from_object(Config)
 # imposto la cache per l'app (simple_cache, time_out=3600s)
 cache = Cache(app)
 
-# secret = secrets.token_urlsafe(32)
+# secret key
 app.secret_key = Config.SECRET_KEY
 
 # imposta invio mail

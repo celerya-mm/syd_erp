@@ -13,6 +13,8 @@ class Oda(db.Model):
 
 	oda_number = db.Column(db.String(8), index=True, unique=True, nullable=False)
 	oda_date = db.Column(db.Date, index=False, unique=False, nullable=False)
+	oda_year = db.Column(db.Integer, index=True, unique=False, nullable=True)
+
 	oda_description = db.Column(db.String(255), index=False, unique=False, nullable=False)
 	oda_delivery_date = db.Column(db.Date, index=False, unique=False, nullable=False)
 	oda_amount = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True, default=None)
@@ -72,6 +74,8 @@ class Oda(db.Model):
 
 			'oda_number': self.oda_number,
 			'oda_date': date_to_str(self.oda_date, "%Y-%m-%d"),
+			'oda_year': self.oda_date.year,
+
 			'oda_description': self.oda_description,
 			'oda_delivery_date': date_to_str(self.oda_delivery_date, "%Y-%m-%d"),
 			'oda_amount': self.oda_amount,

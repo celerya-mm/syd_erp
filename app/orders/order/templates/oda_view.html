@@ -39,6 +39,16 @@
 					</div>
 				</div>
 				
+				<!-- Ricerca per anno-->
+                <br>
+                <form method="post">
+                    <label for="year">Anno Ordine:</label>
+                    <input id="year" type='search' name='year' style="width: 80px;"/>
+                    <button type="submit" class="btn" title="Ricerca" style="">
+                        <img src="{{ url_for('static', filename='icons/search.svg') }}" alt="">
+                    </button>
+                </form>
+				
 				<!--	Tabella elenco Ordini-->
 				<div class="table-responsive" style="padding: 10px">
 					<table class="table table-striped" id="data" style="width:100%">
@@ -47,12 +57,13 @@
 							<th class="title" id="h1">ID</th>
 							<th class="title" id="h2">oda</th>
 							<th class="title" id="h3">Data</th>
-							<th class="title" id="h4">Consegna</th>
-							<th class="title" id="h5">Descrizione</th>
-							<th class="title" id="h6">Totale</th>
-							<th class="title" id="h7">Stato</th>
-							<th class="title" id="h8">F.</th>
-							<th class="title" id="h9">F.S.</th>
+							<th class="title" id="h4">Anno</th>
+							<th class="title" id="h5">Consegna</th>
+							<th class="title" id="h6">Descrizione</th>
+							<th class="title" id="h7">Totale</th>
+							<th class="title" id="h8">Stato</th>
+							<th class="title" id="h9">F.</th>
+							<th class="title" id="h10">F.S.</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -69,6 +80,9 @@
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{{ row.oda_date|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.oda_year|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{{ row.oda_delivery_date|e }}

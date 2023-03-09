@@ -173,6 +173,8 @@ class FormOda(FlaskForm):
 		return {
 			'oda_number': self.oda_number.data,
 			'oda_date': date_to_str(self.oda_date.data),
+			'oda_year': self.oda_date.data.year,
+
 			'oda_description': self.oda_description.data.strip().replace('  ', ' '),
 			'oda_delivery_date': date_to_str(self.oda_delivery_date.data),
 			'oda_currency': self.oda_currency.data,

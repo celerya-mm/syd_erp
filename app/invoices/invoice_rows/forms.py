@@ -77,11 +77,11 @@ class FormInvoiceRowCreate(FlaskForm):
 		return f'<INVOICE_ROW_FORM_CREATE: [ {self.activity_code} ]>'
 
 	@classmethod
-	def new(cls, p_id=None):
+	def new(cls):
 		# Instantiate the form
 		form = cls()
 		# Update the choices
-		form.activity_code.choices = list_activities(p_id)
+		form.activity_code.choices = list_activities()
 		return form
 
 
@@ -95,8 +95,6 @@ class FormInvoiceRowUpdate(FlaskForm):
 	activity_price = DecimalField('Prezzo', validators=[DataRequired("Campo obbligatorio!")], places=2)
 	activity_price_discount = DecimalField('Sconto %', validators=[Optional()], places=2)
 	activity_currency = SelectField('Valuta', choices=list_currency)
-
-	activity_estimated_time = DecimalField('Impegno', validators=[Optional()], places=2)
 
 	activity_amount = DecimalField('Totale', validators=[Optional()], places=2)
 
@@ -138,12 +136,10 @@ class FormInvoiceRowUpdate(FlaskForm):
 		form.activity_quantity.data = obj.activity_quantity or None
 		form.activity_quantity_um.data = obj.activity_quantity_um or None
 
-		form.activity_estimated_time.data = obj.activity_estimated_time or None
-
 		form.invoice_id.data = obj.invoice_id
 
 		form.client_id.data = obj.client_id
-		form.client_site_id.data = obj.client_site_id or None
+		# form.client_site_id.data = obj.client_site_id or None
 
 		form.note.data = obj.note or None
 
@@ -170,7 +166,6 @@ class FormInvoiceRowUpdate(FlaskForm):
 
 			'activity_quantity': not_empty(float(self.activity_quantity.data)),
 			'activity_quantity_um': not_empty(self.activity_quantity_um.data),
-			'activity_estimated_time':  not_empty(float(self.activity_estimated_time.data)),
 
 			'client_id': self.client_id.data,
 			'client_site_id': client_site_id,

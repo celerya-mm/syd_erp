@@ -141,21 +141,21 @@ def partner_view_detail(_id):
 	else:
 		sites_list = []
 
-	# Estraggo la lista degli ordini
+	# Estraggo la lista degli Ordini
 	oda_list = partner.orders
 	if oda_list:
 		oda_list = [oda.to_dict() for oda in oda_list]
 	else:
 		oda_list = []
 
-	# Estraggo la lista degli articoli
+	# Estraggo la lista degli Articoli
 	items_list = partner.items
 	if items_list:
 		items_list = [item.to_dict() for item in items_list]
 	else:
 		items_list = []
 
-	# Estraggo la lista delle offerte
+	# Estraggo la lista delle Fatture
 	invoice_list = partner.invoices
 	if invoice_list:
 		invoice_list = [inv.to_dict() for inv in invoice_list]

@@ -237,11 +237,11 @@
 							%}
 							<li class="nav-item">
 								<a class="nav-item nav-link {% if request.path == '/activity/view/' %} active {% endif %}"
-								   href="{{ url_for('activity_bp.activity_view') }}" title="Articoli">
+								   href="{{ url_for('activity_bp.activity_view') }}" title="Attività">
 									{% if request.path == '/activity/view/' %}
-									<img alt="" src="{{ url_for('static', filename='icons/invoice_active.svg') }}">
+									<img alt="" src="{{ url_for('static', filename='icons/activity_active.svg') }}">
 									{% else %}
-									<img alt="" src="{{ url_for('static', filename='icons/invoice_white.svg') }}">
+									<img alt="" src="{{ url_for('static', filename='icons/activity_white.svg') }}">
 									{% endif %}
 									Activities
 								</a>

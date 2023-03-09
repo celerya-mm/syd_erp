@@ -52,8 +52,24 @@ def oda_view():
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 
-	# Estraggo la lista dei partners
-	_list = Oda.query.all()
+	if request.method == 'POST':
+		year = request.form.get('year')
+		print('YEAR:', year)
+		if year:
+			_list = Oda.query.filter_by(oda_year=year).all()
+			if len(_list):
+				flash(f"Ordini trovati: {len(_list)}")
+			else:
+				_list = Oda.query.all()
+				flash("Nessun Ordine emesso nel periodo cercato.")
+				flash('Mostro tutti i records.')
+		else:
+			_list = Oda.query.all()
+			flash(f"Nessun Anno selezionato, mostro tutti i records: {len(_list)}")
+	else:
+		_list = Oda.query.all()
+
+	# Estraggo la lista degli ordini
 	_list = [r.to_dict() for r in _list]
 
 	# raggruppo per anno ordine (5 anni max)

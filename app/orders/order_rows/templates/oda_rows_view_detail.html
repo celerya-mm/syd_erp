@@ -192,8 +192,8 @@
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
 								if 'superuser' in session['user_roles']
-								or 'partner_contacts_admin' in session['user_roles']
-								or 'partner_contacts_write' in session['user_roles']
+								or 'oda_rows_admin' in session['user_roles']
+								or 'oda_rows_write' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(event_detail, _id=row.id) }}"
 								   title="Visualizza Record"

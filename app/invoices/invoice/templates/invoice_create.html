@@ -53,10 +53,10 @@
 				</div>
 				<div class="row no-gutters justify-content-center rounded"
 					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-					<div class="col-md-2 order-first">
+					<div class="col-md-1 order-first">
 						<div class="form-group">
 							{{ form.invoice_currency.label(style="font-size: 1.2rem;") }}
-							{{ form.invoice_currency(class="form-control") }}
+							{{ form.invoice_currency(class="form-control", style="text-align: center;") }}
 							{% if form.invoice_currency.errors %}
 							{% for error in form.invoice_currency.errors %}
 							<span class="text-danger">{{ error }}</span>
@@ -65,7 +65,7 @@
 							{% endif %}
 						</div>
 					</div>
-					<div class="col-md-6 order-second">
+					<div class="col-md-4 order-second">
 						<div class="form-group">
 							{{ form.invoice_payment.label(style="font-size: 1.2rem;") }}
 							{{ form.invoice_payment(class="form-control", style="text-align: center;") }}

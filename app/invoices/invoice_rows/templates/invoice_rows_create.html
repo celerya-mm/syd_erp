@@ -7,7 +7,7 @@
 			<form enctype="multipart/form-data" method="POST">
 				{{ form.csrf_token }}
 				<h5 class="card-title">
-					<a class="btn btn-update" href="{{ url_for(order_view, _id=o_id) }}" title="Annulla"
+					<a class="btn btn-update" href="{{ url_for(invoice_view, _id=inv_id) }}" title="Annulla"
 					   type="button">
 						<img alt="" class="icon-simple"
 							 src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
@@ -18,8 +18,8 @@
 					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 					<div class="col-md-12 order-first">
 						<div class="form-group">
-							{{ form.item_code.label(style="font-size: 1.2rem;") }}
-							{{ form.item_code(class="form-control emphasis") }}
+							{{ form.activity_code.label(style="font-size: 1.2rem;") }}
+							{{ form.activity_code(class="form-control emphasis") }}
 						</div>
 					</div>
 				</div>

@@ -52,8 +52,24 @@ def invoice_view():
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
 
-	# Estraggo la lista dei partners
-	_list = Invoice.query.all()
+	if request.method == 'POST':
+		year = request.form.get('year')
+		print('YEAR:', year)
+		if year:
+			_list = Invoice.query.filter_by(invoice_year=year).all()
+			if len(_list):
+				flash(f"Ordini trovati: {len(_list)}")
+			else:
+				_list = Invoice.query.all()
+				flash("Nessun Fattura emessa nel periodo cercato.")
+				flash('Mostro tutti i records.')
+		else:
+			_list = Invoice.query.all()
+			flash(f"Nessun Anno selezionato, mostro tutti i records: {len(_list)}")
+	else:
+		_list = Invoice.query.all()
+
+	# Estraggo la lista delle fatture
 	_list = [r.to_dict() for r in _list]
 
 	if _list:

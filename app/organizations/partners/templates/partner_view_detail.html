@@ -570,7 +570,7 @@
 						</tr>
 						</thead>
 						<tbody>
-						{% for row in oda_list %}
+						{% for row in invoice_list %}
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
@@ -600,16 +600,19 @@
 								{{ row.invoice_amount|e }}
 							</td>
 							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{% if row.invoice_status == "Pagata_OK" or row.oda_status == "Pagata_Ritardo" %}
+								{% if row.invoice_status == "Pagata_OK" or row.invoice_status == "Pagata_Ritardo" %}
 								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
-								{% elif row.oda_status == "Scaduta" %}
+								{% elif row.invoice_status == "Scaduta" %}
 								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
-								{% elif row.oda_status == "Emessa" %}
+								{% elif row.invoice_status == "Emessa" %}
 								<img alt="" src="{{ url_for('static', filename='icons/check_pending.svg') }}">
 								{% else %}
 								<img alt="" src="{{ url_for('static', filename='icons/check_emitted.svg') }}">
 								{% endif %}
-								{{ row.oda_status }}
+								{{ row.invoice_status }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.invoice_expiration_date|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%

@@ -6,19 +6,18 @@
 		<div class="row no-gutters justify-content-center">
 			<div class="col-md-12 shadow rounded">
 				<h3 style="padding-top: 10px;">
-					Elenco Articoli:</h3>
+					Elenco Righe Fatture:</h3>
 				<div class="table-responsive" style="padding: 10px">
 					<table class="table table-striped" id="data" style="width:100%">
 						<thead>
 						<tr style="background-color: #2B4692; vertical-align: center;">
 							<th class="title" id="h1">ID</th>
 							<th class="title" id="h2">Codice</th>
-							<th class="title" id="h3">Codice F.</th>
 							<th class="title" id="h4">Descrizione</th>
 							<th class="title" id="h5">Prezzo</th>
 							<th class="title" id="h6">Sconto</th>
-							<th class="title" id="h7">F.</th>
-							<th class="title" id="h8">F.S.</th>
+							<th class="title" id="h7">C.</th>
+							<th class="title" id="h8">C.S.</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -31,19 +30,16 @@
 								</a>
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.item_code|e }}
-							</td>
-							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.item_code_supplier|e }}
+								{{ row.activity_code|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.item_description|e }}
+								{{ row.activity_description|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.item_price|e }}
+								{{ row.activity_price|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.item_price_discount|e }}
+								{{ row.activity_price_discount|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
@@ -53,10 +49,10 @@
 								%}
 								<a class="tab-link" href="{{ url_for(partner_detail, _id=row.supplier_id) }}" style=""
 								   title="Visualizza">
-									{{ row.supplier_id|e }}
+									{{ row.client_id|e }}
 								</a>
 								{% else %}
-									{{ row.supplier_id|e }}
+									{{ row.client_id|e }}
 								{% endif %}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
@@ -67,10 +63,10 @@
 								%}
 								<a class="tab-link" href="{{ url_for(site_detail, _id=row.supplier_site_id) }}" style=""
 								   title="Visualizza">
-									{{ row.supplier_site_id|e }}
+									{{ row.client_site_id|e }}
 								</a>
 								{% else %}
-									{{ row.supplier_site_id|e }}
+									{{ row.client_site_id|e }}
 								{% endif %}
 							</td>
 						</tr>
