@@ -4,6 +4,7 @@ from app.app import db
 # importazioni per creare relazioni in tabella
 from app.event_db.models import EventDB  # noqa
 from app.invoices.invoice_rows.models import InvoiceRow  # noqa
+from app.business.opportunities.models import Opportunity  # noqa
 
 
 class Activity(db.Model):
@@ -32,6 +33,8 @@ class Activity(db.Model):
 	plant_site = db.relationship('PlantSite', backref='ps_activities', viewonly=True)
 
 	invoice_rows = db.relationship('InvoiceRow', backref='inv_activities', viewonly=True)
+
+	opportunity = db.relationship('Opportunity', backref='opp_activities', viewonly=True)
 
 	events = db.relationship('EventDB', backref='activities', order_by='EventDB.id.desc()', lazy='dynamic')
 

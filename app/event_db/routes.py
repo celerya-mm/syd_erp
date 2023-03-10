@@ -4,18 +4,15 @@ from datetime import datetime
 from flask import Blueprint, flash, redirect, render_template, url_for
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db
-from .models import EventDB
-
+from app.app import db
 from app.functions import token_user_validate, date_to_str, timer_func
-
+from .models import EventDB
 
 event_bp = Blueprint(
 	'event_bp', __name__,
 	template_folder='templates',
 	static_folder='static'
 )
-
 
 DETAIL = "/event/view/detail/<int:_id>/"
 DETAIL_FOR = "event_bp.event_view_detail"
@@ -28,7 +25,7 @@ RESTORE_FOR = "event_bp.event_restore"
 @timer_func
 def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None, item_id=None,
 				 order_id=None, plant_id=None, plant_site_id=None, oda_row_id=None, activity_id=None, invoice_id=None,
-				 invoice_row_id=None):
+				 invoice_row_id=None, opportunity=None):
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
@@ -50,6 +47,8 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 			activity_id=activity_id,
 			invoice_id=invoice_id,
 			invoice_row_id=invoice_row_id,
+
+			opportunity=opportunity,
 
 			created_at=datetime.now()
 		)
@@ -113,6 +112,9 @@ def event_view_detail(_id):
 
 	from app.invoices.invoice_rows.models import InvoiceRow
 	from app.invoices.invoice_rows.routes import DETAIL_FOR as INVOICE_ROW_DETAIL
+
+	from app.business.opportunities.models import Opportunity
+	from app.business.opportunities.routes import DETAIL_FOR as OPPORTUNITY_DETAIL
 
 	# Interrogo il DB
 	event = EventDB.query.get(_id)
@@ -232,6 +234,17 @@ def event_view_detail(_id):
 			id_related = related["id"]
 			type_related = "InvoiceRow"
 			view_related = INVOICE_ROW_DETAIL
+
+		# Opportunità
+		elif event.opportunity_id:
+			related = Opportunity.query.get(event.opportunity_id)
+			related = related.to_dict()
+			field = "opportunity_id"
+			table = Opportunity.__tablename__
+			id_related = related["id"]
+			type_related = "Opportunity"
+			view_related = OPPORTUNITY_DETAIL
+
 		else:
 			db.session.close()
 			msg = "Nessun record trovato"
@@ -275,9 +288,11 @@ def event_restore(_id, id_record, table, view_for):
 	from app.invoices.invoice.models import Invoice
 	from app.invoices.invoice_rows.models import InvoiceRow
 
+	from app.business.opportunities.models import Opportunity
+
 	try:
 		models = [User, Plant, PlantSite, Partner, PartnerContact, PartnerSite, Item, Oda, OdaRow, Activity, Invoice,
-				  InvoiceRow]
+				  InvoiceRow, Opportunity]
 		model = next((m for m in models if m.__tablename__ == table), None)
 		# print("TABLE_DB:", model, "ID:", id_record)
 		if model:

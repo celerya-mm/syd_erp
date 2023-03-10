@@ -33,6 +33,9 @@ class PlantSite(db.Model):
 	back_plant = db.relationship('Plant', backref='plant_sites', viewonly=True)
 	users = db.relationship('User', backref='plant_sites', order_by='User.last_name.asc()', lazy='dynamic')
 	activities = db.relationship('Activity', backref='plant_sites', lazy='dynamic')
+
+	opportunities = db.relationship('Opportunity', backref='plant_sites', lazy='dynamic')
+
 	events = db.relationship('EventDB', backref='plant_sites', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)

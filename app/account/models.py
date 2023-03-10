@@ -40,6 +40,9 @@ class User(db.Model):
 
 	auth_tokens = db.relationship('AuthToken', backref='users', order_by='AuthToken.id.asc()', lazy='dynamic')
 	roles = db.relationship('Role', secondary='user_roles', backref='users', viewonly=True, lazy='dynamic')
+
+	opportunities = db.relationship('Opportunity', backref='users', viewonly=True, lazy='dynamic')
+
 	events = db.relationship('EventDB', backref='users', order_by='EventDB.id.desc()', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)

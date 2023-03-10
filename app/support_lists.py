@@ -38,6 +38,14 @@ list_invoice_status = [
 	'Scaduta'
 ]
 
+list_opp_status = [
+	'01 - Investigation',
+	'02 - Open',
+	'03 - Work in Progres',
+	'04 - Closed [Converted]',
+	'05 - Closed [Lost]'
+]
+
 list_roles = [
 	'Amministratore Delegato',
 	'Referente Commerciale',
@@ -61,6 +69,7 @@ list_item_categories = [
 	'Consultancy - Technical',
 	'Cloud, Storage e/o Server',
 	'Privacy & Compliance',
+	'Marketing',
 	'Other'
 ]
 
@@ -71,4 +80,15 @@ list_activity_categories = [
 	'Business Opportunity',
 	'Application Development',
 	'IT - Consultancy',
+	'Marketing'
+]
+
+list_opp_categories = [
+	'01 - SYD [Producer]',
+	'02 - SYD [User]',
+	'03 - Partnership',
+	'04 - Application Development',
+	'05 - IT [Consultancy]',
+	'06 - Fundraiser',
+	'07 - Marketing'
 ]

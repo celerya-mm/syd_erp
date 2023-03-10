@@ -27,6 +27,8 @@ class EventDB(db.Model):
     invoice_id = db.Column(db.Integer, db.ForeignKey('invoices.id', ondelete='CASCADE'), nullable=True)
     invoice_row_id = db.Column(db.Integer, db.ForeignKey('invoice_rows.id', ondelete='CASCADE'), nullable=True)
 
+    opportunity = db.Column(db.Integer, db.ForeignKey('opportunities.id', ondelete='CASCADE'), nullable=True)
+
     created_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
@@ -68,6 +70,8 @@ class EventDB(db.Model):
             'activity_id': self.activity_id,
             'invoice_id': self.invoice_id,
             'invoice_row_id': self.invoice_row_id,
+
+            'opportunity': self.opportunity,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

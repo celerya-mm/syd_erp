@@ -143,22 +143,25 @@
 
 {% block scripts %}
 <script>
-	// Impostazioni grafico ANNO ORDINE
+	// Impostazioni grafico ANNO ORDINE #######################################
     let y_labels = JSON.parse({{ y_labels | tojson }})
     // console.log("LABELS: ", y_labels)
+    
     let y_values = JSON.parse({{ y_values | tojson }})
     // console.log("VALUES: ", y_values)
+    
     const data = {
         labels: y_labels,
         datasets: [
         {
-            label: "Ordini 5 anni",
+            label: "Ordini [5 anni]",
             data: y_values,
             fill: false,
             backgroundColor: "#ED6666", //red
             borderRadius: 2,
         }]
     };
+    
     const config = {
         type: 'bar',
         data: data,
@@ -169,25 +172,29 @@
             }
         }
     };
+    
     const ctx = document.getElementById('chart_years').getContext('2d');
     const myChart = new Chart(ctx, config);
 
 
-    // Impostazioni grafico FORNITORE
+    // Impostazioni grafico FORNITORE #######################################
     let s_labels = JSON.parse({{ s_labels | tojson }})
-    console.log("LABELS: ", s_labels)
+    // console.log("LABELS: ", s_labels)
+    
     let s_values = JSON.parse({{ s_values | tojson }})
     // console.log("VALUES: ", s_values)
+    
     const data1 = {
         labels: s_labels,
         datasets: [{
-            label: "Ordini per fornitore (5 anni)",
+            label: "Ordini per fornitore [5 anni]",
             data: s_values,
             fill: false,
             backgroundColor: "#2B4692", //blue
             borderRadius: 2,
         }]
     };
+    
     const config1 = {
         type: 'bar',
         data: data1,
@@ -198,24 +205,28 @@
             }
         }
     };
+    
     const ctx1 = document.getElementById('chart_suppliers').getContext('2d');
     const myChart1 = new Chart(ctx1, config1);
     
-    // Impostazioni grafico CATEGORIE
+    // Impostazioni grafico CATEGORIE #######################################
     let c_labels = JSON.parse({{ c_labels | tojson }})
-    console.log("LABELS: ", c_labels)
+    // console.log("LABELS: ", c_labels)
+    
     let c_values = JSON.parse({{ c_values | tojson }})
     // console.log("VALUES: ", c_values)
+    
     const data2 = {
         labels: c_labels,
         datasets: [{
-            label: "Ordini per Categoria (5 anni)",
+            label: "Ordini per Categoria [5 anni]",
             data: c_values,
             fill: false,
             backgroundColor: "#5B5A5B", //grey
             borderRadius: 2,
         }]
     };
+    
     const config2 = {
         type: 'bar',
         data: data2,
@@ -230,9 +241,11 @@
             }
         }
     };
+    
     const ctx2 = document.getElementById('chart_categories').getContext('2d');
     const myChart2 = new Chart(ctx2, config2);
 
+	// TABELLA ########################
     $(document).ready(function () {
         $('#data').DataTable({
             responsive: {

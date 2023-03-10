@@ -6,7 +6,7 @@
 		<div class="row no-gutters justify-content-center">
 			<div class="col-md-12 shadow rounded">
 				<h3 style="padding-top: 10px;">
-					Elenco Fatture:</h3>
+					Elenco Opportunità:</h3>
 				<div class="accordion" id="head_accordion">
 					<div class="accordion-item">
 						<h2 class="accordion-header" id="1">
@@ -15,26 +15,26 @@
 									data-bs-target="#collapse1"
 									data-bs-toggle="collapse"
 									type="button">
-								Grafici andamento fatturazione
+								Grafici andamento opportunità
 							</button>
 						</h2>
 						<div aria-labelledby="heading1" class="accordion-collapse collapse"
 							 data-bs-parent="#accordion"
 							 id="collapse1">
 							<div class="row no-gutters justify-content-center">
-								<!-- GRAFICO PER ANNO FATTURA -->
+								<!-- GRAFICO PER ANNO OPPORTUNITA' -->
 								<div class="col-md-4 order-first">
 									<div class="card chart-container">
 										<canvas id="chart_years"></canvas>
 									</div>
 								</div>
-								<!-- GRAFICO PER CLIENTE -->
+								<!-- GRAFICO PER PARTNER -->
 								<div class="col-md-4 order-second">
 									<div class="card chart-container">
 										<canvas id="chart_clients"></canvas>
 									</div>
 								</div>
-								<!-- GRAFICO PER CATEGORIA FATTURA -->
+								<!-- GRAFICO PER CATEGORIA OPPORTUNITA' -->
 								<div class="col-md-4 order-second">
 									<div class="card chart-container">
 										<canvas id="chart_categories"></canvas>
@@ -61,16 +61,15 @@
 						<thead>
 						<tr style="background-color: #2B4692; vertical-align: center;">
 							<th class="title" id="h1">ID</th>
-							<th class="title" id="h2">Invoice</th>
-							<th class="title" id="h3">Data</th>
-							<th class="title" id="h4">Anno</th>
-							<th class="title" id="h5">Categoria</th>
-							<th class="title" id="h6">Descrizione</th>
-							<th class="title" id="h7">Totale</th>
-							<th class="title" id="h8">Stato</th>
-							<th class="title" id="h9">Scadenza</th>
-							<th class="title" id="h11">Sc.</th>
-							<th class="title" id="h12">C.</th>
+							<th class="title" id="h2">Data</th>
+							<th class="title" id="h3">Anno</th>
+							<th class="title" id="h4">Categoria</th>
+							<th class="title" id="h5">Descrizione</th>
+							<th class="title" id="h6">Valore</th>
+							<th class="title" id="h7">Stato</th>
+							<th class="title" id="h8">Scadenza</th>
+							<th class="title" id="h9">Sc.</th>
+							<th class="title" id="h10">P.</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -83,45 +82,42 @@
 								</a>
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.invoice_number|e }}
+								{{ row.opp_date|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.invoice_date|e }}
+								{{ row.opp_year|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.invoice_year|e }}
-							</td>
-							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.invoice_category|e }}
+								{{ row.opp_category|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.invoice_description|e }}
+								{{ row.opp_description|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.invoice_amount|e }}
+								{{ row.opp_amount|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{% if row.invoice_status == "Pagata_OK" or row.invoice_status == "Pagata_Ritardo"%}
+								{% if row.opp_status == "Pagata_OK" or row.opp_status == "Pagata_Ritardo"%}
 								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
-								{% elif row.invoice_status == "Scaduta" %}
+								{% elif row.opp_status == "Scaduta" %}
 								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
-								{% elif row.invoice_status == "Emessa" %}
+								{% elif row.opp_status == "Emessa" %}
 								<img alt="" src="{{ url_for('static', filename='icons/check_pending.svg') }}">
 								{% else %}
 								<img alt="" src="{{ url_for('static', filename='icons/check_emitted.svg') }}">
 								{% endif %}
-								{{ row.invoice_status }}
+								{{ row.opp_status }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.invoice_expiration_date|e }}
+								{{ row.opp_expiration_date|e }}
 							</td>
 							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{% if row.invoice_expired == False %}
+								{% if row.opp_expired == False %}
 								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
 								{% else %}
 								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
 								{% endif %}
-								{{ row.invoice_expired }}
+								{{ row.opp_expired }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
@@ -131,10 +127,10 @@
 								%}
 								<a class="tab-link" href="{{ url_for(partner_detail, _id=row.client_id) }}" style=""
 								   title="Visualizza">
-									{{ row.client_id|e }}
+									{{ row.partner_id|e }}
 								</a>
 								{% else %}
-								{{ row.client_id|e }}
+								{{ row.partner_id|e }}
 								{% endif %}
 							</td>
 						</tr>
@@ -163,7 +159,7 @@
         labels: y_labels,
         datasets: [
         {
-            label: "Fatture [5 anni]",
+            label: "Opportunità [5 anni]",
             data: y_values,
             fill: false,
             backgroundColor: "#ED6666", //red
@@ -196,7 +192,7 @@
     const data1 = {
         labels: s_labels,
         datasets: [{
-            label: "Fatture per Cliente [5 anni]",
+            label: "Opportunità per Partner [5 anni]",
             data: s_values,
             fill: false,
             backgroundColor: "#2B4692", //blue
@@ -228,7 +224,7 @@
     const data2 = {
         labels: c_labels,
         datasets: [{
-            label: "Fatture per Categoria [5 anni]",
+            label: "Opportunità per Categoria [5 anni]",
             data: c_values,
             fill: false,
             backgroundColor: "#5B5A5B", //grey

@@ -33,8 +33,11 @@ class Plant(db.Model):
 
 	users = db.relationship('User', backref='plants', order_by='User.last_name.asc()', lazy='dynamic')
 	plant_site = db.relationship('PlantSite', backref='plants', lazy='dynamic')
+
 	activities = db.relationship('Activity', backref='plants', lazy='dynamic')
 	invoices = db.relationship('Invoice', backref='plants', lazy='dynamic')
+
+	opportunities = db.relationship('Opportunity', backref='plants', lazy='dynamic')
 
 	events = db.relationship('EventDB', backref='plants', order_by='EventDB.id.desc()', lazy='dynamic')
 

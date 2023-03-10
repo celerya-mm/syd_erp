@@ -249,6 +249,51 @@
 							{% endif %}
 						</ul>
 					</li>
+					<li class="nav-item dropdown" style="background-color: #2B4692 !important;" title="Opportunities">
+						<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+						   href="#Invoices"
+						   id="DropdownMenuOpportunità" role="button">
+							Opportunities
+						</a>
+						<ul aria-labelledby="DropdownMenuOpportunities" class="dropdown-menu">
+							<!--  Opportunità-->
+							{%
+							if 'superuser' in session['user_roles']
+							or 'opportunities_admin' in session['user_roles']
+							or 'opportunities_read' in session['user_roles']
+							%}
+							<li class="nav-item">
+								<a class="nav-item nav-link {% if request.path == '/opportunity/view/' %} active {% endif %}"
+								   href="{{ url_for('opportunity_bp.opportunity_view') }}" title="Opportunità">
+									{% if request.path == '/opportunity/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/handshake_active.svg') }}">
+									{% else %}
+									<img alt="" src="{{ url_for('static', filename='icons/handshake_white.svg') }}">
+									{% endif %}
+									Opportunity
+								</a>
+							</li>
+							{% endif %}
+							<!--  Azioni-->
+							{%
+							if 'superuser' in session['user_roles']
+							or 'actions_admin' in session['user_roles']
+							or 'actions_read' in session['user_roles']
+							%}
+							<li class="nav-item">
+								<a class="nav-item nav-link {% if request.path == '/action/view/' %} active {% endif %}"
+								   href="{{ url_for('action_bp.action_view') }}" title="Azioni">
+									{% if request.path == '/action/view/' %}
+									<img alt="" src="{{ url_for('static', filename='icons/activity_active.svg') }}">
+									{% else %}
+									<img alt="" src="{{ url_for('static', filename='icons/activity_white.svg') }}">
+									{% endif %}
+									Activities
+								</a>
+							</li>
+							{% endif %}
+						</ul>
+					</li>
 					<li class="nav-item dropdown" style="background-color: #2B4692 !important;" title="Partners">
 						<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 						   href="#Partners"

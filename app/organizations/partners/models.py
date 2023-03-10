@@ -42,10 +42,13 @@ class Partner(db.Model):
 	contacts = db.relationship(
 		'PartnerContact', backref='partners', order_by='PartnerContact.last_name.asc()', lazy='dynamic')
 	sites = db.relationship('PartnerSite', backref='partners', lazy='dynamic')
+
 	orders = db.relationship('Oda', backref='partners', lazy='dynamic')
 	items = db.relationship('Item', backref='partners', lazy='dynamic')
 
 	invoices = db.relationship('Invoice', backref='clients', lazy='dynamic')
+
+	opportunities = db.relationship('Opportunity', backref='clients', lazy='dynamic')
 
 	events = db.relationship('EventDB', backref='partners', order_by='EventDB.id.desc()', lazy='dynamic')
 

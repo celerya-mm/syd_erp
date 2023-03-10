@@ -1,0 +1,412 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<form enctype="multipart/form-data" method="POST">
+	{{ form.csrf_token }}
+	<div class="container text-center mt-2 justify-content-center">
+		<h5 class="card-title">
+			<a class="btn btn-update" href="{{ url_for(view) }}" title="Vai a lista records"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/list_blue.svg') }}"/>
+			</a>
+			Dettaglio FATTURA [ {{ form.id }} ]
+			{%
+			if 'superuser' in session['user_roles']
+			or 'invoices_admin' in session['user_roles']
+			or 'invoices_write' in session['user_roles']
+			%}
+			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
+			   title="Modifica Ordine"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
+			</a>
+			{% if form.invoice_pdf %}
+			<a class="btn btn-update" href="{{ url_for(invoice_download, _id=form.id) }}"
+			   title="Download pdf INVOICE"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/visibility.svg') }}"/>
+			</a>
+			{% else %}
+			<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"/>
+			{% endif %}
+			{% endif %}
+			
+			{%
+			if 'superuser' in session['user_roles']
+			or 'invoice_rows_admin' in session['user_roles']
+			or 'invoice_rows_write' in session['user_roles']
+			%}
+			{% if form.invoice_status == "Lavorazione" %}
+			<a class="btn btn-update" href="{{ url_for(invoice_row_create, inv_id=form.id, c_id=p_id, s_id=0) }}"
+			   title="Aggiungi riga Fattura"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/shopping_cart_add.svg') }}"/>
+			</a>
+			
+			<a class="btn btn-update" href="{{ url_for(invoice_generate, _id=form.id) }}"
+			   title="Genera pdf Fattura"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/print_blue.svg') }}"/>
+			</a>
+			{% else %}
+			<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/shopping_cart_grey.svg') }}"/>
+			<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/print_grey.svg') }}"/>
+			{% endif %}
+			{% endif %}
+		</h5>
+	</div>
+	
+	<div class="container text-center mt-2">
+		<div class="row no-gutters justify-content-center">
+			<div class="col-md-2 order-first">
+				<h6> Totale Fattura: </h6>
+				<p class="form-control emphasis" style="font-weight: bold; color: white;">
+					{{ form.invoice_amount }}
+				</p>
+			</div>
+			
+			<div class="col-md-5 order-second">
+				<div class="form-group">
+					<a href="{{ url_for(partner_detail, _id=p_id) }}" title="Vai all'azienda">
+						Cliente
+					</a>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.client_id }}
+					</p>
+				</div>
+			</div>
+			
+			<div class="col-md-3 order-third">
+				<div class="form-group">
+					<h6> Categoria </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.invoice_category }}
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="col-md-2 order-first">
+				<div class="form-group">
+					<h6> Fattura </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.invoice_number }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-2 order-second">
+				<div class="form-group">
+					<h6> Data </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.invoice_date }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-8 order-third">
+				<div class="form-group">
+					<h6> Descrizione </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.invoice_description }}
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="col-md-1 order-second">
+				<div class="form-group">
+					<h6> Valuta </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.invoice_currency }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-5 order-third">
+				<div class="form-group">
+					<h6> Pagamento </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.invoice_payment }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-3 order-fourth">
+				<div class="form-group">
+					<h6> Stato </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.invoice_status }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-2 order-fifth">
+				<div class="form-group">
+					<h6> Scadenza </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.invoice_expiration_date }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-1 order-sixth">
+				<div class="form-group">
+					<h6> Scaduta </h6>
+					{% if form.invoice_expired == False %}
+					<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
+					{% else %}
+					<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="col-md-2 order-first">
+				<div class="form-group">
+					<h6> Ordine Cliente </h6>
+					<p class="form-control emphasis" style="font-weight: bold; color: white">
+						{{ form.client_order_nr }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-2 order-second">
+				<div class="form-group">
+					<h6> Data ODA </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.client_order_date }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-6 order-fourth">
+				<div class="form-group">
+					{% if form.client_site_id %}
+					<a href="{{ url_for(partner_site_detail, _id=s_id) }}" title="Vai all'azienda">
+						Sito Cliente
+					</a>
+					{% else %}
+					<h6> Sito Cliente </h6>
+					{% endif %}
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.client_site_id }}
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="form-group">
+				<h6> Note </h6>
+				<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+					{{ form.note }}
+				</p>
+			</div>
+		</div>
+	</div>
+</form>
+<div class="container text-center mt-2 mx-auto" style="margin: 0px;">
+	<div class="accordion" id="accordion">
+		<!--	Righe Fattura-->
+		{% if r_len %}
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="2">
+				<button aria-controls="collapse2"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse2"
+						data-bs-toggle="collapse"
+						type="button">
+					Righe Fattura [ {{ r_len }} ]
+				</button>
+			</h2>
+			<div aria-labelledby="heading1"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse2">
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="rows" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" id="r1">ID</th>
+							<th class="title" id="r2">Codice</th>
+							<th class="title" id="r3">Categoria</th>
+							<th class="title" id="r4">Descrizione</th>
+							<th class="title" id="r5">Prezzo</th>
+							<th class="title" id="r6">Sconto</th>
+							<th class="title" id="r7">Q.</th>
+							<th class="title" id="r8">Tot</th>
+							<th class="title" data-sortable="false" id="r9"></th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in rows_list %}
+						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold"
+								style="padding-bottom: 0pz; padding-top: 0pz; width: 20px !important;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'invoice_rows_admin' in session['user_roles']
+								or 'invoice_rows_write' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(row_detail, _id=row.id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.id|e }}
+								</a>
+								{% else %}
+								{{ row.id|e }}
+								{% endif %}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.activity_code|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.activity_category|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.7rem;">
+								{{ row.activity_description|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.activity_price|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.activity_price_discount|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.activity_quantity|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.activity_amount|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles'] and form.oda_status == "Lavorazione"
+								or 'invoice_rows_admin' in session['user_roles'] and form.invoice_status == "Lavorazione"
+								or 'invoice_rows_write' in session['user_roles'] and form.invoice_status == "Lavorazione"
+								%}
+								<a class="btn-table" href="{{ url_for(row_delete, _id=row.id, inv_id=form.id) }}"
+								   title="Rimuovi riga ordine"
+								   type="button">
+									<img alt="" class="icon-table"
+										 src="{{ url_for('static', filename='icons/trash-fill.svg') }}"/>
+								</a>
+								{% else %}
+								<img alt="" class="icon-table"
+									 src="{{ url_for('static', filename='icons/trash-disable.svg') }}"/>
+								{% endif %}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+		<!--	Modifiche Record-->
+		{% if h_len %}
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="1">
+				<button aria-controls="collapseOne"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse1"
+						data-bs-toggle="collapse"
+						type="button">
+					Elenco Modifiche al Record [ {{ h_len }} ]
+				</button>
+			</h2>
+			<div aria-labelledby="heading1"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse1">
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="events" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" data-defaultsort="desc" id="h1">ID</th>
+							<th class="title" id="h2">Modifica</th>
+							<th class="title" id="h3">Data</th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in history_list %}
+						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'invoices_admin' in session['user_roles']
+								or 'invoices_write' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(event_detail, _id=row.id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.id|e }}
+								</a>
+								{% else %}
+								{{ row.id|e }}
+								{% endif %}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.5rem;">
+								{{ row.event|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.created_at|e }}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+	</div>
+</div>
+<br>
+<p class="info">Data Creazione: {{ form.created_at }}</p>
+<p class="info">Ultima modifica: {{ form.updated_at }}</p>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#rows').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            },
+        });
+    });
+    
+    $(document).ready(function () {
+        $('#events').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            },
+        });
+    });
+
+
+
+
+</script>
+{% endblock %}

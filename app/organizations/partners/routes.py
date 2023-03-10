@@ -115,6 +115,7 @@ def partner_view_detail(_id):
 	from app.orders.items.routes import DETAIL_FOR as ITEM_DETAIL, CREATE_FOR as ITEM_CREATE_FOR
 
 	from app.invoices.invoice.routes import DETAIL_FOR as INVOICE_DETAIL, CREATE_FOR as INVOICE_CREATE_FOR
+	from app.business.opportunities.routes import DETAIL_FOR as OPP_DETAIL, CREATE_FOR as OPP_CREATE_FOR
 
 	# Interrogo il DB
 	partner = Partner.query.get(_id)
@@ -162,17 +163,23 @@ def partner_view_detail(_id):
 	else:
 		invoice_list = []
 
+	# Estraggo la lista delle Opportunità
+	opp_list = partner.opportunities
+	if opp_list:
+		opp_list = [opp.to_dict() for opp in opp_list]
+	else:
+		opp_list = []
+
 	db.session.close()
 	return render_template(
 		DETAIL_HTML, form=_partner, view=VIEW_FOR, update=UPDATE_FOR,
 		event_detail=EVENT_DETAIL, history_list=history_list, h_len=len(history_list),
-		contact_detail=CONTACT_DETAIL, contacts_list=contacts_list, c_len=len(contacts_list),
-		contact_create=CONTACT_CREATE_FOR,
+		contact_create=CONTACT_CREATE_FOR, contact_detail=CONTACT_DETAIL, contacts_list=contacts_list, c_len=len(contacts_list),  # noqa
 		site_create=SITE_CREATE_FOR, site_detail=SITE_DETAIL, sites_list=sites_list, s_len=len(sites_list),
 		oda_create=ODA_CREATE_FOR, oda_detail=ODA_DETAIL, oda_list=oda_list, o_len=len(oda_list),
 		item_create=ITEM_CREATE_FOR, item_detail=ITEM_DETAIL, items_list=items_list, i_len=len(items_list),
-		invoice_create=INVOICE_CREATE_FOR, invoice_detail=INVOICE_DETAIL, invoice_list=invoice_list,
-		inv_len=len(invoice_list),
+		invoice_create=INVOICE_CREATE_FOR, invoice_detail=INVOICE_DETAIL, invoice_list=invoice_list, inv_len=len(invoice_list),  # noqa
+		opp_create=OPP_CREATE_FOR, opp_detail=OPP_DETAIL, opp_list=opp_list, opp_len=len(opp_list),
 	)
 
 
