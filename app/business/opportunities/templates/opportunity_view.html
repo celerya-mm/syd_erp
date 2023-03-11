@@ -48,7 +48,7 @@
 				<!-- Ricerca per anno-->
                 <br>
                 <form method="post">
-                    <label for="year">Anno Fattura:</label>
+                    <label for="year">Anno:</label>
                     <input id="year" type='search' name='year' style="width: 80px;"/>
                     <button type="submit" class="btn" title="Ricerca" style="">
                         <img src="{{ url_for('static', filename='icons/search.svg') }}" alt="">
@@ -94,7 +94,7 @@
 								{{ row.opp_description|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.opp_amount|e }}
+								{{ row.opp_value|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{% if row.opp_status == "Pagata_OK" or row.opp_status == "Pagata_Ritardo"%}
@@ -125,7 +125,7 @@
 								or 'partners_admin' in session['user_roles']
 								or 'partners_read' in session['user_roles']
 								%}
-								<a class="tab-link" href="{{ url_for(partner_detail, _id=row.client_id) }}" style=""
+								<a class="tab-link" href="{{ url_for(partner_detail, _id=row.partner_id) }}" style=""
 								   title="Visualizza">
 									{{ row.partner_id|e }}
 								</a>

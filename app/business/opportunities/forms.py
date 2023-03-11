@@ -92,7 +92,7 @@ def list_plant_sites():
 
 	_list = ["-"]
 	try:
-		records = PlantSite.query.order_by(PlantSite.id.asc()).all()
+		records = PlantSite.query.filter_by(active=True).order_by(PlantSite.id.asc()).all()
 
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
@@ -150,16 +150,16 @@ class FormOpportunity(FlaskForm):
 	opp_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"), Length(max=500)])
 	opp_category = SelectField('Categoria', choices=list_opp_categories)
 
-	opp_accountable = SelectField('Responsabile', choices=list_users)
+	opp_accountable = SelectField('Responsabile', choices=list_users, validators=[DataRequired("Campo obbligatorio!")])
 
 	opp_status = SelectField('Stato', choices=list_opp_status, validators=[DataRequired("Campo obbligatorio!")])
 
 	plant_id = SelectField('Sede Legale', validators=[DataRequired("Campo obbligatorio!")])
-	plant_site_id = SelectField('Sede Operativa', validators=[DataRequired("Campo obbligatorio!")])
+	plant_site_id = SelectField('Sede Operativa')
 
-	partner_id = SelectField("Seleziona partner")
-	partner_site_id = SelectField("Seleziona Sito Partner")
-	partner_contact_id = SelectField("Seleziona Referente")
+	partner_id = SelectField("Partner", validators=[DataRequired("Campo obbligatorio!")])
+	partner_site_id = SelectField("Sito Partner")
+	partner_contact_id = SelectField("Referente", validators=[DataRequired("Campo obbligatorio!")])
 
 	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
@@ -192,11 +192,11 @@ class FormOpportunity(FlaskForm):
 		form = cls()
 		form.opp_value.data = obj.opp_value
 		form.opp_date.data = obj.opp_date
+		form.opp_expiration_date.data = obj.opp_expiration_date
 
 		form.opp_description.data = obj.opp_description
 		form.opp_category.data = obj.opp_category
 
-		form.opp_accountable.data = obj.opp_accountable
 		form.opp_status.data = obj.opp_status
 
 		form.note.data = obj.note
@@ -239,7 +239,7 @@ class FormOpportunity(FlaskForm):
 			'opp_value': self.opp_value.data,
 
 			'opp_date': date_to_str(self.opp_date.data),
-			'opp_year': self.opp_date.data.year,
+			'opp_year': int(self.opp_date.data.year),
 
 			'opp_description': self.opp_description.data.strip().replace('  ', ' '),
 			'opp_category': self.opp_category.data,
@@ -249,14 +249,14 @@ class FormOpportunity(FlaskForm):
 			'opp_expiration_date': date_to_str(self.opp_expiration_date.data),
 			'opp_expired': expired,
 
-			'opp_accountable': self.opp_accountable.data,
+			'opp_accountable': int(self.opp_accountable.data.split(' - ')[0]),
 
-			'plant_id': self.plant_id.data.split(' - ')[0],
+			'plant_id': int(self.plant_id.data.split(' - ')[0]),
 			'plant_site_id': plant_site_id,
 
-			'partner_id': self.partner_id.data.split(' - ')[0],
+			'partner_id': int(self.partner_id.data.split(' - ')[0]),
 			'partner_site_id': partner_site_id,
-			'partner_contact_id': self.partner_contact_id.data(' - ')[0],
+			'partner_contact_id': int(self.partner_contact_id.data.split(' - ')[0]),
 
 			'note': not_empty(self.note.data.strip()),
 			'updated_at': datetime.now()

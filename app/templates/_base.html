@@ -253,7 +253,7 @@
 						<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 						   href="#Invoices"
 						   id="DropdownMenuOpportunità" role="button">
-							Opportunities
+							Opportunity
 						</a>
 						<ul aria-labelledby="DropdownMenuOpportunities" class="dropdown-menu">
 							<!--  Opportunità-->
@@ -284,11 +284,11 @@
 								<a class="nav-item nav-link {% if request.path == '/action/view/' %} active {% endif %}"
 								   href="{{ url_for('action_bp.action_view') }}" title="Azioni">
 									{% if request.path == '/action/view/' %}
-									<img alt="" src="{{ url_for('static', filename='icons/activity_active.svg') }}">
+									<img alt="" src="{{ url_for('static', filename='icons/action_active.svg') }}">
 									{% else %}
-									<img alt="" src="{{ url_for('static', filename='icons/activity_white.svg') }}">
+									<img alt="" src="{{ url_for('static', filename='icons/action_white.svg') }}">
 									{% endif %}
-									Activities
+									Actions
 								</a>
 							</li>
 							{% endif %}

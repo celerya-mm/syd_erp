@@ -66,20 +66,20 @@ def opportunity_view():
 
 	if _list:
 		# raggruppo per anno ordine (5 anni max)
-		g_year = dict_group_by(_list, 'opp_date', amount='opp_amount', year=True)
+		g_year = dict_group_by(_list, 'opp_date', amount='opp_value', year=True)
 		y_labels = [sub['opp_date'] for sub in g_year]
-		y_values = [sub['opp_amount'] for sub in g_year]
+		y_values = [sub['opp_value'] for sub in g_year]
 
 		# raggruppa per fornitore
-		g_supplier = dict_group_by(_list, 'opp_date', group_f="partner_id", amount='opp_amount', year=True)
+		g_supplier = dict_group_by(_list, 'opp_date', group_f="partner_id", amount='opp_value', year=True)
 		s_labels = [sub["partner_id"] for sub in g_supplier]
-		s_values = [sub['opp_amount'] for sub in g_supplier]
+		s_values = [sub['opp_value'] for sub in g_supplier]
 
 		# raggruppa per categoria
-		g_category = dict_group_by(_list, 'opp_date', group_f="opp_category", amount='opp_amount',
+		g_category = dict_group_by(_list, 'opp_date', group_f="opp_category", amount='opp_value',
 								   year=True)
 		c_labels = [sub["opp_category"] for sub in g_category]
-		c_values = [sub['opp_category'] for sub in g_category]
+		c_values = [sub['opp_value'] for sub in g_category]
 	else:
 		y_labels, y_values, s_labels, s_values, c_labels, c_values = [], [], [], [], [], []
 
@@ -99,11 +99,13 @@ def opportunity_view():
 def opportunity_create(p_id, s_id=None):
 	"""Creazione Opportunità."""
 	from app.organizations.plant.models import Plant
+	
+	from app.invoices.activities.models import Activity
 
 	from app.organizations.partners.models import Partner
-	from app.organizations.partner_sites.models import PartnerSite
-
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
+	
+	from app.organizations.partner_sites.models import PartnerSite
 	from app.organizations.partner_sites.routes import DETAIL_FOR as PARTNER_SITE_DETAIL
 
 	form = FormOpportunity.new(p_id=p_id)
@@ -112,12 +114,16 @@ def opportunity_create(p_id, s_id=None):
 		try:
 			form_data = FormOpportunity(request.form).to_dict()
 			# print('NEW_OPPORTUNITY:', json.dumps(form_data, indent=2))
+			
+			id_activity = Activity.query.filter_by(activity_code=form_data['opp_activity']).first()
+			value = id_activity.activity_price
+			id_activity = id_activity.id
 
 			_time = datetime.now()
 
 			new_opportunities = Opportunity(
-				opp_activity=form_data['opp_activity'],
-				opp_value=form_data['opp_value'],
+				opp_activity=id_activity,
+				opp_value=value,
 
 				opp_date=form_data['opp_date'],
 				opp_year=form_data['opp_year'],
@@ -158,7 +164,11 @@ def opportunity_create(p_id, s_id=None):
 			db.session.rollback()
 			db.session.close()
 			flash(f"ERRORE: {str(err.orig)}")
-			return render_template(CREATE_HTML, form=form)
+			return render_template(
+				CREATE_HTML, form=form,
+				partner_view=PARTNER_DETAIL, p_id=p_id,
+				partner_site_view=PARTNER_SITE_DETAIL, s_id=s_id,
+			)
 	else:
 		# Estraggo dati azienda
 		plant = Plant.query.get(1)
@@ -167,15 +177,19 @@ def opportunity_create(p_id, s_id=None):
 
 		# Estraggo dati fornitore
 		partner = Partner.query.get(p_id)
-		form.client_id.data = f'{partner.id} - {partner.organization}'
+		form.partner_id.data = f'{partner.id} - {partner.organization}'
 		# print('PARTNER:', form.supplier_id.data)
 
 		if s_id:
 			partner_site = PartnerSite.query.get(s_id)
-			form.client_site_id.data = f'{partner_site.id} - {partner_site.organization}'
+			form.partner_site_id.data = f'{partner_site.id} - {partner_site.organization}'
 		# print('PARTNER_SITE:', form.supplier_site_id.data)
 
-		return render_template(CREATE_HTML, form=form)
+		return render_template(
+			CREATE_HTML, form=form,
+			partner_view=PARTNER_DETAIL, p_id=p_id,
+			partner_site_view=PARTNER_SITE_DETAIL, s_id=s_id,
+		)
 
 
 @opportunity_bp.route(DETAIL, methods=["GET", "POST"])
@@ -189,6 +203,7 @@ def opportunity_view_detail(_id):
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as PARTNER_SITE_DETAIL
 	from app.organizations.partner_contacts.routes import DETAIL_FOR as CONTACT_DETAIL
+	from app.invoices.activities.routes import DETAIL_FOR as ACTIVITY_DETAIL
 
 	# from app.invoices.invoice_rows.routes import (CREATE_FOR as INVOICE_ROW_CREATE, DETAIL_FOR as INVOICE_ROW_DETAIL,
 	# 											  DELETE_FOR as INVOICE_ROW_DELETE)
@@ -200,6 +215,7 @@ def opportunity_view_detail(_id):
 		.options(joinedload(Opportunity.partner)) \
 		.options(joinedload(Opportunity.partner_site)) \
 		.options(joinedload(Opportunity.partner_contact)) \
+		.options(joinedload(Opportunity.accountable)) \
 		.options(joinedload(Opportunity.activity)) \
 		.get(_id)
 
@@ -214,28 +230,30 @@ def opportunity_view_detail(_id):
 		
 	# Attività
 	_opportunity["opp_activity"] = f'{opportunity.activity.activity_code} - {opportunity.activity.activity_description}'
+	act_id = opportunity.activity.id
+	
+	# Responsabile
+	_opportunity["opp_accountable"] = f'{opportunity.accountable.id} - {opportunity.accountable.full_name}'
+	acc_id = opportunity.accountable.id
 
 	# Organizzazione
 	_opportunity["plant_id"] = f'{opportunity.plant.id} - {opportunity.plant.organization}'
-
+	# Sito
 	if opportunity.plant_site:
 		_opportunity["plant_site_id"] = f'{opportunity.plant_site.id} - {opportunity.plant_site.organization}'
 
 	# Partner
 	_opportunity["partner_id"] = f'{opportunity.partner.id} - {opportunity.partner.organization}'
 	p_id = opportunity.partner.id
-
+	# Sito
 	if opportunity.partner_site:
 		_opportunity["partner_site_id"] = f'{opportunity.partner_site.id} - {opportunity.partner_site.site}'
 		s_id = opportunity.partner_site.id
 	else:
 		s_id = None
-
-	if opportunity.partner_contact:
-		_opportunity["partner_site_id"] = f'{opportunity.partner_contact.id} - {opportunity.partner_contact.full_name}'
-		c_id = opportunity.partner_contact.id
-	else:
-		c_id = None
+	# Referente
+	_opportunity["partner_contact_id"] = f'{opportunity.partner_contact.id} - {opportunity.partner_contact.full_name}'
+	c_id = opportunity.partner_contact.id
 
 	# # Estraggo la lista delle azioni
 	# actions_list = opportunity.actions
@@ -275,10 +293,11 @@ def opportunity_view_detail(_id):
 	return render_template(
 		DETAIL_HTML, form=_opportunity, view=VIEW_FOR, update=UPDATE_FOR,
 		event_detail=EVENT_DETAIL, history_list=history_list, h_len=len(history_list),
-		partner_detail=PARTNER_DETAIL, p_id=p_id,
-		partner_site_detail=PARTNER_SITE_DETAIL, s_id=s_id,
-		contact_detail=PARTNER_SITE_DETAIL, c_id=c_id,
-		# rows_list=actions_list, r_len=len(actions_list),
+		partner_detail=PARTNER_DETAIL,              p_id=p_id,
+		partner_site_detail=PARTNER_SITE_DETAIL,    s_id=s_id,
+		contact_detail=CONTACT_DETAIL,              c_id=c_id,
+		activity_detail=ACTIVITY_DETAIL,            act_id=act_id,
+		# act_list=actions_list, act_len=len(actions_list),
 	)
 
 
@@ -298,17 +317,26 @@ def opportunity_update(_id):
 		.options(joinedload(Opportunity.partner)) \
 		.options(joinedload(Opportunity.partner_site)) \
 		.options(joinedload(Opportunity.partner_contact)) \
+		.options(joinedload(Opportunity.accountable)) \
 		.options(joinedload(Opportunity.activity)) \
 		.get(_id)
 
-	form = FormOpportunity.update(obj=opportunity, p_id=opportunity.plant_id)
+	form = FormOpportunity.update(obj=opportunity, p_id=opportunity.partner_id)
+	
+	id_activity = opportunity.opp_activity
 
 	if request.method == 'POST' and form.validate():
 		new_data = FormOpportunity(request.form).to_dict()
 
 		previous_data = opportunity.to_dict()
-		[previous_data.pop(key) for key in ["updated_at", "invoice_pdf"]]
-		previous_data['invoice_amount'] = str(previous_data['invoice_amount'])
+		[previous_data.pop(key) for key in ["updated_at"]]
+		previous_data['opp_value'] = str(previous_data['opp_value'])
+		
+		_activity = Activity.query.filter_by(activity_code=new_data['opp_activity']).first()
+		
+		new_data['opp_activity'] = _activity.id
+		if id_activity != _activity.id:
+			new_data['opp_value'] = _activity.activity_price
 
 		try:
 			Opportunity.update(_id, new_data)
@@ -333,16 +361,19 @@ def opportunity_update(_id):
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		# Attività
-		form.opp_activity = f'{opportunity.activity.activity_code} - {opportunity.activity.activity_description}'
+		form.opp_activity.data = f'{opportunity.activity.activity_code} - {opportunity.activity.activity_description}'
+
+		# Responsabile
+		form.opp_accountable.data = f'{opportunity.accountable.id} - {opportunity.accountable.full_name}'
 
 		# Organizzazione
 		form.plant_id.data = f'{opportunity.plant.id} - {opportunity.plant.organization}'
 		form.plant_site_id.data = f'{opportunity.plant_site.id} - {opportunity.plant_site.site}' if opportunity.plant_site else None  # noqa
 
 		# Fornitore
-		form.client_id.data = f'{opportunity.client.id} - {opportunity.client.organization}'
-		form.client_site_id.data = f'{opportunity.client_site.id} - {opportunity.client_site.site}' if opportunity.client_site else None  # noqa
-		form.partner_contact_id.data = f'{opportunity.partner_contact_id.id} - {opportunity.partner_contact_id.full_name}' if opportunity.partner_contact_id else None  # noqa
+		form.partner_id.data = f'{opportunity.partner.id} - {opportunity.partner.organization}'
+		form.partner_site_id.data = f'{opportunity.partner_site.id} - {opportunity.partner_site.site}' if opportunity.partner_site else None  # noqa
+		form.partner_contact_id.data = f'{opportunity.partner_contact.id} - {opportunity.partner_contact.full_name}'
 
 		_info = {
 			'created_at': opportunity.created_at,

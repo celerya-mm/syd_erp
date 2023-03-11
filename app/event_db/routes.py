@@ -25,7 +25,7 @@ RESTORE_FOR = "event_bp.event_restore"
 @timer_func
 def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None, item_id=None,
 				 order_id=None, plant_id=None, plant_site_id=None, oda_row_id=None, activity_id=None, invoice_id=None,
-				 invoice_row_id=None, opportunity=None):
+				 invoice_row_id=None, opportunity_id=None):
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
@@ -48,7 +48,7 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 			invoice_id=invoice_id,
 			invoice_row_id=invoice_row_id,
 
-			opportunity=opportunity,
+			opportunity_id=opportunity_id,
 
 			created_at=datetime.now()
 		)

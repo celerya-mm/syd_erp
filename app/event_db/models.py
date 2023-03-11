@@ -27,7 +27,7 @@ class EventDB(db.Model):
     invoice_id = db.Column(db.Integer, db.ForeignKey('invoices.id', ondelete='CASCADE'), nullable=True)
     invoice_row_id = db.Column(db.Integer, db.ForeignKey('invoice_rows.id', ondelete='CASCADE'), nullable=True)
 
-    opportunity = db.Column(db.Integer, db.ForeignKey('opportunities.id', ondelete='CASCADE'), nullable=True)
+    opportunity_id = db.Column(db.Integer, db.ForeignKey('opportunities.id', ondelete='CASCADE'), nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
 
@@ -71,7 +71,7 @@ class EventDB(db.Model):
             'invoice_id': self.invoice_id,
             'invoice_row_id': self.invoice_row_id,
 
-            'opportunity': self.opportunity,
+            'opportunity_id': self.opportunity_id,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

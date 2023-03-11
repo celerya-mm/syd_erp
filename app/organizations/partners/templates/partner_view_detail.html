@@ -488,7 +488,7 @@
 								or 'opportunities_admin' in session['user_roles']
 								or 'opportunities_read' in session['user_roles']
 								%}
-								<a class="btn-table" href="{{ url_for(site_detail, _id=row.id) }}"
+								<a class="btn-table" href="{{ url_for(opp_detail, _id=row.id) }}"
 								   title="Visualizza Record"
 								   type="button">
 									{{ row.id|e }}
@@ -510,10 +510,7 @@
 								{{ row.opp_description|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.opp_description|e }}
-							</td>
-							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.opp_amount|e }}
+								{{ row.opp_value|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{% if row.opp_status == "Pagata_OK" or row.opp_status == "Pagata_Ritardo"%}

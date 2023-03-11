@@ -14,7 +14,7 @@ class Opportunity(db.Model):
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
 	opp_activity = db.Column(db.Integer, db.ForeignKey('activities.id'), nullable=False)
-	opp_value = db.Column(db.Numeric(5, 2), index=False, unique=False, nullable=True)
+	opp_value = db.Column(db.Numeric(10, 2), index=False, unique=False, nullable=True)
 
 	opp_date = db.Column(db.Date, index=False, unique=False, nullable=False)
 	opp_year = db.Column(db.Integer, index=True, unique=False, nullable=True)
@@ -40,7 +40,8 @@ class Opportunity(db.Model):
 
 	plant = db.relationship('Plant', backref='p_opportunities', viewonly=True)
 	plant_site = db.relationship('PlantSite', backref='ps_opportunities', viewonly=True)
-
+	
+	accountable = db.relationship('User', backref='acc_opportunities', viewonly=True)
 	activity = db.relationship('Activity', backref='act_opportunities', viewonly=True)
 	partner = db.relationship('Partner', backref='p_opportunities', viewonly=True)
 	partner_site = db.relationship('PartnerSite', backref='ps_opportunities', viewonly=True)
@@ -86,7 +87,7 @@ class Opportunity(db.Model):
 		return {
 			'id': self.id,
 			'opp_activity': self.opp_activity,
-			'opp_value': self.opp_value,
+			'opp_value': self.opp_value or None,
 
 			'opp_date': date_to_str(self.opp_date, "%Y-%m-%d"),
 			'opp_year': self.opp_date.year,
