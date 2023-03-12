@@ -10,14 +10,14 @@ from app.functions import token_user_validate, access_required, serialize_dict, 
 from .forms import FormInvoiceRowUpdate, FormInvoiceRowCreate
 from .models import InvoiceRow
 
-invoice_rows_bp = Blueprint(
-	'invoice_rows_bp', __name__,
+action_bp = Blueprint(
+	'action_bp', __name__,
 	template_folder='templates',
 	static_folder='static'
 )
 
-TABLE = 'invoice_rows'
-BLUE_PRINT, B_PRINT = invoice_rows_bp, 'invoice_rows_bp'
+TABLE = 'actions'
+BLUE_PRINT, B_PRINT = action_bp, 'action_bp'
 
 CREATE = "/create/<int:inv_id>/<int:c_id>/<int:s_id>/"
 CREATE_FOR = f"{B_PRINT}.{TABLE}_create"
@@ -39,8 +39,8 @@ DELETE_FOR = f"{B_PRINT}.{TABLE}_delete"
 @timer_func
 @token_user_validate
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
-def invoice_rows_create(inv_id, c_id, s_id=None):
-	"""Creazione Riga Fattura."""
+def actions_create(inv_id, c_id, s_id=None):
+	"""Creazione Azione."""
 	from app.invoices.invoice.routes import DETAIL_FOR as INVOICE_DETAIL
 	from app.invoices.activities.models import Activity
 
@@ -98,7 +98,7 @@ def invoice_rows_create(inv_id, c_id, s_id=None):
 @timer_func
 @token_user_validate
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
-def invoice_rows_view_detail(_id):
+def actions_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
@@ -150,7 +150,7 @@ def invoice_rows_view_detail(_id):
 @timer_func
 @token_user_validate
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
-def invoice_rows_update(_id):
+def actions_update(_id):
 	"""Aggiorna dati Riga Fattura."""
 	from app.event_db.routes import events_create
 
@@ -228,7 +228,7 @@ def invoice_rows_update(_id):
 @timer_func
 @token_user_validate
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
-def invoice_rows_delete(_id, inv_id):
+def actions_delete(_id, inv_id):
 	"""Cancella Riga Fattura"""
 	from app.invoices.invoice.routes import DETAIL_FOR as INVOICE_DETAIL
 	try:

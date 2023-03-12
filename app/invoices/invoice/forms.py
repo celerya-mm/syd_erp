@@ -49,7 +49,7 @@ def list_partner_sites(spl_id=None):
 
 
 def list_plants():
-	from app.organizations.plant.models import Plant
+	from app.organizations.plants.models import Plant
 
 	_list = ["-"]
 	try:
@@ -66,7 +66,7 @@ def list_plants():
 
 
 def list_plant_sites(pl_id=None):
-	from app.organizations.plant_site.models import PlantSite
+	from app.organizations.plant_sites.models import PlantSite
 
 	_list = ["-"]
 	try:

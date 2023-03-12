@@ -17,28 +17,31 @@ partner_contact_bp = Blueprint(
 	static_folder='static'
 )
 
+TABLE = 'partner_contacts'
+BLUE_PRINT, B_PRINT = partner_contact_bp, 'partner_contact_bp'
+
 VIEW = "/view/"
-VIEW_FOR = "partner_contact_bp.contact_view"
-VIEW_HTML = "contact_view.html"
+VIEW_FOR = f"{B_PRINT}.{TABLE}_view"
+VIEW_HTML = f"{TABLE}_view.html"
 
 CREATE = "/create/<int:p_id>/<int:s_id>/"
-CREATE_FOR = "partner_contact_bp.contact_create"
-CREATE_HTML = "contact_create.html"
+CREATE_FOR = f"{B_PRINT}.{TABLE}_create"
+CREATE_HTML = f"{TABLE}_create.html"
 
 DETAIL = "/view/detail/<int:_id>"
-DETAIL_FOR = "partner_contact_bp.contact_view_detail"
-DETAIL_HTML = "contact_view_detail.html"
+DETAIL_FOR = f"{B_PRINT}.{TABLE}_view_detail"
+DETAIL_HTML = f"{TABLE}_view_detail.html"
 
 UPDATE = "/update/<int:_id>"
-UPDATE_FOR = "partner_contact_bp.contact_update"
-UPDATE_HTML = "contact_update.html"
+UPDATE_FOR = f"{B_PRINT}.{TABLE}_update"
+UPDATE_HTML = f"{TABLE}_update.html"
 
 
-@partner_contact_bp.route(VIEW, methods=["GET", "POST"])
+@BLUE_PRINT.route(VIEW, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['partner_contacts_admin', 'partner_contacts_read'])
-def contact_view():
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def partner_contacts_view():
 	"""Visualizzo informazioni Contacts."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 
@@ -50,11 +53,11 @@ def contact_view():
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, detail=DETAIL_FOR, partner_detail=PARTNER_DETAIL)
 
 
-@partner_contact_bp.route(CREATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(CREATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['partner_contacts_admin', 'partner_contacts_write'])
-def contact_create(p_id, s_id=None):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def partner_contacts_create(p_id, s_id=None):
 	"""Creazione Contact."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
@@ -112,11 +115,11 @@ def contact_create(p_id, s_id=None):
 							   site_view=SITE_DETAIL, s_id=s_id)
 
 
-@partner_contact_bp.route(DETAIL, methods=["GET", "POST"])
+@BLUE_PRINT.route(DETAIL, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['partner_contacts_admin', 'partner_contacts_read'])
-def contact_view_detail(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def partner_contacts_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
@@ -149,13 +152,13 @@ def contact_view_detail(_id):
 	)
 
 
-@partner_contact_bp.route(UPDATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(UPDATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['partner_contacts_admin', 'partner_contacts_write'])
-def contact_update(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def partner_contacts_update(_id):
 	"""Aggiorna dati Contact."""
-	from app.event_db.routes import event_create
+	from app.event_db.routes import events_create
 
 	# recupero i dati
 	contact = PartnerContact.query \
@@ -192,7 +195,7 @@ def contact_update(_id):
 			"Modification": f"Update PARTNER CONTACT whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, partner_contact_id=_id)
+		_event = events_create(_event, partner_contact_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.partner_id.data = f'{contact.partner.id} - {contact.partner.organization}'

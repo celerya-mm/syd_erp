@@ -18,28 +18,31 @@ item_bp = Blueprint(
 	static_folder='static'
 )
 
+TABLE = 'items'
+BLUE_PRINT, B_PRINT = item_bp, 'item_bp'
+
 VIEW = "/view/"
-VIEW_FOR = "item_bp.item_view"
-VIEW_HTML = "item_view.html"
+VIEW_FOR = f"{B_PRINT}.{TABLE}_view"
+VIEW_HTML = f"{TABLE}_view.html"
 
 CREATE = "/create/<int:p_id>/<int:s_id>/"
-CREATE_FOR = "item_bp.item_create"
-CREATE_HTML = "item_create.html"
+CREATE_FOR = f"{B_PRINT}.{TABLE}_create"
+CREATE_HTML = f"{TABLE}_create.html"
 
 DETAIL = "/view/detail/<int:_id>"
-DETAIL_FOR = "item_bp.item_view_detail"
-DETAIL_HTML = "item_view_detail.html"
+DETAIL_FOR = f"{B_PRINT}.{TABLE}_view_detail"
+DETAIL_HTML = f"{TABLE}view_detail.html"
 
 UPDATE = "/update/<int:_id>"
-UPDATE_FOR = "item_bp.item_update"
-UPDATE_HTML = "item_update.html"
+UPDATE_FOR = f"{B_PRINT}.{TABLE}_update"
+UPDATE_HTML = f"{TABLE}_update.html"
 
 
-@item_bp.route(VIEW, methods=["GET", "POST"])
+@BLUE_PRINT.route(VIEW, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['items_admin', 'items_read'])
-def item_view():
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def items_view():
 	"""Visualizzo informazioni Items."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
@@ -53,11 +56,11 @@ def item_view():
 						   site_detail=SITE_DETAIL)
 
 
-@item_bp.route(CREATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(CREATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['items_admin', 'items_write'])
-def item_create(p_id, s_id=None):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def items_create(p_id, s_id=None):
 	"""Creazione Item."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
@@ -126,11 +129,11 @@ def item_create(p_id, s_id=None):
 							   site_view=SITE_DETAIL, s_id=s_id)
 
 
-@item_bp.route(DETAIL, methods=["GET", "POST"])
+@BLUE_PRINT.route(DETAIL, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['items_admin', 'items_read'])
-def item_view_detail(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def items_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
@@ -166,13 +169,13 @@ def item_view_detail(_id):
 	)
 
 
-@item_bp.route(UPDATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(UPDATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['items_admin', 'items_write'])
-def item_update(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def items_update(_id):
 	"""Aggiorna dati Item."""
-	from app.event_db.routes import event_create
+	from app.event_db.routes import events_create
 
 	# recupero i dati
 	item = Item.query \
@@ -207,7 +210,7 @@ def item_update(_id):
 			"Modification": f"Update ITEM whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, item_id=_id)
+		_event = events_create(_event, item_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.supplier_id.data = f'{item.supplier.id} - {item.supplier.organization}'

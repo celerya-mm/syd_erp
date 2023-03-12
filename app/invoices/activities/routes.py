@@ -9,7 +9,7 @@ from app.app import session, db
 from app.functions import token_user_validate, access_required, not_empty, timer_func
 from .forms import FormActivity
 from .models import Activity
-from app.organizations.plant_site.models import PlantSite
+from app.organizations.plant_sites.models import PlantSite
 
 activity_bp = Blueprint(
 	'activity_bp', __name__,
@@ -17,30 +17,33 @@ activity_bp = Blueprint(
 	static_folder='static'
 )
 
+TABLE = 'activities'
+BLUE_PRINT, B_PRINT = activity_bp, 'activity_bp'
+
 VIEW = "/view/"
-VIEW_FOR = "activity_bp.activity_view"
-VIEW_HTML = "activity_view.html"
+VIEW_FOR = f"{B_PRINT}.{TABLE}_view"
+VIEW_HTML = f"{TABLE}_view.html"
 
 CREATE = "/create/<int:p_id>/<int:s_id>/"
-CREATE_FOR = "activity_bp.activity_create"
-CREATE_HTML = "activity_create.html"
+CREATE_FOR = f"{B_PRINT}.{TABLE}_create"
+CREATE_HTML = f"{TABLE}_create.html"
 
 DETAIL = "/view/detail/<int:_id>"
-DETAIL_FOR = "activity_bp.activity_view_detail"
-DETAIL_HTML = "activity_view_detail.html"
+DETAIL_FOR = f"{B_PRINT}.{TABLE}_view_detail"
+DETAIL_HTML = f"{TABLE}_view_detail.html"
 
 UPDATE = "/update/<int:_id>"
-UPDATE_FOR = "activity_bp.activity_update"
-UPDATE_HTML = "activity_update.html"
+UPDATE_FOR = f"{B_PRINT}.{TABLE}_update"
+UPDATE_HTML = f"{TABLE}_update.html"
 
 
-@activity_bp.route(VIEW, methods=["GET", "POST"])
+@BLUE_PRINT.route(VIEW, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['activities_admin', 'activities_read'])
-def activity_view():
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def activities_view():
 	"""Visualizzo informazioni Activities."""
-	from app.organizations.plant_site.routes import DETAIL_FOR as SITE_DETAIL
+	from app.organizations.plant_sites.routes import DETAIL_FOR as SITE_DETAIL
 
 	# Estraggo la lista dei partners
 	_list = Activity.query.all()
@@ -51,13 +54,13 @@ def activity_view():
 						   detail=DETAIL_FOR, site_detail=SITE_DETAIL)
 
 
-@activity_bp.route(CREATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(CREATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['activities_admin', 'activities_write'])
-def activity_create(p_id, s_id=None):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def activities_create(p_id, s_id=None):
 	"""Creazione Activity."""
-	from app.organizations.plant_site.routes import DETAIL_FOR as SITE_DETAIL
+	from app.organizations.plant_sites.routes import DETAIL_FOR as SITE_DETAIL
 
 	form = FormActivity.new(p_id=p_id)
 	if request.method == 'POST' and form.validate():
@@ -114,14 +117,14 @@ def activity_create(p_id, s_id=None):
 		return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
 
 
-@activity_bp.route(DETAIL, methods=["GET", "POST"])
+@BLUE_PRINT.route(DETAIL, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['activities_admin', 'activities_read'])
-def activity_view_detail(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def activities_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
-	from app.organizations.plant_site.routes import DETAIL_FOR as SITE_DETAIL
+	from app.organizations.plant_sites.routes import DETAIL_FOR as SITE_DETAIL
 
 	# Interrogo il DB
 	activity = Activity.query \
@@ -137,7 +140,7 @@ def activity_view_detail(_id):
 		history_list = []
 
 	_activity["plant_id"] = f'{activity.plant.id} - {activity.plant.organization}'
-	p_id = activity.plant.id
+	p_id = activity.plant.id  # noqa
 
 	if activity.plant_site:
 		_activity["plant_site_id"] = f'{activity.plant_site.id} - {activity.plant_site.organization}'
@@ -152,13 +155,13 @@ def activity_view_detail(_id):
 	)
 
 
-@activity_bp.route(UPDATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(UPDATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['activities_admin', 'activities_write'])
-def activity_update(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def activities_update(_id):
 	"""Aggiorna dati Activity."""
-	from app.event_db.routes import event_create
+	from app.event_db.routes import events_create
 
 	# recupero i dati
 	activity = Activity.query \
@@ -193,7 +196,7 @@ def activity_update(_id):
 			"Modification": f"Update ACTIVITY whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, activity_id=_id)
+		_event = events_create(_event, activity_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		# form.plant_id.data = f'{activity.plant.id} - {activity.plant.organization}'

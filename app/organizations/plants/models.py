@@ -1,9 +1,9 @@
 from app.app import db
 
 # importazioni per creare relazioni in tabella
-from app.organizations.plant_site.models import PlantSite  # noqa
+from app.organizations.plant_sites.models import PlantSite  # noqa
 from app.event_db.models import EventDB  # noqa
-from app.account.models import User  # noqa
+from app.users.models import User  # noqa
 from app.invoices.activities.models import Activity  # noqa
 from app.invoices.invoice.models import Invoice  # noqa
 

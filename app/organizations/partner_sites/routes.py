@@ -15,28 +15,31 @@ partner_site_bp = Blueprint(
 	static_folder='static'
 )
 
+TABLE = 'partner_sites'
+BLUE_PRINT, B_PRINT = partner_site_bp, 'partner_site_bp'
+
 VIEW = "/view/"
-VIEW_FOR = "partner_site_bp.partner_site_view"
-VIEW_HTML = "partner_site_view.html"
+VIEW_FOR = f"{B_PRINT}.{TABLE}_view"
+VIEW_HTML = f"{TABLE}_view.html"
 
 CREATE = "/create/<int:p_id>/"
-CREATE_FOR = "partner_site_bp.partner_site_create"
-CREATE_HTML = "partner_site_create.html"
+CREATE_FOR = f"{B_PRINT}.{TABLE}_create"
+CREATE_HTML = f"{TABLE}_create.html"
 
 DETAIL = "/view/detail/<int:_id>/"
-DETAIL_FOR = "partner_site_bp.partner_site_view_detail"
-DETAIL_HTML = "partner_site_view_detail.html"
+DETAIL_FOR = f"{B_PRINT}.{TABLE}_view_detail"
+DETAIL_HTML = f"{TABLE}_view_detail.html"
 
 UPDATE = "/update/<int:_id>/"
-UPDATE_FOR = "partner_site_bp.partner_site_update"
-UPDATE_HTML = "partner_site_update.html"
+UPDATE_FOR = f"{B_PRINT}.{TABLE}_update"
+UPDATE_HTML = f"{TABLE}_update.html"
 
 
-@partner_site_bp.route(VIEW, methods=["GET", "POST"])
+@BLUE_PRINT.route(VIEW, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['partner_sites_admin', 'partner_sites_read'])
-def partner_site_view():
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def partner_sites_view():
 	"""Visualizzo informazioni Sito."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL_FOR
 
@@ -49,11 +52,11 @@ def partner_site_view():
 						   partner_detail=PARTNER_DETAIL_FOR)
 
 
-@partner_site_bp.route(CREATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(CREATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['partner_sites_admin', 'partner_sites_write'])
-def partner_site_create(p_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def partner_sites_create(p_id):
 	"""Creazione Sito."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL_FOR
 
@@ -112,11 +115,11 @@ def partner_site_create(p_id):
 							   partner=partner)
 
 
-@partner_site_bp.route(DETAIL, methods=["GET", "POST"])
+@BLUE_PRINT.route(DETAIL, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['partner_sites_admin', 'partner_sites_read'])
-def partner_site_view_detail(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def partner_sites_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
@@ -162,13 +165,13 @@ def partner_site_view_detail(_id):
 	)
 
 
-@partner_site_bp.route(UPDATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(UPDATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['partner_sites_admin', 'partner_sites_write'])
-def partner_site_update(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def partner_sites_update(_id):
 	"""Aggiorna dati Sito."""
-	from app.event_db.routes import event_create
+	from app.event_db.routes import events_create
 
 	# recupero i dati
 	site = PartnerSite.query.options(joinedload(PartnerSite.back_partner)).get(_id)
@@ -201,7 +204,7 @@ def partner_site_update(_id):
 			"Modification": f"Update PARTNER whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, partner_site_id=_id)
+		_event = events_create(_event, partner_site_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.partner_id.data = f'{site.back_partner.id} - {site.back_partner.organization}'

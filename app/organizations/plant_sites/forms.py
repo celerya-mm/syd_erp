@@ -28,7 +28,7 @@ def list_plant_sites():
 
 
 def list_plants():
-	from app.organizations.plant.models import Plant
+	from app.organizations.plants.models import Plant
 	_list = ["-"]
 	try:
 		records = Plant.query.order_by(Plant.id.asc()).all()

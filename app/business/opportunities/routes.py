@@ -1,4 +1,4 @@
-# import json
+# import json  # noqa
 from datetime import datetime
 
 import simplejson as json
@@ -18,28 +18,31 @@ opportunity_bp = Blueprint(
 	static_folder='static'
 )
 
+TABLE = 'opportunities'
+BLUE_PRINT, B_PRINT = opportunity_bp, 'opportunity_bp'
+
 VIEW = "/view/"
-VIEW_FOR = "opportunity_bp.opportunity_view"
-VIEW_HTML = "opportunity_view.html"
+VIEW_FOR = f"{B_PRINT}.{TABLE}_view"
+VIEW_HTML = f"{TABLE}_view.html"
 
 CREATE = "/create/<int:p_id>/<int:s_id>/"
-CREATE_FOR = "opportunity_bp.opportunity_create"
-CREATE_HTML = "opportunity_create.html"
+CREATE_FOR = f"{B_PRINT}.{TABLE}_create"
+CREATE_HTML = f"{TABLE}_create.html"
 
 DETAIL = "/view/detail/<int:_id>"
-DETAIL_FOR = "opportunity_bp.opportunity_view_detail"
-DETAIL_HTML = "opportunity_view_detail.html"
+DETAIL_FOR = f"{B_PRINT}.{TABLE}_view_detail"
+DETAIL_HTML = f"{TABLE}_view_detail.html"
 
 UPDATE = "/update/<int:_id>"
-UPDATE_FOR = "opportunity_bp.opportunity_update"
-UPDATE_HTML = "opportunity_update.html"
+UPDATE_FOR = f"{B_PRINT}.{TABLE}_update"
+UPDATE_HTML = f"{TABLE}_update.html"
 
 
-@opportunity_bp.route(VIEW, methods=["GET", "POST"])
+@BLUE_PRINT.route(VIEW, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['opportunities_admin', 'opportunities_read'])
-def opportunity_view():
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def opportunities_view():
 	"""Visualizzo informazioni Opportunità."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
@@ -92,13 +95,13 @@ def opportunity_view():
 	)
 
 
-@opportunity_bp.route(CREATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(CREATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['opportunities_admin', 'opportunities_write'])
-def opportunity_create(p_id, s_id=None):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def opportunities_create(p_id, s_id=None):
 	"""Creazione Opportunità."""
-	from app.organizations.plant.models import Plant
+	from app.organizations.plants.models import Plant
 	
 	from app.invoices.activities.models import Activity
 
@@ -192,11 +195,11 @@ def opportunity_create(p_id, s_id=None):
 		)
 
 
-@opportunity_bp.route(DETAIL, methods=["GET", "POST"])
+@BLUE_PRINT.route(DETAIL, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['opportunities_admin', 'opportunities_read'])
-def opportunity_view_detail(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def opportunities_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 
@@ -234,7 +237,7 @@ def opportunity_view_detail(_id):
 	
 	# Responsabile
 	_opportunity["opp_accountable"] = f'{opportunity.accountable.id} - {opportunity.accountable.full_name}'
-	acc_id = opportunity.accountable.id
+	acc_id = opportunity.accountable.id  # noqa
 
 	# Organizzazione
 	_opportunity["plant_id"] = f'{opportunity.plant.id} - {opportunity.plant.organization}'
@@ -280,14 +283,14 @@ def opportunity_view_detail(_id):
 	# 	[previous_data.pop(key) for key in ["updated_at"]]
 	# 	previous_data['opp_value'] = str(previous_data['opp_value'])
 	#
-	# 	from app.event_db.routes import event_create
+	# 	from app.events_db.routes import events_create
 	# 	_event = {
 	# 		"username": session["user"]["username"],
 	# 		"table": Opportunity.__tablename__,
 	# 		"Modification": f"Update OPPORTUNITY whit id: {_id}",
 	# 		"Previous_data": previous_data
 	# 	}
-	# 	_event = event_create(_event, opportunity_id=_id)
+	# 	_event = events_create(_event, opportunity_id=_id)
 
 	db.session.close()
 	return render_template(
@@ -301,13 +304,13 @@ def opportunity_view_detail(_id):
 	)
 
 
-@opportunity_bp.route(UPDATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(UPDATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['opportunities_admin', 'opportunities_write'])
-def opportunity_update(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def opportunities_update(_id):
 	"""Aggiorna dati Opportunità."""
-	from app.event_db.routes import event_create
+	from app.event_db.routes import events_create
 	from app.invoices.activities.models import Activity
 
 	# recupero i dati
@@ -357,7 +360,7 @@ def opportunity_update(_id):
 			"Modification": f"Update OPPORTUNITY whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, opportunity_id=_id)
+		_event = events_create(_event, opportunity_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		# Attività

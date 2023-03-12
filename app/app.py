@@ -45,46 +45,48 @@ migrate.init_app(app, db)
 # importo i Blueprint
 with app.app_context():
 	from app.event_db.routes import event_bp
-
-	from app.organizations.plant.routes import plant_bp
-	from app.organizations.plant_site.routes import plant_site_bp
-
-	from app.account.routes import account_bp
+	
+	from app.organizations.plants.routes import plant_bp
+	from app.organizations.plant_sites.routes import plant_site_bp
+	
+	from app.users.routes import user_bp
 	from app.roles.routes import role_bp
-
-	from app.orders.order.routes import oda_bp
+	
+	from app.orders.orders.routes import oda_bp
 	from app.orders.order_rows.routes import oda_rows_bp
 	from app.orders.items.routes import item_bp
-
+	
 	from app.organizations.partner_contacts.routes import partner_contact_bp
 	from app.organizations.partner_sites.routes import partner_site_bp
 	from app.organizations.partners.routes import partner_bp
-
+	
 	from app.invoices.activities.routes import activity_bp
 	from app.invoices.invoice.routes import invoice_bp
 	from app.invoices.invoice_rows.routes import invoice_rows_bp
-
+	
 	from app.business.opportunities.routes import opportunity_bp
-
+	# from app.business.actions.routes import action_bp
+	
 	# registro i blueprints
 	app.register_blueprint(event_bp, url_prefix='/event')
-
+	
 	app.register_blueprint(plant_bp, url_prefix='/plant')
 	app.register_blueprint(plant_site_bp, url_prefix='/plant/site')
-
-	app.register_blueprint(account_bp, url_prefix='/account')
+	
+	app.register_blueprint(user_bp, url_prefix='/user')
 	app.register_blueprint(role_bp, url_prefix='/role')
-
+	
 	app.register_blueprint(oda_bp, url_prefix='/oda')
 	app.register_blueprint(oda_rows_bp, url_prefix='/oda_row')
 	app.register_blueprint(item_bp, url_prefix='/item')
-
+	
 	app.register_blueprint(partner_contact_bp, url_prefix='/partner/contact')
 	app.register_blueprint(partner_site_bp, url_prefix='/partner/site')
 	app.register_blueprint(partner_bp, url_prefix='/partner')
-
+	
 	app.register_blueprint(activity_bp, url_prefix='/activity')
 	app.register_blueprint(invoice_bp, url_prefix='/invoice')
 	app.register_blueprint(invoice_rows_bp, url_prefix='/invoice_row')
-
+	
 	app.register_blueprint(opportunity_bp, url_prefix='/opportunity')
+	# app.register_blueprint(action_bp, url_prefix='/action')

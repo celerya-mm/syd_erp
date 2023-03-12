@@ -14,18 +14,23 @@ event_bp = Blueprint(
 	static_folder='static'
 )
 
+TABLE = 'events'
+BLUE_PRINT, B_PRINT = event_bp, 'event_bp'
+
 DETAIL = "/event/view/detail/<int:_id>/"
-DETAIL_FOR = "event_bp.event_view_detail"
-DETAIL_HTML = "event_view_detail.html"
+DETAIL_FOR = f"{B_PRINT}.{TABLE}_view_detail"
+DETAIL_HTML = f"{TABLE}_view_detail.html"
 
 RESTORE = "/event/restore/<int:_id>/<int:id_record>/<table>/<view_for>/"
-RESTORE_FOR = "event_bp.event_restore"
+RESTORE_FOR = f"{B_PRINT}.{TABLE}_restore"
 
 
 @timer_func
-def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None, item_id=None,
-				 order_id=None, plant_id=None, plant_site_id=None, oda_row_id=None, activity_id=None, invoice_id=None,
-				 invoice_row_id=None, opportunity_id=None):
+def events_create(
+		event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None, item_id=None,
+		order_id=None, plant_id=None, plant_site_id=None, oda_row_id=None, activity_id=None, invoice_id=None,
+		invoice_row_id=None, opportunity_id=None
+):
 	"""Registro evento DB."""
 	try:
 		new_event = EventDB(
@@ -72,19 +77,19 @@ def event_create(event, user_id=None, partner_id=None, partner_contact_id=None, 
 		return str(err)
 
 
-@event_bp.route(DETAIL, methods=["GET", "POST"])
+@BLUE_PRINT.route(DETAIL, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-def event_view_detail(_id):
+def events_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
-	from app.account.models import User
-	from app.account.routes import DETAIL_FOR as USER_DETAIL
+	from app.users.models import User
+	from app.users.routes import DETAIL_FOR as USER_DETAIL
 
-	from app.organizations.plant.models import Plant
-	from app.organizations.plant.routes import DETAIL_FOR as PLANT_DETAIL
+	from app.organizations.plants.models import Plant
+	from app.organizations.plants.routes import DETAIL_FOR as PLANT_DETAIL
 
-	from app.organizations.plant_site.models import PlantSite
-	from app.organizations.plant_site.routes import DETAIL_FOR as PLANT_SITE_DETAIL
+	from app.organizations.plant_sites.models import PlantSite
+	from app.organizations.plant_sites.routes import DETAIL_FOR as PLANT_SITE_DETAIL
 
 	from app.organizations.partners.models import Partner
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
@@ -98,8 +103,8 @@ def event_view_detail(_id):
 	from app.orders.items.models import Item
 	from app.orders.items.routes import DETAIL_FOR as ITEM_DETAIL
 
-	from app.orders.order.models import Oda
-	from app.orders.order.routes import DETAIL_FOR as ORDER_DETAIL
+	from app.orders.orders.models import Oda
+	from app.orders.orders.routes import DETAIL_FOR as ORDER_DETAIL
 
 	from app.orders.order_rows.models import OdaRow
 	from app.orders.order_rows.routes import DETAIL_FOR as ORDER_ROW_DETAIL
@@ -266,14 +271,14 @@ def event_view_detail(_id):
 		return f'ERROR_VIEW_EVENT: {err}'
 
 
-@event_bp.route(RESTORE, methods=["GET", "POST"])
+@BLUE_PRINT.route(RESTORE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-def event_restore(_id, id_record, table, view_for):
-	from app.account.models import User
+def events_restore(_id, id_record, table, view_for):
+	from app.users.models import User
 
-	from app.organizations.plant.models import Plant
-	from app.organizations.plant_site.models import PlantSite
+	from app.organizations.plants.models import Plant
+	from app.organizations.plant_sites.models import PlantSite
 
 	from app.organizations.partners.models import Partner
 	from app.organizations.partner_contacts.models import PartnerContact
@@ -281,7 +286,7 @@ def event_restore(_id, id_record, table, view_for):
 
 	from app.orders.items.models import Item
 
-	from app.orders.order.models import Oda
+	from app.orders.orders.models import Oda
 	from app.orders.order_rows.models import OdaRow
 
 	from app.invoices.activities.models import Activity

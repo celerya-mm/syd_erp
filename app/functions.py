@@ -10,8 +10,9 @@ from .app import session
 
 def token_user_validate(func):
 	"""Eseguo la funzione solo se presente token autenticazione admin valido."""
-	from .auth_token.models import AuthToken
-	from .account.models import User
+	from app.auth_token.models import AuthToken
+	from app.users.models import User
+	from app.users.routes import B_PRINT
 
 	@wraps(func)
 	def wrap(*args, **kwargs):
@@ -22,27 +23,27 @@ def token_user_validate(func):
 			if authenticated is None:
 				print("AUTHORIZATION_CHECK_FAIL token don't match.")
 				msg = f"Non è stato passato un token valido, ripetere la login."
-				return redirect(url_for('account_bp.logout', msg=msg))
+				return redirect(url_for(f'{B_PRINT}.logout', msg=msg))
 			elif authenticated.expires_at < datetime.now():
 				print("AUTHORIZATION_CHECK_FAIL token_expired:", authenticated.expires_at)
 				msg = f"Il token è scaduto: {authenticated.expires_at}, ripetere la login."
-				return redirect(url_for('account_bp.logout', msg=msg))
+				return redirect(url_for(f'{B_PRINT}.logout', msg=msg))
 			elif authenticated.user_id in ["", None]:
 				print("AUTHORIZATION_CHECK_FAIL user don't match.")
 				msg = f"Non è registrato nessun utente con username '{session['user']['username']}', " \
 					  f"provare a ripetere la login."
-				return redirect(url_for('account_bp.logout', msg=msg))
+				return redirect(url_for(f'{B_PRINT}.logout', msg=msg))
 			elif _user.active is False:
 				print("AUTHORIZATION_CHECK_FAIL user_active:", _user.active)
 				msg = f"L'utente {_user.username} non è abilitato all'accesso."
-				return redirect(url_for('account_bp.logout', msg=msg))
+				return redirect(url_for(f'{B_PRINT}.logout', msg=msg))
 			else:
 				# esegue la funzione
 				return func(*args, **kwargs)
 		else:
 			print("AUTHORIZATION_CHECK_FAIL_1")
 			msg = f'Per accedere devi prima effettuare la login.'
-			return redirect(url_for('account_bp.logout', msg=msg))
+			return redirect(url_for(f'{B_PRINT}.logout', msg=msg))
 
 	return wrap
 
@@ -54,8 +55,9 @@ def access_required(roles='ANY'):
 		@wraps(fn)
 		def check_rule(roles_=roles, *args, **kwargs):
 			if session['user']['psw_changed'] is not True:
+				from app.users.routes import B_PRINT, TABLE
 				msg = 'Per poter proseguire devi aggiornare la tua password.'
-				redirect(url_for("account_bp.user_update_password", _id=session['user']['id'], msg=msg))
+				redirect(url_for(f"{B_PRINT}.{TABLE}_update_password", _id=session['user']['id'], msg=msg))
 			elif 'user_roles' not in session.keys() or roles_ == 'ANY':
 				msg = "Non hai i permessi per accedere alla risorsa richiesta."
 				return msg

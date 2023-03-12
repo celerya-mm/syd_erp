@@ -13,28 +13,31 @@ plant_site_bp = Blueprint(
 	static_folder='static'
 )
 
+TABLE = 'plant_sites'
+BLUE_PRINT, B_PRINT = plant_site_bp, 'plant_site_bp'
+
 VIEW = "/view/"
-VIEW_FOR = "plant_site_bp.plant_site_view"
-VIEW_HTML = "plant_site_view.html"
+VIEW_FOR = f"{B_PRINT}.{TABLE}_view"
+VIEW_HTML = f"{TABLE}_view.html"
 
 CREATE = "/create/<int:p_id>/"
-CREATE_FOR = "plant_site_bp.plant_site_create"
-CREATE_HTML = "plant_site_create.html"
+CREATE_FOR = f"{B_PRINT}.{TABLE}_create"
+CREATE_HTML = f"{TABLE}_create.html"
 
 DETAIL = "/view/detail/<int:_id>"
-DETAIL_FOR = "plant_site_bp.plant_site_view_detail"
-DETAIL_HTML = "plant_site_view_detail.html"
+DETAIL_FOR = f"{B_PRINT}.{TABLE}_view_detail"
+DETAIL_HTML = f"{TABLE}_view_detail.html"
 
 UPDATE = "/update/<int:_id>"
-UPDATE_FOR = "plant_site_bp.plant_site_update"
-UPDATE_HTML = "plant_site_update.html"
+UPDATE_FOR = f"{B_PRINT}.{TABLE}_update"
+UPDATE_HTML = f"{TABLE}_update.html"
 
 
-@plant_site_bp.route(VIEW, methods=["GET", "POST"])
+@BLUE_PRINT.route(VIEW, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['plant_sites_admin', 'plant_sites_read'])
-def plant_site_view():
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def plant_sites_view():
 	"""Visualizzo informazioni Partner."""
 	# Estraggo la lista dei partners
 	_list = PlantSite.query.all()
@@ -44,13 +47,13 @@ def plant_site_view():
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, detail=DETAIL_FOR)
 
 
-@plant_site_bp.route(CREATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(CREATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['plant_sites_admin', 'plant_sites_write'])
-def plant_site_create(p_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def plant_sites_create(p_id):
 	"""Creazione Partner."""
-	from app.organizations.plant.models import Plant
+	from app.organizations.plants.models import Plant
 
 	form = FormPlantSite.new()
 	if form.validate_on_submit():
@@ -105,14 +108,14 @@ def plant_site_create(p_id):
 		return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
 
 
-@plant_site_bp.route(DETAIL, methods=["GET", "POST"])
+@BLUE_PRINT.route(DETAIL, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['plant_sites_admin', 'plant_sites_read'])
-def plant_site_view_detail(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def plant_sites_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
-	from app.organizations.plant.routes import DETAIL_FOR as PLANT_DETAIL
+	from app.organizations.plants.routes import DETAIL_FOR as PLANT_DETAIL
 
 	# Interrogo il DB
 	partner = PlantSite.query.options(joinedload(PlantSite.back_plant)).get(_id)
@@ -136,13 +139,13 @@ def plant_site_view_detail(_id):
 	)
 
 
-@plant_site_bp.route(UPDATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(UPDATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['plant_sites_admin', 'plant_sites_write'])
-def plant_site_update(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def plant_sites_update(_id):
 	"""Aggiorna dati Utente."""
-	from app.event_db.routes import event_create
+	from app.event_db.routes import events_create
 
 	# recupero i dati
 	plant_site = PlantSite.query.options(joinedload(PlantSite.back_plant)).get(_id)
@@ -175,7 +178,7 @@ def plant_site_update(_id):
 			"Modification": f"Update SITO whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, plant_site_id=_id)
+		_event = events_create(_event, plant_site_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.plant_id.data = f'{plant_site.back_plant.id} - {plant_site.back_plant.organization}'

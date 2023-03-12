@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from app.app import db, session
 from .forms import FormRole, FormRoleAddUser
 from .models import Role, UserRoles
-from ..account.models import User
+from ..users.models import User
 from ..functions import token_user_validate, access_required, timer_func
 
 role_bp = Blueprint(
@@ -15,35 +15,38 @@ role_bp = Blueprint(
 	static_folder='static'
 )
 
+TABLE = 'roles'
+BLUE_PRINT, B_PRINT = role_bp, 'role_bp'
+
 VIEW = "/view/"
-VIEW_FOR = "role_bp.role_view"
-VIEW_HTML = "role_view.html"
+VIEW_FOR = f"{B_PRINT}.{TABLE}_view"
+VIEW_HTML = f"{TABLE}_view.html"
 
 CREATE = "/create/"
-CREATE_FOR = "role_bp.role_create"
-CREATE_HTML = "role_create.html"
+CREATE_FOR = f"{B_PRINT}.{TABLE}_create"
+CREATE_HTML = f"{TABLE}_create.html"
 
 DETAIL = "/view/detail/<int:_id>"
-DETAIL_FOR = "role_bp.role_view_detail"
-DETAIL_HTML = "role_view_detail.html"
+DETAIL_FOR = f"{B_PRINT}.{TABLE}_view_detail"
+DETAIL_HTML = f"{TABLE}_view_detail.html"
 
 UPDATE = "/update/<int:_id>"
-UPDATE_FOR = "role_bp.role_update"
-UPDATE_HTML = "role_update.html"
+UPDATE_FOR = f"{B_PRINT}.{TABLE}_update"
+UPDATE_HTML = f"{TABLE}_update.html"
 
 ADD = "/add/role_to_user/<_id>/"
-ADD_FOR = "role_bp.add_role_to_user"
-ADD_HTML = "role_assign.html"
+ADD_FOR = f"{B_PRINT}.{TABLE}_add_to_user"
+ADD_HTML = f"{TABLE}_assign.html"
 
 REMOVE = "/remove/role_to_user/<id_role>/<id_user>/"
-REMOVE_FOR = "role_bp.remove_role_to_user"
+REMOVE_FOR = f"{B_PRINT}.{TABLE}_remove_to_user"
 
 
-@role_bp.route(VIEW, methods=["GET", "POST"])
+@BLUE_PRINT.route(VIEW, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['roles_admin', 'roles_read'])
-def role_view():
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def roles_view():
 	"""Visualizzo informazioni User."""
 
 	# Estraggo la lista dei permessi
@@ -57,11 +60,11 @@ def role_view():
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, detail=DETAIL_FOR)
 
 
-@role_bp.route(CREATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(CREATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['roles_admin', 'roles_write'])
-def role_create():
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def roles_create():
 	"""Creazione Utente Consorzio."""
 	form = FormRole()
 	if form.validate_on_submit():
@@ -82,13 +85,13 @@ def role_create():
 		return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
 
 
-@role_bp.route(DETAIL, methods=["GET", "POST"])
+@BLUE_PRINT.route(DETAIL, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['roles_admin', 'roles_read'])
-def role_view_detail(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def roles_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
-	from ..account.routes import DETAIL_FOR as USER_DETAIL_FOR
+	from ..users.routes import DETAIL_FOR as USER_DETAIL_FOR
 
 	# Interrogo il DB
 	role = Role.query.get(_id)
@@ -107,11 +110,11 @@ def role_view_detail(_id):
 						   assign=ADD_FOR, user_detail=USER_DETAIL_FOR, delete=REMOVE_FOR, u_len=u_len)
 
 
-@role_bp.route(UPDATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(UPDATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['roles_admin', 'roles_write'])
-def role_update(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def roles_update(_id):
 	"""Aggiorna dati Record."""
 	# recupero i dati
 	role = Role.query.get(_id)
@@ -141,11 +144,11 @@ def role_update(_id):
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, detail=DETAIL_FOR)
 
 
-@role_bp.route(ADD, methods=["GET", "POST"])
+@BLUE_PRINT.route(ADD, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['roles_admin'])
-def add_role_to_user(_id):
+@access_required(roles=[f'{TABLE}_admin'])
+def roles_add_to_user(_id):
 	"""Aggiunge una regala a un utente."""
 
 	form = FormRoleAddUser()
@@ -167,11 +170,11 @@ def add_role_to_user(_id):
 		return render_template(ADD_HTML, form=form, id=_id, detail=DETAIL_FOR)
 
 
-@role_bp.route(REMOVE, methods=["GET", "POST"])
+@BLUE_PRINT.route(REMOVE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['roles_admin', 'roles_delete'])
-def remove_role_to_user(id_role, id_user):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_delete'])
+def roles_remove_to_user(id_role, id_user):
 	"""Rimuove una regala a un utente."""
 	try:
 		remove_data = UserRoles.query.filter_by(role_id=id_role, user_id=id_user).first()

@@ -11,7 +11,7 @@ list_activity_categories.sort()
 
 
 def list_plant_sites(p_id=None):
-	from app.organizations.plant_site.models import PlantSite
+	from app.organizations.plant_sites.models import PlantSite
 
 	_list = ["-"]
 	try:

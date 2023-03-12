@@ -20,34 +20,37 @@ invoice_bp = Blueprint(
 	static_folder='static'
 )
 
+TABLE = 'invoices'
+BLUE_PRINT, B_PRINT = invoice_bp, 'invoice_bp'
+
 VIEW = "/view/"
-VIEW_FOR = "invoice_bp.invoice_view"
-VIEW_HTML = "invoice_view.html"
+VIEW_FOR = f"{B_PRINT}.{TABLE}_view"
+VIEW_HTML = f"{TABLE}_view.html"
 
 CREATE = "/create/<int:p_id>/<int:s_id>/"
-CREATE_FOR = "invoice_bp.invoice_create"
-CREATE_HTML = "invoice_create.html"
+CREATE_FOR = f"{B_PRINT}.{TABLE}_create"
+CREATE_HTML = f"{TABLE}_create.html"
 
 DETAIL = "/view/detail/<int:_id>"
-DETAIL_FOR = "invoice_bp.invoice_view_detail"
-DETAIL_HTML = "invoice_view_detail.html"
+DETAIL_FOR = f"{B_PRINT}.{TABLE}_view_detail"
+DETAIL_HTML = f"{TABLE}_view_detail.html"
 
 UPDATE = "/update/<int:_id>"
-UPDATE_FOR = "invoice_bp.invoice_update"
-UPDATE_HTML = "invoice_update.html"
+UPDATE_FOR = f"{B_PRINT}.{TABLE}_update"
+UPDATE_HTML = f"{TABLE}_update.html"
 
 GENERATE = "/generate/<int:_id>"
-GENERATE_FOR = "invoice_bp.invoice_generate"
+GENERATE_FOR = f"{B_PRINT}.{TABLE}_generate"
 
 DOWNLOAD = "/download/<int:_id>/"
-DOWNLOAD_FOR = "invoice_bp.invoice_download"
+DOWNLOAD_FOR = f"{B_PRINT}.{TABLE}_download"
 
 
-@invoice_bp.route(VIEW, methods=["GET", "POST"])
+@BLUE_PRINT.route(VIEW, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['invoices_admin', 'invoices_read'])
-def invoice_view():
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def invoices_view():
 	"""Visualizzo informazioni ODA."""
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as SITE_DETAIL
@@ -99,13 +102,13 @@ def invoice_view():
 	)
 
 
-@invoice_bp.route(CREATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(CREATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['invoices_admin', 'invoices_write'])
-def invoice_create(p_id, s_id=None):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def invoices_create(p_id, s_id=None):
 	"""Creazione OFFERTA."""
-	from app.organizations.plant.models import Plant
+	from app.organizations.plants.models import Plant
 
 	from app.organizations.partners.models import Partner
 	from app.organizations.partner_sites.models import PartnerSite
@@ -194,11 +197,11 @@ def invoice_create(p_id, s_id=None):
 		)
 
 
-@invoice_bp.route(DETAIL, methods=["GET", "POST"])
+@BLUE_PRINT.route(DETAIL, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['invoices_admin', 'invoices_read'])
-def invoice_view_detail(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def invoices_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
 
@@ -266,14 +269,14 @@ def invoice_view_detail(_id):
 		[previous_data.pop(key) for key in ["updated_at", "invoice_pdf"]]
 		previous_data['invoice_amount'] = str(previous_data['invoice_amount'])
 
-		from app.event_db.routes import event_create
+		from app.event_db.routes import events_create
 		_event = {
 			"username": session["user"]["username"],
 			"table": Invoice.__tablename__,
 			"Modification": f"Update INVOICE whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, invoice_id=_id)
+		_event = events_create(_event, invoice_id=_id)
 
 	db.session.close()
 	return render_template(
@@ -287,13 +290,13 @@ def invoice_view_detail(_id):
 	)
 
 
-@invoice_bp.route(UPDATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(UPDATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['invoices_admin', 'invoices_write'])
-def invoice_update(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def invoices_update(_id):
 	"""Aggiorna dati OFFERTA."""
-	from app.event_db.routes import event_create
+	from app.event_db.routes import events_create
 
 	# recupero i dati
 	invoice = Invoice.query \
@@ -331,7 +334,7 @@ def invoice_update(_id):
 			"Modification": f"Update INVOICE whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, invoice_id=_id)
+		_event = events_create(_event, invoice_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		# Organizzazione
@@ -350,7 +353,7 @@ def invoice_update(_id):
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=DETAIL_FOR)
 
 
-@invoice_bp.route("/<form>/<form_rows>/", methods=["GET", "POST"])
+@BLUE_PRINT.route("/<form>/<form_rows>/", methods=["GET", "POST"])
 @timer_func
 @token_user_validate
 def html_to_pdf(invoice, invoice_rows):  # , _qrcode):
@@ -408,15 +411,15 @@ def html_to_pdf(invoice, invoice_rows):  # , _qrcode):
 		return False
 
 
-@invoice_bp.route(GENERATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(GENERATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['invoices_admin', 'invoices_write'])
-def invoice_generate(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def invoices_generate(_id):
 	"""Genera il pdf di un'OFFERTA."""
 	from app.orders.order_rows.models import OdaRow
 	from app.functions_pdf import pdf_to_byte
-	from app.event_db.routes import event_create
+	from app.event_db.routes import events_create
 
 	invoice = Invoice.query.options(joinedload(Invoice.client)).get(_id)
 	invoice_rows = OdaRow.query.filter_by(oda_id=_id).order_by(OdaRow.id.asc()).all()
@@ -456,7 +459,7 @@ def invoice_generate(_id):
 			"Modification": f"Update INVOICE whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, invoice_id=_id)
+		_event = events_create(_event, invoice_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		flash(f"ERRORE CREAZIONE BYTE PDF.")
@@ -464,11 +467,11 @@ def invoice_generate(_id):
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 
 
-@invoice_bp.route(DOWNLOAD, methods=["GET", "POST"])
+@BLUE_PRINT.route(DOWNLOAD, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['invoices_admin', 'invoices_read'])
-def invoice_download(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def invoices_download(_id):
 	"""Genera file pdf da stringa in byte."""
 	import os
 	from flask import send_file

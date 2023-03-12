@@ -16,34 +16,37 @@ from .forms import FormUserLogin, FormUserCreate, FormUserUpdate, FormUserPswCha
 from .functions import psw_hash
 from .models import User
 
-account_bp = Blueprint(
-	'account_bp', __name__,
+user_bp = Blueprint(
+	'user_bp', __name__,
 	template_folder='templates',
 	static_folder='static'
 )
 
+TABLE = 'users'
+BLUE_PRINT, B_PRINT = user_bp, 'user_bp'
+
 VIEW = "/view/"
-VIEW_FOR = "account_bp.user_view"
-VIEW_HTML = "user_view.html"
+VIEW_FOR = f"{B_PRINT}.{TABLE}_view"
+VIEW_HTML = f"{TABLE}_view.html"
 
 CREATE = "/create/"
-CREATE_FOR = "account_bp.user_create"
-CREATE_HTML = "user_create.html"
+CREATE_FOR = f"{B_PRINT}.{TABLE}_create"
+CREATE_HTML = f"{TABLE}_create.html"
 
 DETAIL = "/view/detail/<int:_id>"
-DETAIL_FOR = "account_bp.user_view_detail"
-DETAIL_HTML = "user_view_detail.html"
+DETAIL_FOR = f"{B_PRINT}.{TABLE}_view_detail"
+DETAIL_HTML = f"{TABLE}_view_detail.html"
 
 UPDATE = "/update/<int:_id>"
-UPDATE_FOR = "account_bp.user_update"
-UPDATE_HTML = "user_update.html"
+UPDATE_FOR = f"{B_PRINT}.{TABLE}_update"
+UPDATE_HTML = f"{TABLE}_update.html"
 
 UPDATE_PSW = "/update/psw/<int:_id>/"
-UPDATE_PSW_FOR = "account_bp.user_update_password"
-UPDATE_PSW_HTML = "user_update_password.html"
+UPDATE_PSW_FOR = f"{B_PRINT}.{TABLE}_update_password"
+UPDATE_PSW_HTML = f"{TABLE}_update_password.html"
 
 
-@account_bp.route("/login/", methods=["GET", "POST"])
+@BLUE_PRINT.route("/login/", methods=["GET", "POST"])
 @timer_func
 def login():
 	"""Effettua la log-in."""
@@ -91,15 +94,15 @@ def login():
 					return redirect(url_for(VIEW_FOR))
 			except Exception as err:
 				flash(f'ERROR: {err}')
-				return render_template("user_login.html", form=form)
+				return render_template(f"{TABLE}_login.html", form=form)
 		else:
 			flash("Invalid username or password. Please try again!", category="alert")
-			return render_template("user_login.html", form=form)
+			return render_template(f"{TABLE}_login.html", form=form)
 	else:
-		return render_template("user_login.html", form=form)
+		return render_template(f"{TABLE}_login.html", form=form)
 
 
-@account_bp.route("/logout/")
+@BLUE_PRINT.route("/logout/")
 @timer_func
 def logout(msg=None):
 	"""Effettua il log-out ed elimina i dati della sessione."""
@@ -107,14 +110,14 @@ def logout(msg=None):
 		flash(msg)
 	flash("Log-Out effettuato.")
 	session.clear()
-	return redirect(url_for('account_bp.login'))
+	return redirect(url_for(f'{B_PRINT}.login'))
 
 
-@account_bp.route(VIEW, methods=["GET", "POST"])
+@BLUE_PRINT.route(VIEW, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['users_admin', 'users_read'])
-def user_view():
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def users_view():
 	"""Visualizzo informazioni Utente."""
 	try:
 		# Estraggo l'utente corrente
@@ -132,14 +135,14 @@ def user_view():
 		)
 	except Exception as err:
 		flash(f'ERROR: {err}')
-		return redirect(url_for('account_bp.login'))
+		return redirect(url_for(f'{B_PRINT}.login'))
 
 
-@account_bp.route(CREATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(CREATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['users_admin', 'users_write'])
-def user_create():
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def users_create():
 	"""Creazione Utente personale."""
 	form = FormUserCreate.new()
 	if form.validate_on_submit():
@@ -189,15 +192,15 @@ def user_create():
 		return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
 
 
-@account_bp.route(DETAIL, methods=["GET", "POST"])
+@BLUE_PRINT.route(DETAIL, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['users_admin', 'users_read'])
-def user_view_detail(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
+def users_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
-	from app.organizations.plant.routes import DETAIL_FOR as PLANT_DETAIL
-	from app.organizations.plant_site.routes import DETAIL_FOR as SITE_DETAIL
+	from app.organizations.plants.routes import DETAIL_FOR as PLANT_DETAIL
+	from app.organizations.plant_sites.routes import DETAIL_FOR as SITE_DETAIL
 	from app.roles.routes import DETAIL_FOR as ROLE_DETAIL
 
 	# Estraggo l' ID dell'utente corrente
@@ -244,13 +247,13 @@ def user_view_detail(_id):
 	)
 
 
-@account_bp.route(UPDATE, methods=["GET", "POST"])
+@BLUE_PRINT.route(UPDATE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-@access_required(roles=['users_admin', 'users_write'])
-def user_update(_id):
+@access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def users_update(_id):
 	"""Aggiorna dati Utente."""
-	from app.event_db.routes import event_create
+	from app.event_db.routes import events_create
 
 	# recupero i dati
 	user = User.query.filter_by(id=_id).options(
@@ -288,7 +291,7 @@ def user_update(_id):
 			"Modification": f"Update account USER whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = event_create(_event, user_id=_id)
+		_event = events_create(_event, user_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		if user.plant_user:
@@ -307,12 +310,12 @@ def user_update(_id):
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, detail=DETAIL_FOR)
 
 
-@account_bp.route(UPDATE_PSW, methods=["GET", "POST"])
+@BLUE_PRINT.route(UPDATE_PSW, methods=["GET", "POST"])
 @timer_func
-@access_required_update_psw(roles=['users_admin', 'users_write'])
-def user_update_password(_id, msg=None):
+@access_required_update_psw(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
+def users_update_password(_id, msg=None):
 	"""Aggiorna password Utente."""
-	from app.event_db.routes import event_create
+	from app.event_db.routes import events_create
 
 	form = FormUserPswChange()
 	if request.method == 'POST' and form.validate():
@@ -338,8 +341,8 @@ def user_update_password(_id, msg=None):
 				"username": _user.username,
 				"Modification": "Password reset"
 			}
-			_event = event_create(_event, user_id=_id)
-			return redirect(url_for('account_bp.logout', msg=msg))
+			_event = events_create(_event, user_id=_id)
+			return redirect(url_for(f'{B_PRINT}.logout', msg=msg))
 	else:
 		if session["user"]["id"] != _id and session["user"]["psw_changed"] is True:
 			flash(f"Non hai i privilegi per effettuare il cambio password per l'utente con id: {_id}")

@@ -28,7 +28,7 @@ def list_user():
 
 
 def list_plant_sites():
-	from app.organizations.plant_site.models import PlantSite
+	from app.organizations.plant_sites.models import PlantSite
 
 	_list = ["-"]
 	try:
@@ -46,7 +46,7 @@ def list_plant_sites():
 
 
 def list_plants():
-	from app.organizations.plant.models import Plant
+	from app.organizations.plants.models import Plant
 
 	_list = ["-"]
 	try:

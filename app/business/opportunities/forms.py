@@ -71,7 +71,7 @@ def list_partner_contacts(p_id, s_id=None):
 
 
 def list_plants():
-	from app.organizations.plant.models import Plant
+	from app.organizations.plants.models import Plant
 
 	_list = ["-"]
 	try:
@@ -88,7 +88,7 @@ def list_plants():
 
 
 def list_plant_sites():
-	from app.organizations.plant_site.models import PlantSite
+	from app.organizations.plant_sites.models import PlantSite
 
 	_list = ["-"]
 	try:
@@ -123,7 +123,7 @@ def list_activities():
 
 
 def list_users():
-	from app.account.models import User
+	from app.users.models import User
 
 	_list = []
 	try:
