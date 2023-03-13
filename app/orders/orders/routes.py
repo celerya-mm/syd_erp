@@ -20,7 +20,7 @@ oda_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'orders'
+TABLE = Oda.__tablename__
 BLUE_PRINT, B_PRINT = oda_bp, 'oda_bp'
 
 VIEW = "/view/"
@@ -268,14 +268,14 @@ def orders_view_detail(_id):
 		[previous_data.pop(key) for key in ["updated_at", "oda_pdf"]]
 		previous_data['oda_amount'] = str(previous_data['oda_amount'])
 
-		from app.event_db.routes import events_create
+		from app.event_db.routes import events_db_create
 		_event = {
 			"username": session["user"]["username"],
 			"table": Oda.__tablename__,
 			"Modification": f"Update ODA whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, order_id=_id)
+		_event = events_db_create(_event, order_id=_id)
 
 	db.session.close()
 	return render_template(
@@ -294,7 +294,7 @@ def orders_view_detail(_id):
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
 def orders_update(_id):
 	"""Aggiorna dati ODA."""
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	# recupero i dati
 	oda = Oda.query \
@@ -332,7 +332,7 @@ def orders_update(_id):
 			"Modification": f"Update ODA whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, order_id=_id)
+		_event = events_db_create(_event, order_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		# Organizzazione
@@ -384,7 +384,7 @@ def html_to_pdf(oda, oda_rows):  # , _qrcode):
 		if oda.oda_currency == '€':
 			oda.oda_currency = 'Euro'
 
-		html = render_template('oda_to_pdf.html', oda=oda, oda_rows=oda_rows, logo=logo, sign=sign)  # , qrcode=_img)
+		html = render_template(f'{TABLE}_to_pdf.html', oda=oda, oda_rows=oda_rows, logo=logo, sign=sign)  # , qrcode=_img)
 		_html = os.path.join(folder_temp_pdf, "temp.html")
 
 		db.session.close()
@@ -416,7 +416,7 @@ def orders_generate(_id):
 	"""Genera il pdf di un ODA."""
 	from app.orders.order_rows.models import OdaRow
 	from app.functions_pdf import pdf_to_byte
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	oda = Oda.query.options(joinedload(Oda.supplier)).get(_id)
 	oda_row = OdaRow.query.filter_by(oda_id=_id).order_by(OdaRow.id.asc()).all()
@@ -456,7 +456,7 @@ def orders_generate(_id):
 			"Modification": f"Update ODA whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, order_id=_id)
+		_event = events_db_create(_event, order_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		flash(f"ERRORE CREAZIONE BYTE PDF.")
@@ -479,8 +479,8 @@ def orders_download(_id):
 	db.session.close()
 	if oda.oda_pdf and len(oda.oda_pdf) > 100:
 		_pdf = byte_to_pdf(oda.oda_pdf, oda.oda_number)
-		_payment_condition = os.path.join(_path, "orders", "order", "attachments", "CG_Celerya_Rev_12_2020.pdf")
-		_merged = os.path.join(_path, "orders", "orders", "temp_pdf", "_merged.pdf")
+		_payment_condition = os.path.join(_path, "orders", f"{TABLE}", "attachments", "CG_Celerya_Rev_12_2020.pdf")
+		_merged = os.path.join(_path, "orders", f"{TABLE}", "temp_pdf", "_merged.pdf")
 
 		merger = PdfMerger()
 		with open(_pdf, 'rb') as f:

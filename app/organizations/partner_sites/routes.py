@@ -15,7 +15,7 @@ partner_site_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'partner_sites'
+TABLE = PartnerSite.__tablename__
 BLUE_PRINT, B_PRINT = partner_site_bp, 'partner_site_bp'
 
 VIEW = "/view/"
@@ -171,7 +171,7 @@ def partner_sites_view_detail(_id):
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
 def partner_sites_update(_id):
 	"""Aggiorna dati Sito."""
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	# recupero i dati
 	site = PartnerSite.query.options(joinedload(PartnerSite.back_partner)).get(_id)
@@ -204,7 +204,7 @@ def partner_sites_update(_id):
 			"Modification": f"Update PARTNER whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, partner_site_id=_id)
+		_event = events_db_create(_event, partner_site_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.partner_id.data = f'{site.back_partner.id} - {site.back_partner.organization}'

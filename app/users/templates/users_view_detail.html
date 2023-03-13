@@ -127,6 +127,198 @@
 </form>
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
 	<div class="accordion" id="accordion">
+		<!--	Opportunità-->
+		{% if opp_list != 0 %}
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="3">
+				<button aria-controls="collapse3"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse3"
+						data-bs-toggle="collapse"
+						type="button">
+					Elenco Opportunità assegnate [ {{ opp_len }} ]
+				</button>
+			</h2>
+			<div aria-labelledby="heading3"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse3">
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="opportunities" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" id="op1">ID</th>
+							<th class="title" id="op2">Data</th>
+							<th class="title" id="op3">Anno</th>
+							<th class="title" id="op4">Categoria</th>
+							<th class="title" id="op5">Descrizione</th>
+							<th class="title" id="op6">Valore</th>
+							<th class="title" id="op7">Stato</th>
+							<th class="title" id="op8">Scadenza</th>
+							<th class="title" id="op9">Sc.</th>
+							<th class="title" id="op10">P.</th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in opp_list %}
+						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'opportunities_admin' in session['user_roles']
+								or 'opportunities_read' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(opp_detail, _id=row.id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.id|e }}
+								</a>
+								{% else %}
+								{{ row.id|e }}
+								{% endif %}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.opp_date|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.opp_year|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.opp_category|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.opp_description|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.opp_value|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{% if row.opp_status == "04 - Closed [Converted]"%}
+								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
+								{% elif row.opp_status == "05 - Closed [Lost]" %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
+								{% else %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_pending.svg') }}">
+								{% endif %}
+								{{ row.opp_status }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.opp_expiration_date|e }}
+							</td>
+							<td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{% if row.opp_expired == False %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
+								{% else %}
+								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
+								{% endif %}
+								{{ row.opp_expired }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'partners_admin' in session['user_roles']
+								or 'partners_read' in session['user_roles']
+								%}
+								<a class="tab-link" href="{{ url_for(partner_detail, _id=row.partner_id) }}" style=""
+								   title="Visualizza">
+									{{ row.partner_id|e }}
+								</a>
+								{% else %}
+								{{ row.partner_id|e }}
+								{% endif %}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+		<!--	Azioni Opportunità-->
+		{% if act_len != 0 %}
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="4">
+				<button aria-controls="collapse4"
+						aria-expanded="true"
+						class="accordion-button"
+						data-bs-target="#collapse4"
+						data-bs-toggle="collapse"
+						type="button">
+					Elenco Azioni Opportunità assegnate [ {{ act_len }} ]
+				</button>
+			</h2>
+			<div aria-labelledby="heading4"
+				 class="accordion-collapse collapse"
+				 data-bs-parent="#accordion"
+				 id="collapse4">
+				<div class="table-responsive" style="padding: 10px">
+					<table class="table table-striped" id="actions" style="width:100%">
+						<thead>
+						<tr style="background-color: #2B4692; vertical-align: center;">
+							<th class="title" id="a1">ID</th>
+							<th class="title" id="a2">Data</th>
+							<th class="title" id="a3">Categoria</th>
+							<th class="title" id="a4">Descrizione</th>
+							<th class="title" id="a5">Opport.</th>
+							<th class="title" id="a6">Time</th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for row in act_list %}
+						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+							<td class="primary fw-bold"
+								style="padding-bottom: 0pz; padding-top: 0pz; width: 20px !important;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'actions_admin' in session['user_roles']
+								or 'actions_write' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(act_detail, _id=row.id) }}"
+								   title="Visualizza Record"
+								   type="button">
+									{{ row.id|e }}
+								</a>
+								{% else %}
+								{{ row.id|e }}
+								{% endif %}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.action_date|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.action_category|e }}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.7rem;">
+								{{ row.action_description|e }}
+							</td>
+							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{%
+								if 'superuser' in session['user_roles']
+								or 'opportunities_admin' in session['user_roles']
+								or 'opportunities_write' in session['user_roles']
+								%}
+								<a class="btn-table" href="{{ url_for(opp_detail, _id=row.opp_id) }}"
+								   title="Visualizza Opportunità"
+								   type="button">
+									{{ row.opp_id|e }}
+								</a>
+								{% else %}
+								{{ row.opp_id|e }}
+								{% endif %}
+							</td>
+							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+								{{ row.action_time_spent|e }}
+							</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		{% endif %}
 		<!--	Ruoli-->
 		{% if r_len != 0 %}
 		<div class="accordion-item">
@@ -249,7 +441,25 @@
 {% block scripts %}
 <script>
     $(document).ready(function () {
-        $('#events').DataTable({
+        $('#opportunities').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            },
+        });
+    });
+    
+    $(document).ready(function () {
+        $('#actions').DataTable({
             responsive: {
                 breakpoints: [
                     { name: 'bigdesktop', width: 1920 },
@@ -283,6 +493,25 @@
             },
         });
     });
+    
+    $(document).ready(function () {
+        $('#events').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            },
+        });
+    });
+
 
 </script>
 {% endblock %}

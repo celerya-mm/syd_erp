@@ -65,7 +65,7 @@ with app.app_context():
 	from app.invoices.invoice_rows.routes import invoice_rows_bp
 	
 	from app.business.opportunities.routes import opportunity_bp
-	# from app.business.actions.routes import action_bp
+	from app.business.actions.routes import action_bp
 	
 	# registro i blueprints
 	app.register_blueprint(event_bp, url_prefix='/event')
@@ -89,4 +89,4 @@ with app.app_context():
 	app.register_blueprint(invoice_rows_bp, url_prefix='/invoice_row')
 	
 	app.register_blueprint(opportunity_bp, url_prefix='/opportunity')
-	# app.register_blueprint(action_bp, url_prefix='/action')
+	app.register_blueprint(action_bp, url_prefix='/action')

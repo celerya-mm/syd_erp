@@ -97,14 +97,12 @@
 								{{ row.opp_value|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{% if row.opp_status == "Pagata_OK" or row.opp_status == "Pagata_Ritardo"%}
+								{% if row.opp_status == "04 - Closed [Converted]"%}
 								<img alt="" src="{{ url_for('static', filename='icons/check_OK.svg') }}">
-								{% elif row.opp_status == "Scaduta" %}
+								{% elif row.opp_status == "05 - Closed [Lost]" %}
 								<img alt="" src="{{ url_for('static', filename='icons/check_KO.svg') }}">
-								{% elif row.opp_status == "Emessa" %}
-								<img alt="" src="{{ url_for('static', filename='icons/check_pending.svg') }}">
 								{% else %}
-								<img alt="" src="{{ url_for('static', filename='icons/check_emitted.svg') }}">
+								<img alt="" src="{{ url_for('static', filename='icons/check_pending.svg') }}">
 								{% endif %}
 								{{ row.opp_status }}
 							</td>

@@ -16,7 +16,7 @@ invoice_rows_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'invoice_rows'
+TABLE = InvoiceRow.__tablename__
 BLUE_PRINT, B_PRINT = invoice_rows_bp, 'invoice_rows_bp'
 
 CREATE = "/create/<int:inv_id>/<int:c_id>/<int:s_id>/"
@@ -152,7 +152,7 @@ def invoice_rows_view_detail(_id):
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
 def invoice_rows_update(_id):
 	"""Aggiorna dati Riga Fattura."""
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	# recupero i dati
 	invoice_row = InvoiceRow.query \
@@ -209,7 +209,7 @@ def invoice_rows_update(_id):
 			"Modification": f"Update INVOICE_ROW whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, invoice_row_id=_id)
+		_event = events_db_create(_event, invoice_row_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		if invoice_row.client_site:

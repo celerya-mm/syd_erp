@@ -17,7 +17,7 @@ activity_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'activities'
+TABLE = Activity.__tablename__
 BLUE_PRINT, B_PRINT = activity_bp, 'activity_bp'
 
 VIEW = "/view/"
@@ -161,7 +161,7 @@ def activities_view_detail(_id):
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
 def activities_update(_id):
 	"""Aggiorna dati Activity."""
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	# recupero i dati
 	activity = Activity.query \
@@ -196,7 +196,7 @@ def activities_update(_id):
 			"Modification": f"Update ACTIVITY whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, activity_id=_id)
+		_event = events_db_create(_event, activity_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		# form.plant_id.data = f'{activity.plant.id} - {activity.plant.organization}'

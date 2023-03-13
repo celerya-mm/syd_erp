@@ -42,6 +42,7 @@ class User(db.Model):
 	roles = db.relationship('Role', secondary='user_roles', backref='users', viewonly=True, lazy='dynamic')
 
 	opportunities = db.relationship('Opportunity', backref='users', viewonly=True, lazy='dynamic')
+	actions = db.relationship('Action', backref='users', viewonly=True, lazy='dynamic')
 
 	events = db.relationship('EventDB', backref='users', order_by='EventDB.id.desc()', lazy='dynamic')
 

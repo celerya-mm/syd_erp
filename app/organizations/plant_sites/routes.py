@@ -13,7 +13,7 @@ plant_site_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'plant_sites'
+TABLE = PlantSite.__tablename__
 BLUE_PRINT, B_PRINT = plant_site_bp, 'plant_site_bp'
 
 VIEW = "/view/"
@@ -145,7 +145,7 @@ def plant_sites_view_detail(_id):
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
 def plant_sites_update(_id):
 	"""Aggiorna dati Utente."""
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	# recupero i dati
 	plant_site = PlantSite.query.options(joinedload(PlantSite.back_plant)).get(_id)
@@ -178,7 +178,7 @@ def plant_sites_update(_id):
 			"Modification": f"Update SITO whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, plant_site_id=_id)
+		_event = events_db_create(_event, plant_site_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		form.plant_id.data = f'{plant_site.back_plant.id} - {plant_site.back_plant.organization}'

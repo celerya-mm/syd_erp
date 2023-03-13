@@ -35,6 +35,7 @@ class PlantSite(db.Model):
 	activities = db.relationship('Activity', backref='plant_sites', lazy='dynamic')
 
 	opportunities = db.relationship('Opportunity', backref='plant_sites', lazy='dynamic')
+	actions = db.relationship('Action', backref='plant_sites', lazy='dynamic')
 
 	events = db.relationship('EventDB', backref='plant_sites', order_by='EventDB.id.desc()', lazy='dynamic')
 

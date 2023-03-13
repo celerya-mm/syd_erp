@@ -1,64 +1,65 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, SelectField, IntegerField, DecimalField, TextAreaField
+from wtforms import SubmitField, SelectField, IntegerField, DecimalField, TextAreaField, DateField
 from wtforms.validators import Length, Optional, DataRequired
 
-from app.app import db
-from app.support_lists import list_currency, list_um, list_activity_categories
+from app.app import db, session
+from app.support_lists import list_opp_categories
 
-list_activity_categories.sort()
+list_opp_categories.sort()
 
 
-def list_activities(upd=None):
-	from app.invoices.activities.models import Activity
+def list_users(pl_id=None):
+	from app.users.models import User
 
 	_list = ["-"]
 	try:
-		records = Activity.query.order_by(Activity.activity_code.asc()).all()
+		if pl_id:
+			records = User.query.filter_by(plant_id=pl_id, active=True).order_by(User.full_name.asc()).all()
+		else:
+			records = User.query.filter_by(active=True).order_by(User.full_name.asc()).all()
+			
 		for r in records:
-			if upd:
-				_list.append(r.activity_code)
-			else:
-				_list.append(f"{r.activity_code} - {r.activity_description}")
+			_list.append(f"{r.id} - {r.full_name}")
 	except Exception as err:
-		print('ERROR_LIST_ACTIVITIES:', err)
+		print('ERROR_LIST_USERS_ACTIONS:', err)
 		pass
 
 	db.session.close()
 	return _list
 
 
-def list_clients():
+def list_partners():
 	from app.organizations.partners.models import Partner
 
 	_list = ["-"]
 	try:
-		records = Partner.query.filter_by(client=True).order_by(Partner.id.asc()).all()
+		records = Partner.query.order_by(Partner.organization.asc()).all()
 		for r in records:
 			_list.append(f"{r.id} - {r.organization}")
 	except Exception as err:
-		print('ERROR_LIST_CLIENTS:', err)
+		print('ERROR_LIST_PARTNERS_ACTIONS:', err)
 		pass
 
 	db.session.close()
 	return _list
 
 
-def list_client_sites(p_id=None):
+def list_partner_sites(p_id=None):
 	from app.organizations.partner_sites.models import PartnerSite
 
 	_list = ["-"]
 	try:
 		if p_id:
-			records = PartnerSite.query.filter_by(partner_id=p_id, client=True).order_by(PartnerSite.id.asc()).all()
+			records = PartnerSite.query.filter_by(partner_id=p_id).order_by(PartnerSite.site.asc()).all()
 		else:
 			records = PartnerSite.query.order_by(PartnerSite.id.asc()).all()
 
 		for r in records:
 			_list.append(f"{r.id} - {r.site}")
 	except Exception as err:
-		print('ERROR_LIST_CLIENT_SITES:', err)
+		print('ERROR_LIST_PARTNER_SITES_ACTIONS:', err)
 		pass
 
 	# print("LIST:", _list)
@@ -66,113 +67,165 @@ def list_client_sites(p_id=None):
 	return _list
 
 
-class FormInvoiceRowCreate(FlaskForm):
-	"""Form per creare una riga Fattura."""
-	activity_code = SelectField('Codice Attività', choices=list_activities)
+def list_partner_contacts(p_id=None):
+	from app.organizations.partner_contacts.models import PartnerContact
 
-	submit = SubmitField("SAVE")
+	_list = ["-"]
+	try:
+		if p_id:
+			records = PartnerContact.query.filter_by(partner_id=p_id).order_by(PartnerContact.full_name.asc()).all()
+		else:
+			records = PartnerContact.query.order_by(PartnerContact.id.asc()).all()
 
-	def __repr__(self):
-		return f'<INVOICE_ROW_FORM_CREATE: [ {self.activity_code} ]>'
+		for r in records:
+			_list.append(f"{r.id} - {r.full_name}")
+	except Exception as err:
+		print('ERROR_LIST_PARTNER_CONTACTS_ACTIONS:', err)
+		pass
 
-	def __str__(self):
-		return f'<INVOICE_ROW_FORM_CREATE: [ {self.activity_code} ]>'
-
-	@classmethod
-	def new(cls):
-		# Instantiate the form
-		form = cls()
-		# Update the choices
-		form.activity_code.choices = list_activities()
-		return form
+	# print("LIST:", _list)
+	db.session.close()
+	return _list
 
 
-class FormInvoiceRowUpdate(FlaskForm):
+def list_plant_sites(pl_id=None):
+	from app.organizations.plant_sites.models import PlantSite
+
+	_list = ["-"]
+	try:
+		if pl_id:
+			records = PlantSite.query.filter_by(partner_id=pl_id, active=True).order_by(PlantSite.site.asc()).all()
+		else:
+			records = PlantSite.query.order_by(PlantSite.id.asc()).all()
+			
+		if records:
+			for r in records:
+				_list.append(f"{r.id} - {r.site}")
+	except Exception as err:
+		print('ERROR_LIST_PLANT_SITES_ACTIONS:', err)
+		pass
+
+	# print("LIST:", _list)
+	db.session.close()
+	return _list
+
+
+class FormActions(FlaskForm):
 	"""Form per aggiornare riga Fattura."""
-	activity_code = SelectField('Codice Attività', choices=list_activities)
-
-	activity_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"),
+	action_description = TextAreaField('Descrizione', validators=[DataRequired("Campo obbligatorio!"),
 																	Length(max=500)])
-	activity_category = SelectField('Categoria', choices=list_activity_categories)
+	action_category = SelectField('Categoria', choices=list_opp_categories)
+	
+	action_date = DateField('Data', validators=[DataRequired("Campo obbligatorio!")])
+	
+	user_id = SelectField("Utente", validators=[DataRequired("Campo obbligatorio!")])
 
-	activity_price = DecimalField('Prezzo', validators=[DataRequired("Campo obbligatorio!")], places=2)
-	activity_price_discount = DecimalField('Sconto %', validators=[Optional()], places=2)
-	activity_currency = SelectField('Valuta', choices=list_currency)
+	action_time_spent = DecimalField('Impegno h', validators=[DataRequired("Campo obbligatorio!")], places=1)
 
-	activity_amount = DecimalField('Totale', validators=[Optional()], places=2)
+	opp_id = IntegerField("Opportunità", validators=[DataRequired("Campo obbligatorio!")])
 
-	invoice_id = IntegerField("Fattura", validators=[DataRequired("Campo obbligatorio!")])
+	plant_id = IntegerField("Azienda", validators=[DataRequired("Campo obbligatorio!")])
+	plant_site_id = SelectField('Sede Operativa', validators=[Optional()])
 
-	activity_quantity = DecimalField('Q.', validators=[Optional()])
-	activity_quantity_um = SelectField('U.M.', choices=list_um, validators=[Optional()])
-
-	client_id = IntegerField("Cliente", validators=[DataRequired("Campo obbligatorio!")])
-	client_site_id = SelectField("Sito C.", validators=[Optional()])
+	partner_id = SelectField("Partner", validators=[DataRequired("Campo obbligatorio!")])
+	partner_site_id = SelectField("Sito Partner", validators=[Optional()])
+	partner_contact_id = SelectField("Referente", validators=[Optional()])
 
 	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 
 	def __repr__(self):
-		return f'<INVOICE_ROW_FORM_UPDATE: [ {self.activity_code} ] - {self.activity_description}>'
+		return f'<ACTION_FORM: {self.action_description}>'
 
 	def __str__(self):
-		return f'<INVOICE_ROW_FORM_UPDATE: [ {self.activity_code} ] - {self.activity_description}>'
+		return f'<ACTION_FORM: {self.action_description}>'
+	
+	@classmethod
+	def new(cls, pl_id=None, p_id=None):
+		# Instantiate the form
+		form = cls()
+		form.action_date.data = date.today()
+		form.user_id.data = f"{session['user']['id']} - {session['user']['full_name']}"
+		
+		# Update the choices
+		form.user_id.choices = list_users(pl_id)
+		form.plant_site_id.choices = list_plant_sites(pl_id)
+		
+		form.partner_id.choices = list_partners()
+		form.partner_site_id.choices = list_partner_sites(p_id)
+		form.partner_contact_id.choices = list_partner_contacts(p_id)
+		return form
 
 	@classmethod
-	def update(cls, obj, p_id=None):
+	def update(cls, obj, pl_id=None, p_id=None):
 		# Instantiate the form
 		form = cls()
 
-		form.activity_code.data = obj.activity_code
+		form.action_description.data = obj.action_description
+		form.action_category.data = obj.action_category
+		
+		form.action_date.data = obj.action_date
+		
+		form.action_time_spent.data = obj.action_time_spent or None
 
-		form.activity_description.data = obj.activity_description
-		form.activity_category.data = obj.activity_category
-
-		form.activity_price.data = obj.activity_price
-		form.activity_price_discount.data = obj.activity_price_discount or None
-		form.activity_currency.data = obj.activity_currency or None
-
-		form.activity_quantity.data = obj.activity_quantity or None
-		form.activity_quantity_um.data = obj.activity_quantity_um or None
-
-		form.invoice_id.data = obj.invoice_id
-
-		form.client_id.data = obj.client_id
-
-		# Update the choices
-		form.activity_code.choices = list_activities(upd=True)
-		form.client_site_id.choices = list_client_sites(p_id)
+		form.opp_id.data = obj.opp_id
+		
+		form.plant_id.data = obj.plant_id
 
 		form.note.data = obj.note or None
-
+		
+		# Update the choices
+		form.user_id.choices = list_users(pl_id)
+		form.plant_site_id.choices = list_plant_sites(pl_id)
+		
+		form.partner_id.choices = list_partners()
+		form.partner_site_id.choices = list_partner_sites(p_id)
+		form.partner_contact_id.choices = list_partner_contacts(p_id)
 		return form
 
 	def to_dict(self):
 		"""Converte form in dict."""
-		from app.functions import not_empty
-
-		if self.client_site_id.data and self.client_site_id.data not in ['', '-']:
-			client_site_id = self.client_site_id.data.split(' - ')[0]
+		from app.functions import not_empty, date_to_str
+		
+		if self.user_id.data and self.user_id.data not in ['', '-']:
+			user_id = int(self.user_id.data.split(' - ')[0])
 		else:
-			client_site_id = None
+			user_id = None
+			
+		if self.plant_site_id.data and self.plant_site_id.data not in ['', '-']:
+			plant_site_id = int(self.plant_site_id.data.split(' - ')[0])
+		else:
+			plant_site_id = None
+
+		if self.partner_site_id.data and self.partner_site_id.data not in ['', '-']:
+			partner_site_id = int(self.partner_site_id.data.split(' - ')[0])
+		else:
+			partner_site_id = None
+		
+		if self.partner_contact_id.data and self.partner_contact_id.data not in ['', '-']:
+			partner_contact_id = int(self.partner_contact_id.data.split(' - ')[0])
+		else:
+			partner_contact_id = None
 
 		return {
-			'activity_code': self.activity_code.data.split(' - ')[0],
+			'action_description': not_empty(self.action_description.data.strip().replace('  ', ' ')),
+			'action_category': self.action_category.data,
 
-			'activity_description': not_empty(self.activity_description.data.strip().replace('  ', ' ')),
-			'activity_category': self.activity_category.data,
+			'action_date': date_to_str(self.action_date.data),
+			
+			'user_id': user_id,
+			
+			'action_time_spent': float(self.action_time_spent.data),
+			
+			'opp_id': int(self.opp_id.data),
 
-			'activity_price': float(self.activity_price.data),
-			'activity_price_discount': float(self.activity_price_discount.data) if self.activity_price_discount.data
-			else None,
-			'activity_currency': self.activity_currency.data,
+			'plant_id': int(self.plant_id.data),
+			'plant_site_id': plant_site_id,
 
-			'activity_quantity': not_empty(float(self.activity_quantity.data)),
-			'activity_quantity_um': not_empty(self.activity_quantity_um.data),
-
-			'client_id': self.client_id.data,
-			'client_site_id': client_site_id,
+			'partner_id': int(self.partner_id.data.split(' - ')[0]),
+			'partner_site_id': partner_site_id,
+			'partner_contact_id': partner_contact_id,
 
 			'note': not_empty(self.note.data.strip()),
 			'updated_at': datetime.now()

@@ -3,6 +3,7 @@ from app.app import db
 # importazioni per creare relazioni in tabella
 from app.orders.items.models import Item  # noqa
 from app.event_db.models import EventDB  # noqa
+from app.business.actions.models import Action  # noqa
 
 
 class PartnerSite(db.Model):
@@ -42,7 +43,8 @@ class PartnerSite(db.Model):
 
 	invoices = db.relationship('Invoice', backref='client_sites', lazy='dynamic')
 
-	opportunities = db.relationship('Opportunity', backref='client_sites', lazy='dynamic')
+	opportunities = db.relationship('Opportunity', backref='partner_sites', lazy='dynamic')
+	actions = db.relationship('Action', backref='partner_sites', lazy='dynamic')
 
 	events = db.relationship('EventDB', backref='partner_sites', order_by='EventDB.id.desc()', lazy='dynamic')
 

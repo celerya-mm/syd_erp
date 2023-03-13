@@ -20,7 +20,7 @@ invoice_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'invoices'
+TABLE = Invoice.__tablename__
 BLUE_PRINT, B_PRINT = invoice_bp, 'invoice_bp'
 
 VIEW = "/view/"
@@ -269,14 +269,14 @@ def invoices_view_detail(_id):
 		[previous_data.pop(key) for key in ["updated_at", "invoice_pdf"]]
 		previous_data['invoice_amount'] = str(previous_data['invoice_amount'])
 
-		from app.event_db.routes import events_create
+		from app.event_db.routes import events_db_create
 		_event = {
 			"username": session["user"]["username"],
 			"table": Invoice.__tablename__,
 			"Modification": f"Update INVOICE whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, invoice_id=_id)
+		_event = events_db_create(_event, invoice_id=_id)
 
 	db.session.close()
 	return render_template(
@@ -296,7 +296,7 @@ def invoices_view_detail(_id):
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
 def invoices_update(_id):
 	"""Aggiorna dati OFFERTA."""
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	# recupero i dati
 	invoice = Invoice.query \
@@ -334,7 +334,7 @@ def invoices_update(_id):
 			"Modification": f"Update INVOICE whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, invoice_id=_id)
+		_event = events_db_create(_event, invoice_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		# Organizzazione
@@ -419,7 +419,7 @@ def invoices_generate(_id):
 	"""Genera il pdf di un'OFFERTA."""
 	from app.orders.order_rows.models import OdaRow
 	from app.functions_pdf import pdf_to_byte
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	invoice = Invoice.query.options(joinedload(Invoice.client)).get(_id)
 	invoice_rows = OdaRow.query.filter_by(oda_id=_id).order_by(OdaRow.id.asc()).all()
@@ -459,7 +459,7 @@ def invoices_generate(_id):
 			"Modification": f"Update INVOICE whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, invoice_id=_id)
+		_event = events_db_create(_event, invoice_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		flash(f"ERRORE CREAZIONE BYTE PDF.")

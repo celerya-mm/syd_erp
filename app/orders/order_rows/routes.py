@@ -16,7 +16,7 @@ oda_rows_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'oda_rows'
+TABLE = OdaRow.__tablename__
 BLUE_PRINT, B_PRINT = oda_rows_bp, 'oda_rows_bp'
 
 CREATE = "/create/<int:o_id>/<int:p_id>/<int:s_id>/"
@@ -152,7 +152,7 @@ def oda_rows_view_detail(_id):
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
 def oda_rows_update(_id):
 	"""Aggiorna dati Riga Ordine."""
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	# recupero i dati
 	oda_row = OdaRow.query \
@@ -210,7 +210,7 @@ def oda_rows_update(_id):
 			"Modification": f"Update ODA_ROW whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, oda_row_id=_id)
+		_event = events_db_create(_event, oda_row_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		if oda_row.supplier_site:

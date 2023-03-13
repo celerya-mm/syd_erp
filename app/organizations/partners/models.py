@@ -49,6 +49,7 @@ class Partner(db.Model):
 	invoices = db.relationship('Invoice', backref='clients', lazy='dynamic')
 
 	opportunities = db.relationship('Opportunity', backref='clients', lazy='dynamic')
+	actions = db.relationship('Action', backref='partners', lazy='dynamic')
 
 	events = db.relationship('EventDB', backref='partners', order_by='EventDB.id.desc()', lazy='dynamic')
 

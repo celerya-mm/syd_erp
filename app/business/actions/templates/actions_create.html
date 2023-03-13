@@ -7,19 +7,172 @@
 			<form enctype="multipart/form-data" method="POST">
 				{{ form.csrf_token }}
 				<h5 class="card-title">
-					<a class="btn btn-update" href="{{ url_for(invoice_view, _id=inv_id) }}" title="Annulla"
+					<a class="btn btn-update" href="{{ url_for(opp_view, _id=op_id) }}" title="Annulla"
 					   type="button">
 						<img alt="" class="icon-simple"
 							 src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
 					</a>
-					Aggiungi RIGA in FATTURA [ {{ inv_id }} ]:
+					Aggiungi AZIONE in OPPORTUNITA' [ {{ op_id }} ]:
 				</h5>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-8 order-first">
+						<div class="form-group">
+							{{ form.action_description.label(style="font-size: 1.2rem;") }}
+							{{ form.action_description(class="form-control emphasis") }}
+							{% if form.action_description.errors %}
+							{% for error in form.action_description.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-4 order-second">
+						<div class="form-group">
+							{{ form.action_category.label(style="font-size: 1.2rem;") }}
+							{{ form.action_category(class="form-control emphasis", style="text-align: center;") }}
+							{% if form.action_category.errors %}
+							{% for error in form.action_category.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-4 order-first">
+						<div class="form-group">
+							{{ form.action_date.label(style="font-size: 1.2rem;") }}
+							{{ form.action_date(class="form-control") }}
+							{% if form.action_date.errors %}
+							{% for error in form.action_date.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6 order-second">
+						<div class="form-group">
+							{{ form.user_id.label(style="font-size: 1.2rem;") }}
+							{{ form.user_id(class="form-control emphasis", style="text-align: center;") }}
+							{% if form.user_id.errors %}
+							{% for error in form.user_id.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-2 order-third">
+						<div class="form-group">
+							{{ form.action_time_spent.label(style="font-size: 1.2rem;") }}
+							{{ form.action_time_spent(class="form-control") }}
+							{% if form.action_time_spent.errors %}
+							{% for error in form.action_time_spent.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-2 order-first">
+						<div class="form-group">
+							{{ form.opp_id.label(style="font-size: 1.2rem;") }}
+							{{ form.opp_id(class="form-control emphasis", style="text-align: center;") }}
+							{% if form.opp_id.errors %}
+							{% for error in form.opp_id.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-10 order-second">
+						<div class="form-group">
+							{{ form.partner_id.label(style="font-size: 1.2rem;") }}
+							{{ form.partner_id(class="form-control emphasis", style="text-align: center;") }}
+							{% if form.partner_id.errors %}
+							{% for error in form.partner_id.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-6 order-first">
+						<div class="form-group">
+							{{ form.partner_site_id.label(style="font-size: 1.2rem;") }}
+							{{ form.partner_site_id(class="form-control emphasis", style="text-align: center;") }}
+							{% if form.partner_site_id.errors %}
+							{% for error in form.partner_site_id.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6 order-second">
+						<div class="form-group">
+							{{ form.partner_contact_id.label(style="font-size: 1.2rem;") }}
+							{{ form.partner_contact_id(class="form-control emphasis", style="text-align: center;") }}
+							{% if form.partner_contact_id.errors %}
+							{% for error in form.partner_contact_id.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-2 order-first">
+						<div class="form-group">
+							{{ form.plant_id.label(style="font-size: 1.2rem;") }}
+							{{ form.plant_id(class="form-control", style="text-align: center;") }}
+							{% if form.plant_id.errors %}
+							{% for error in form.plant_id.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-10 order-second">
+						<div class="form-group">
+							{{ form.plant_site_id.label(style="font-size: 1.2rem;") }}
+							{{ form.plant_site_id(class="form-control", style="text-align: center;") }}
+							{% if form.plant_site_id.errors %}
+							{% for error in form.plant_site_id.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
 				<div class="row no-gutters justify-content-center rounded"
 					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 					<div class="col-md-12 order-first">
 						<div class="form-group">
-							{{ form.activity_code.label(style="font-size: 1.2rem;") }}
-							{{ form.activity_code(class="form-control emphasis") }}
+							{{ form.note.label(style="font-size: 1.2rem;") }}
+							{{ form.note(class="form-control") }}
+							{% if form.note.errors %}
+							{% for error in form.note.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
 						</div>
 					</div>
 				</div>

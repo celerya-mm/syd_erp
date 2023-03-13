@@ -5,14 +5,14 @@
 	{{ form.csrf_token }}
 	<div class="container text-center mt-2">
 		<h5 class="card-title">
-			Dettaglio RIGA id: [ {{ form.id }} ] FATTURA id: [ {{ form.invoice_id }} ]
+			Dettaglio AZIONE id: [ {{ form.id }} ] OPPORTUNITA' id: [ {{ form.opp_id }} ]
 			{%
 			if 'superuser' in session['user_roles']
-			or 'invoice_rows_admin' in session['user_roles']
-			or 'invoice_rows_write' in session['user_roles']
+			or 'actions_admin' in session['user_roles']
+			or 'actions_write' in session['user_roles']
 			%}
 			<a class="btn btn-update" href="{{ url_for(update, _id=form.id) }}"
-			   title="Modifica Attività"
+			   title="Modifica Azione"
 			   type="button">
 				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}"/>
 			</a>
@@ -25,130 +25,160 @@
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="col-md-2 order-first">
 				<div class="form-group">
-					<h6> Totale riga </h6>
-					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.activity_amount }}
-					</p>
-				</div>
-			</div>
-			<div class="col-md-2 order-second">
-				<div class="form-group">
-					<a href="{{ url_for(invoice_detail, _id=form.invoice_id) }}" title="Vai alla fattura">
-						Fattura
+					{% if 'opportunities_admin' in session['user_roles'] or 'opportunities_read' in session['user_roles'] %}
+					<a href="{{ url_for(opp_detail, _id=form.opp_id) }}" title="Vai all' Utente">
+						Opportunità
 					</a>
+					{% else %}
+					<h6> Opportunità </h6>
+					{% endif %}
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.invoice_id }}
+						{{ form.opp_id }}
 					</p>
 				</div>
 			</div>
-			<div class="col-md-4 order-third">
+			<div class="col-md-3 order-second">
 				<div class="form-group">
-					<h6> Categoria </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.activity_category }}
-					</p>
-				</div>
-			</div>
-		</div>
-		<div class="row no-gutters justify-content-center rounded"
-			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="col-md-2 order-first">
-				<div class="form-group">
-					<a href="{{ url_for(activity_detail, _id=act_id) }}" title="Vai all' Attività">
-						Cod. Attività
-					</a>
+					<h6> Data </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.activity_code }}
+						{{ form.action_date }}
 					</p>
 				</div>
 			</div>
 			<div class="col-md-2 order-third">
 				<div class="form-group">
-					<h6> Prezzo </h6>
+					<h6> Impegno h </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.activity_price }}
+						{{ form.action_time_spent }}
 					</p>
 				</div>
 			</div>
-			<div class="col-md-2 order-fourth">
+			<div class="col-md-5 order-fourth">
 				<div class="form-group">
-					<h6> Sconto </h6>
-					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.activity_price_discount }}
-					</p>
-				</div>
-			</div>
-			<div class="col-md-1 order-fifth">
-				<div class="form-group">
-					<h6> Valuta </h6>
+					{% if 'users_admin' in session['user_roles'] or 'users_read' in session['user_roles'] %}
+					<a href="{{ url_for(user_detail, _id=u_id) }}" title="Vai all' Utente">
+						Utente
+					</a>
+					{% else %}
+					<h6> Utente </h6>
+					{% endif %}
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.activity_currency }}
-					</p>
-				</div>
-			</div>
-			<div class="col-md-2 order-sixth">
-				<div class="form-group">
-					<h6> Quantità </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.activity_quantity }}
-					</p>
-				</div>
-			</div>
-			<div class="col-md-1 order-seventh">
-				<div class="form-group">
-					<h6> U.M. </h6>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.activity_quantity_um }}
+						{{ form.user_id }}
 					</p>
 				</div>
 			</div>
 		</div>
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="col-md-12 order-second">
+			<div class="col-md-12 order-first">
 				<div class="form-group">
 					<h6> Descrizione </h6>
 					<p class="form-control emphasis" style="font-weight: bold; color: white">
-						{{ form.activity_description }}
+						{{ form.action_description }}
 					</p>
 				</div>
 			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="col-md-4 order-first">
+				<div class="form-group">
+					<h6> Categoria </h6>
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.action_category }}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-8 order-second">
+				<div class="form-group">
+					{% if 'partners_admin' in session['user_roles'] or 'partners_read' in session['user_roles'] %}
+					<a href="{{ url_for(p_detail, _id=p_id) }}" title="Vai al Partner">
+						Partner
+					</a>
+					{% else %}
+					<h6> Partner </h6>
+					{% endif %}
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.partner_id }}
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="col-md-6 order-first">
+				<div class="form-group">
+					{% if 'partners_admin' in session['user_roles'] or 'partners_read' in session['user_roles'] %}
+					<a href="{{ url_for(p_contact_detail, _id=pc_id) }}" title="Vai al Referente">
+						Referente
+					</a>
+					{% else %}
+					<h6> Referente </h6>
+					{% endif %}
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.partner_contact_id }}
+					</p>
+				</div>
+			</div>
+			{% if form.partner_site_id %}
+			<div class="col-md-6 order-second">
+				<div class="form-group">
+					{% if 'partner_sites_admin' in session['user_roles'] or 'partner_sites_read' in session['user_roles'] %}
+					<a href="{{ url_for(p_site_detail, _id=ps_id) }}" title="Vai al Sito">
+						Sito Partner
+					</a>
+					{% else %}
+					<h6> Sito Partner </h6>
+					{% endif %}
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.partner_site_id }}
+					</p>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+		<div class="row no-gutters justify-content-center rounded"
+			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+			<div class="col-md-6 order-first">
+				<div class="form-group">
+					{% if 'plants_admin' in session['user_roles'] or 'plants_read' in session['user_roles'] %}
+					<a href="{{ url_for(plant_detail, _id=pl_id) }}" title="Vai al Referente">
+						Sede
+					</a>
+					{% else %}
+					<h6> Sede </h6>
+					{% endif %}
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.plant_id }}
+					</p>
+				</div>
+			</div>
+			{% if form.plant_site_id %}
+			<div class="col-md-6 order-second">
+				<div class="form-group">
+					{% if 'plant_sites_admin' in session['user_roles'] or 'plant_sites_read' in session['user_roles'] %}
+					<a href="{{ url_for(plant_site_detail, _id=pls_id) }}" title="Vai al Sito">
+						Sede Operativa
+					</a>
+					{% else %}
+					<h6> Sede Operativa </h6>
+					{% endif %}
+					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
+						{{ form.plant_site_id }}
+					</p>
+				</div>
+			</div>
+			{% endif %}
 		</div>
 		<div class="row no-gutters justify-content-center rounded"
 			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
 			<div class="col-md-12 order-first">
 				<div class="form-group">
-					<a href="{{ url_for(partner_detail, _id=p_id) }}" title="Vai al fornitore">
-						Cliente
-					</a>
+					<h6> Note </h6>
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.client_id }}
+						{{ form.note }}
 					</p>
 				</div>
-			</div>
-		</div>
-		{% if form.supplier_site_id %}
-		<div class="row no-gutters justify-content-center rounded"
-			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="col-md-12 order-first">
-				<div class="form-group">
-					<a href="{{ url_for(site_detail, _id=s_id) }}" title="Vai al sito del fornitore">
-						Sito Cliente
-					</a>
-					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-						{{ form.client_site_id }}
-					</p>
-				</div>
-			</div>
-		</div>
-		{% endif %}
-		<div class="row no-gutters justify-content-center rounded"
-			 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-			<div class="form-group">
-				<h6> Note </h6>
-				<p class="form-control" style="font-weight: bold; color: #5B5A5B">
-					{{ form.note }}
-				</p>
 			</div>
 		</div>
 	</div>
@@ -156,6 +186,7 @@
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
 	<div class="accordion" id="accordion">
 		<!--	Modifiche Record-->
+		{% if h_len != 0 %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="1">
 				<button aria-controls="collapseOne"
@@ -186,8 +217,8 @@
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
 								if 'superuser' in session['user_roles']
-								or 'invoice_rows_admin' in session['user_roles']
-								or 'invoice_rows_write' in session['user_roles']
+								or 'actions_admin' in session['user_roles']
+								or 'actions_write' in session['user_roles']
 								%}
 								<a class="btn-table" href="{{ url_for(event_detail, _id=row.id) }}"
 								   title="Visualizza Record"
@@ -211,6 +242,7 @@
 				</div>
 			</div>
 		</div>
+		{% endif %}
 	</div>
 </div>
 <br>
@@ -239,8 +271,6 @@
             },
         });
     });
-
-
 
 </script>
 {% endblock %}

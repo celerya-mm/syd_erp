@@ -28,7 +28,8 @@
 			or 'actions_write' in session['user_roles']
 			%}
 				{% if form.opp_status != "04 - Closed [Converted]" and form.opp_status != "05 - Closed [Lost]" %}
-				<a class="btn btn-update" href="{{ url_for(actions_create, op_id=form.id, p_id=p_id, s_id=0) }}"
+				<a class="btn btn-update"
+				   href="{{ url_for(action_create, opp_id=form.id, pl_id=pl_id, pls_id=pls_id, p_id=p_id, ps_id=s_id, pc_id=c_id) }}"
 				   title="Aggiungi Azione"
 				   type="button">
 					<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/action_blue.svg') }}"/>
@@ -130,7 +131,13 @@
 			</div>
 			<div class="col-md-5 order-second">
 				<div class="form-group">
+					{% if 'users_admin' in session['user_roles'] or 'users_read' in session['user_roles'] %}
+					<a href="{{ url_for(user_detail, _id=u_id) }}" title="Vai all'utente">
+						Responsabile
+					</a>
+					{% else %}
 					<h6> Responsabile </h6>
+					{% endif %}
 					<p class="form-control" style="font-weight: bold; color: #5B5A5B">
 						{{ form.opp_accountable }}
 					</p>
@@ -176,7 +183,7 @@
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
 	<div class="accordion" id="accordion">
 		<!--	Azioni-->
-		{% if act_len %}
+		{% if actions_len %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="1">
 				<button aria-controls="collapse1"
@@ -185,7 +192,7 @@
 						data-bs-target="#collapse1"
 						data-bs-toggle="collapse"
 						type="button">
-					Elenco Azioni [ {{ act_len }} ]
+					Elenco Azioni [ {{ actions_len }} ]
 				</button>
 			</h2>
 			<div aria-labelledby="heading1"
@@ -197,27 +204,25 @@
 						<thead>
 						<tr style="background-color: #2B4692; vertical-align: center;">
 							<th class="title" id="r1">ID</th>
-							<th class="title" id="r2">Codice</th>
+							<th class="title" id="r2">Data</th>
 							<th class="title" id="r3">Categoria</th>
 							<th class="title" id="r4">Descrizione</th>
-							<th class="title" id="r5">Prezzo</th>
-							<th class="title" id="r6">Sconto</th>
-							<th class="title" id="r7">Q.</th>
-							<th class="title" id="r8">Tot</th>
-							<th class="title" data-sortable="false" id="r9"></th>
+							<th class="title" id="r5">User</th>
+							<th class="title" id="r6">Time</th>
+							<th class="title" id="r7" data-sortable="false"></th>
 						</tr>
 						</thead>
 						<tbody>
-						{% for row in act_list %}
+						{% for row in actions_list %}
 						<tr class="selectable-row" style="border: 0pz; vertical-align: center;">
 							<td class="primary fw-bold"
 								style="padding-bottom: 0pz; padding-top: 0pz; width: 20px !important;">
 								{%
 								if 'superuser' in session['user_roles']
-								or 'invoice_rows_admin' in session['user_roles']
-								or 'invoice_rows_write' in session['user_roles']
+								or 'actions_admin' in session['user_roles']
+								or 'actions_write' in session['user_roles']
 								%}
-								<a class="btn-table" href="{{ url_for(row_detail, _id=row.id) }}"
+								<a class="btn-table" href="{{ url_for(action_detail, _id=row.id) }}"
 								   title="Visualizza Record"
 								   type="button">
 									{{ row.id|e }}
@@ -227,33 +232,27 @@
 								{% endif %}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.activity_code|e }}
+								{{ row.action_date|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.activity_category|e }}
+								{{ row.action_category|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.7rem;">
-								{{ row.activity_description|e }}
+								{{ row.action_description|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.activity_price|e }}
+								{{ row.user_id|e }}
 							</td>
 							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.activity_price_discount|e }}
-							</td>
-							<td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.activity_quantity|e }}
-							</td>
-							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-								{{ row.activity_amount|e }}
+								{{ row.action_time_spent|e }}
 							</td>
 							<td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
 								{%
-								if 'superuser' in session['user_roles'] and form.oda_status == "Lavorazione"
-								or 'invoice_rows_admin' in session['user_roles'] and form.invoice_status == "Lavorazione"
-								or 'invoice_rows_write' in session['user_roles'] and form.invoice_status == "Lavorazione"
+								if 'superuser' in session['user_roles'] and 'Closed' not in form.opp_status
+								or 'actions_admin' in session['user_roles'] and 'Closed' not in form.opp_status
+								or 'actions_write' in session['user_roles'] and 'Closed' not in form.opp_status
 								%}
-								<a class="btn-table" href="{{ url_for(row_delete, _id=row.id, inv_id=form.id) }}"
+								<a class="btn-table" href="{{ url_for(action_delete, _id=row.id, op_id=form.id) }}"
 								   title="Rimuovi riga ordine"
 								   type="button">
 									<img alt="" class="icon-table"

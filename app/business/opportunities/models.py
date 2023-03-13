@@ -43,11 +43,12 @@ class Opportunity(db.Model):
 	
 	accountable = db.relationship('User', backref='acc_opportunities', viewonly=True)
 	activity = db.relationship('Activity', backref='act_opportunities', viewonly=True)
+	
 	partner = db.relationship('Partner', backref='p_opportunities', viewonly=True)
 	partner_site = db.relationship('PartnerSite', backref='ps_opportunities', viewonly=True)
 	partner_contact = db.relationship('PartnerContact', backref='pc_opportunities', viewonly=True)
 
-	# actions = db.relationship('Action', backref='opportunities', lazy='dynamic')
+	actions = db.relationship('Action', backref='opportunities', lazy='dynamic')
 
 	events = db.relationship('EventDB', backref='opportunities', order_by='EventDB.id.desc()', lazy='dynamic')
 

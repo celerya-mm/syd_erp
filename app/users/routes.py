@@ -22,7 +22,7 @@ user_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'users'
+TABLE = User.__tablename__
 BLUE_PRINT, B_PRINT = user_bp, 'user_bp'
 
 VIEW = "/view/"
@@ -199,9 +199,14 @@ def users_create():
 def users_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
+	from app.roles.routes import DETAIL_FOR as ROLE_DETAIL
+	
 	from app.organizations.plants.routes import DETAIL_FOR as PLANT_DETAIL
 	from app.organizations.plant_sites.routes import DETAIL_FOR as SITE_DETAIL
-	from app.roles.routes import DETAIL_FOR as ROLE_DETAIL
+	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
+	
+	from app.business.opportunities.routes import DETAIL_FOR as OPP_DETAIL
+	from app.business.actions.routes import DETAIL_FOR as ACTION_DETAIL
 
 	# Estraggo l' ID dell'utente corrente
 	session["id_user"] = _id
@@ -224,24 +229,24 @@ def users_view_detail(_id):
 	s_id = user.plant_site_user.id if user.plant_site_user else None
 
 	# Estraggo la storia delle modifiche per l'utente
-	history_list = user.events
-	if history_list:
-		history_list = [history.to_dict() for history in history_list]
-	else:
-		history_list = []
+	history_list = [history.to_dict() for history in user.events] if user.events else []
 
 	# Estraggo i ruoli assegnati all'utente
-	roles_list = user.roles
-	if roles_list:
-		roles_list = [role.to_dict() for role in roles_list]
-	else:
-		roles_list = []
+	roles_list = [role.to_dict() for role in user.roles] if user.roles else []
+	
+	# Estraggo le Opportunità assegnate all'utente
+	opp_list = [opp.to_dict() for opp in user.opportunities] if user.opportunities else []
+	
+	# Estraggo le Azioni per Opportunità assegnate all'utente
+	act_list = [act.to_dict() for act in user.actions] if user.actions else []
 
 	db.session.close()
 	return render_template(
-		DETAIL_HTML, form=_user, view=VIEW_FOR, update=UPDATE_FOR, update_psw=UPDATE_PSW_FOR,
+		DETAIL_HTML, form=_user, view=VIEW_FOR, update=UPDATE_FOR, update_psw=UPDATE_PSW_FOR, partner_detail=PARTNER_DETAIL,  # noqa
 		history_list=history_list, h_len=len(history_list), event_detail=EVENT_DETAIL,
 		roles_list=roles_list, r_len=len(roles_list), role_detail=ROLE_DETAIL,
+		opp_list=opp_list, opp_len=len(opp_list), opp_detail=OPP_DETAIL,
+		act_list=act_list, act_len=len(act_list), act_detail=ACTION_DETAIL,
 		plant_detail=PLANT_DETAIL, p_id=p_id,
 		site_detail=SITE_DETAIL, s_id=s_id
 	)
@@ -253,7 +258,7 @@ def users_view_detail(_id):
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
 def users_update(_id):
 	"""Aggiorna dati Utente."""
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	# recupero i dati
 	user = User.query.filter_by(id=_id).options(
@@ -291,7 +296,7 @@ def users_update(_id):
 			"Modification": f"Update account USER whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, user_id=_id)
+		_event = events_db_create(_event, user_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		if user.plant_user:
@@ -315,7 +320,7 @@ def users_update(_id):
 @access_required_update_psw(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
 def users_update_password(_id, msg=None):
 	"""Aggiorna password Utente."""
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	form = FormUserPswChange()
 	if request.method == 'POST' and form.validate():
@@ -341,7 +346,7 @@ def users_update_password(_id, msg=None):
 				"username": _user.username,
 				"Modification": "Password reset"
 			}
-			_event = events_create(_event, user_id=_id)
+			_event = events_db_create(_event, user_id=_id)
 			return redirect(url_for(f'{B_PRINT}.logout', msg=msg))
 	else:
 		if session["user"]["id"] != _id and session["user"]["psw_changed"] is True:

@@ -18,7 +18,7 @@ opportunity_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'opportunities'
+TABLE = Opportunity.__tablename__
 BLUE_PRINT, B_PRINT = opportunity_bp, 'opportunity_bp'
 
 VIEW = "/view/"
@@ -202,14 +202,15 @@ def opportunities_create(p_id, s_id=None):
 def opportunities_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.event_db.routes import DETAIL_FOR as EVENT_DETAIL
+	from app.users.routes import DETAIL_FOR as USER_DETAIL
+	from app.invoices.activities.routes import DETAIL_FOR as ACTIVITY_DETAIL
 
 	from app.organizations.partners.routes import DETAIL_FOR as PARTNER_DETAIL
 	from app.organizations.partner_sites.routes import DETAIL_FOR as PARTNER_SITE_DETAIL
 	from app.organizations.partner_contacts.routes import DETAIL_FOR as CONTACT_DETAIL
-	from app.invoices.activities.routes import DETAIL_FOR as ACTIVITY_DETAIL
-
-	# from app.invoices.invoice_rows.routes import (CREATE_FOR as INVOICE_ROW_CREATE, DETAIL_FOR as INVOICE_ROW_DETAIL,
-	# 											  DELETE_FOR as INVOICE_ROW_DELETE)
+	
+	from app.business.actions.routes import (DETAIL_FOR as ACTION_DETAIL, CREATE_FOR as ACTION_CREATE,
+	                                         DELETE_FOR as ACTION_DELETE)
 
 	# Interrogo il DB
 	opportunity = Opportunity.query \
@@ -225,11 +226,7 @@ def opportunities_view_detail(_id):
 	_opportunity = opportunity.to_dict()
 
 	# Estraggo la storia delle modifiche per l'articolo
-	history_list = opportunity.events
-	if history_list:
-		history_list = [history.to_dict() for history in history_list]
-	else:
-		history_list = []
+	history_list = [event.to_dict() for event in opportunity.events] if opportunity.events else []
 		
 	# Attività
 	_opportunity["opp_activity"] = f'{opportunity.activity.activity_code} - {opportunity.activity.activity_description}'
@@ -237,14 +234,18 @@ def opportunities_view_detail(_id):
 	
 	# Responsabile
 	_opportunity["opp_accountable"] = f'{opportunity.accountable.id} - {opportunity.accountable.full_name}'
-	acc_id = opportunity.accountable.id  # noqa
+	u_id = opportunity.accountable.id  # noqa
 
 	# Organizzazione
 	_opportunity["plant_id"] = f'{opportunity.plant.id} - {opportunity.plant.organization}'
-	# Sito
+	pl_id = opportunity.plant.id
+	# Sede Operativa
 	if opportunity.plant_site:
 		_opportunity["plant_site_id"] = f'{opportunity.plant_site.id} - {opportunity.plant_site.organization}'
-
+		pls_id = opportunity.plant_site.id
+	else:
+		pls_id = 0
+		
 	# Partner
 	_opportunity["partner_id"] = f'{opportunity.partner.id} - {opportunity.partner.organization}'
 	p_id = opportunity.partner.id
@@ -253,54 +254,53 @@ def opportunities_view_detail(_id):
 		_opportunity["partner_site_id"] = f'{opportunity.partner_site.id} - {opportunity.partner_site.site}'
 		s_id = opportunity.partner_site.id
 	else:
-		s_id = None
+		s_id = 0
 	# Referente
 	_opportunity["partner_contact_id"] = f'{opportunity.partner_contact.id} - {opportunity.partner_contact.full_name}'
 	c_id = opportunity.partner_contact.id
 
-	# # Estraggo la lista delle azioni
-	# actions_list = opportunity.actions
-	# if actions_list:
-	# 	actions_list = [row.to_dict() for row in actions_list]
-	# else:
-	# 	actions_list = []
-	#
-	# # Calcolo totale
-	# amount = opportunity.opp_value
-	# if actions_list:
-	# 	_opportunity["opp_value"] = 0
-	# 	for row in actions_list:
-	# 		_opportunity["opp_value"] = round(_opportunity["opp_value"] + row["act_value"], 2)
-	# else:
-	# 	_opportunity["opp_value"] = None
+	# Estraggo la lista delle azioni
+	actions_list = [row.to_dict() for row in opportunity.actions] if opportunity.actions else []
 
-	# if amount != _opportunity["opp_value"]:
-	# 	opportunity.opp_value = _opportunity["opp_value"]
-	# 	Opportunity.update(_id, opportunity.to_dict())
-	# 	flash("TOTALE OPPORTUNITA' aggiornato.")
-	#
-	# 	previous_data = opportunity.to_dict()
-	# 	[previous_data.pop(key) for key in ["updated_at"]]
-	# 	previous_data['opp_value'] = str(previous_data['opp_value'])
-	#
-	# 	from app.events_db.routes import events_create
-	# 	_event = {
-	# 		"username": session["user"]["username"],
-	# 		"table": Opportunity.__tablename__,
-	# 		"Modification": f"Update OPPORTUNITY whit id: {_id}",
-	# 		"Previous_data": previous_data
-	# 	}
-	# 	_event = events_create(_event, opportunity_id=_id)
+	# Calcolo totale impegno
+	opp_time_spent = opportunity.opp_time_spent
+	if actions_list:
+		_opportunity["opp_time_spent"] = 0
+		for row in actions_list:
+			_opportunity["opp_time_spent"] = round(_opportunity["opp_time_spent"] + row["action_time_spent"], 1)
+	else:
+		_opportunity["opp_time_spent"] = None
+
+	if opp_time_spent != _opportunity["opp_time_spent"]:
+		opportunity.opp_time_spent = _opportunity["opp_time_spent"]
+		Opportunity.update(_id, opportunity.to_dict())
+		flash("IMPEGNO OPPORTUNITA' aggiornato.")
+
+		previous_data = opportunity.to_dict()
+		[previous_data.pop(key) for key in ["updated_at"]]
+		previous_data['opp_value'] = str(previous_data['opp_value'])
+		previous_data['opp_time_spent'] = str(previous_data['opp_time_spent'])
+
+		from app.event_db.routes import events_db_create
+		_event = {
+			"username": session["user"]["username"],
+			"table": Opportunity.__tablename__,
+			"Modification": f"Update OPPORTUNITY whit id: {_id}",
+			"Previous_data": previous_data
+		}
+		_event = events_db_create(_event, opportunity_id=_id)
 
 	db.session.close()
 	return render_template(
-		DETAIL_HTML, form=_opportunity, view=VIEW_FOR, update=UPDATE_FOR,
+		DETAIL_HTML, form=_opportunity, view=VIEW_FOR, update=UPDATE_FOR, pl_id=pl_id, pls_id=pls_id,
 		event_detail=EVENT_DETAIL, history_list=history_list, h_len=len(history_list),
+		user_detail=USER_DETAIL,                    u_id=u_id,
 		partner_detail=PARTNER_DETAIL,              p_id=p_id,
 		partner_site_detail=PARTNER_SITE_DETAIL,    s_id=s_id,
 		contact_detail=CONTACT_DETAIL,              c_id=c_id,
 		activity_detail=ACTIVITY_DETAIL,            act_id=act_id,
-		# act_list=actions_list, act_len=len(actions_list),
+		action_detail=ACTION_DETAIL, action_create=ACTION_CREATE, actions_list=actions_list, actions_len=len(actions_list),  # noqa
+		action_delete=ACTION_DELETE
 	)
 
 
@@ -310,7 +310,7 @@ def opportunities_view_detail(_id):
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
 def opportunities_update(_id):
 	"""Aggiorna dati Opportunità."""
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 	from app.invoices.activities.models import Activity
 
 	# recupero i dati
@@ -334,6 +334,7 @@ def opportunities_update(_id):
 		previous_data = opportunity.to_dict()
 		[previous_data.pop(key) for key in ["updated_at"]]
 		previous_data['opp_value'] = str(previous_data['opp_value'])
+		previous_data['opp_time_spent'] = str(previous_data['opp_time_spent'])
 		
 		_activity = Activity.query.filter_by(activity_code=new_data['opp_activity']).first()
 		
@@ -360,7 +361,7 @@ def opportunities_update(_id):
 			"Modification": f"Update OPPORTUNITY whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, opportunity_id=_id)
+		_event = events_db_create(_event, opportunity_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		# Attività

@@ -27,6 +27,7 @@ class PartnerContact(db.Model):
 	partner_site = db.relationship('PartnerSite', backref='partner_contacts', viewonly=True)
 
 	opportunities = db.relationship('Opportunity', backref='partner_contacts', lazy='dynamic')
+	actions = db.relationship('Action', backref='partner_contacts', lazy='dynamic')
 
 	events = db.relationship('EventDB', backref='partner_contacts', order_by='EventDB.id.desc()', lazy='dynamic')
 

@@ -14,22 +14,22 @@ event_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'events'
+TABLE = EventDB.__tablename__
 BLUE_PRINT, B_PRINT = event_bp, 'event_bp'
 
-DETAIL = "/event/view/detail/<int:_id>/"
+DETAIL = "/view/detail/<int:_id>/"
 DETAIL_FOR = f"{B_PRINT}.{TABLE}_view_detail"
 DETAIL_HTML = f"{TABLE}_view_detail.html"
 
-RESTORE = "/event/restore/<int:_id>/<int:id_record>/<table>/<view_for>/"
+RESTORE = "/restore/<int:_id>/<int:id_record>/<table>/<view_for>/"
 RESTORE_FOR = f"{B_PRINT}.{TABLE}_restore"
 
 
 @timer_func
-def events_create(
+def events_db_create(
 		event, user_id=None, partner_id=None, partner_contact_id=None, partner_site_id=None, item_id=None,
 		order_id=None, plant_id=None, plant_site_id=None, oda_row_id=None, activity_id=None, invoice_id=None,
-		invoice_row_id=None, opportunity_id=None
+		invoice_row_id=None, opportunity_id=None, action_id=None
 ):
 	"""Registro evento DB."""
 	try:
@@ -54,6 +54,7 @@ def events_create(
 			invoice_row_id=invoice_row_id,
 
 			opportunity_id=opportunity_id,
+			action_id=action_id,
 
 			created_at=datetime.now()
 		)
@@ -80,7 +81,7 @@ def events_create(
 @BLUE_PRINT.route(DETAIL, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-def events_view_detail(_id):
+def events_db_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from app.users.models import User
 	from app.users.routes import DETAIL_FOR as USER_DETAIL
@@ -120,6 +121,9 @@ def events_view_detail(_id):
 
 	from app.business.opportunities.models import Opportunity
 	from app.business.opportunities.routes import DETAIL_FOR as OPPORTUNITY_DETAIL
+	
+	from app.business.actions.models import Action
+	from app.business.actions.routes import DETAIL_FOR as ACTION_DETAIL
 
 	# Interrogo il DB
 	event = EventDB.query.get(_id)
@@ -249,7 +253,16 @@ def events_view_detail(_id):
 			id_related = related["id"]
 			type_related = "Opportunity"
 			view_related = OPPORTUNITY_DETAIL
-
+		# Azione
+		elif event.action_id:
+			related = Action.query.get(event.action_id)
+			related = related.to_dict()
+			field = "action_id"
+			table = Action.__tablename__
+			id_related = related["id"]
+			type_related = "Action"
+			view_related = ACTION_DETAIL
+			
 		else:
 			db.session.close()
 			msg = "Nessun record trovato"
@@ -274,7 +287,7 @@ def events_view_detail(_id):
 @BLUE_PRINT.route(RESTORE, methods=["GET", "POST"])
 @timer_func
 @token_user_validate
-def events_restore(_id, id_record, table, view_for):
+def events_db_restore(_id, id_record, table, view_for):
 	from app.users.models import User
 
 	from app.organizations.plants.models import Plant
@@ -294,10 +307,13 @@ def events_restore(_id, id_record, table, view_for):
 	from app.invoices.invoice_rows.models import InvoiceRow
 
 	from app.business.opportunities.models import Opportunity
+	from app.business.actions.models import Action
 
 	try:
-		models = [User, Plant, PlantSite, Partner, PartnerContact, PartnerSite, Item, Oda, OdaRow, Activity, Invoice,
-				  InvoiceRow, Opportunity]
+		models = [
+			User, Plant, PlantSite, Partner, PartnerContact, PartnerSite, Item, Oda, OdaRow, Activity, Invoice,
+			InvoiceRow, Opportunity, Action
+		]
 		model = next((m for m in models if m.__tablename__ == table), None)
 		# print("TABLE_DB:", model, "ID:", id_record)
 		if model:

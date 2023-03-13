@@ -4,10 +4,10 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import IntegrityError
 
 from app.app import db, session
+from app.functions import token_user_validate, access_required, timer_func
+from app.users.models import User
 from .forms import FormRole, FormRoleAddUser
 from .models import Role, UserRoles
-from ..users.models import User
-from ..functions import token_user_validate, access_required, timer_func
 
 role_bp = Blueprint(
 	'role_bp', __name__,
@@ -15,7 +15,7 @@ role_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'roles'
+TABLE = Role.__tablename__
 BLUE_PRINT, B_PRINT = role_bp, 'role_bp'
 
 VIEW = "/view/"
@@ -48,14 +48,14 @@ REMOVE_FOR = f"{B_PRINT}.{TABLE}_remove_to_user"
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_read'])
 def roles_view():
 	"""Visualizzo informazioni User."""
-
+	
 	# Estraggo la lista dei permessi
 	_list = Role.query.all()
 	if 'superuser' in session['user_roles']:
 		_list = [r.to_dict() for r in _list]
 	else:
 		_list = [r.to_dict() for r in _list if r.name != 'superuser']
-
+	
 	db.session.close()
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, detail=DETAIL_FOR)
 
@@ -92,22 +92,22 @@ def roles_create():
 def roles_view_detail(_id):
 	"""Visualizzo il dettaglio del record."""
 	from ..users.routes import DETAIL_FOR as USER_DETAIL_FOR
-
+	
 	# Interrogo il DB
 	role = Role.query.get(_id)
 	_role = role.to_dict()
-
+	
 	_user_list = []
 	for u in role.user_roles:
 		u = User.query.get(u.id)
 		if u not in _user_list:
 			_user_list.append(u)
-
+	
 	u_len = len(_user_list)
-
+	
 	db.session.close()
 	return render_template(DETAIL_HTML, form=_role, users=_user_list, view=VIEW_FOR, update=UPDATE_FOR,
-						   assign=ADD_FOR, user_detail=USER_DETAIL_FOR, delete=REMOVE_FOR, u_len=u_len)
+	                       assign=ADD_FOR, user_detail=USER_DETAIL_FOR, delete=REMOVE_FOR, u_len=u_len)
 
 
 @BLUE_PRINT.route(UPDATE, methods=["GET", "POST"])
@@ -119,7 +119,7 @@ def roles_update(_id):
 	# recupero i dati
 	role = Role.query.get(_id)
 	form = FormRole(obj=role)
-
+	
 	if request.method == 'POST' and form.validate():
 		new_data = FormRole(request.form).to_dict()
 		try:
@@ -150,9 +150,9 @@ def roles_update(_id):
 @access_required(roles=[f'{TABLE}_admin'])
 def roles_add_to_user(_id):
 	"""Aggiunge una regala a un utente."""
-
+	
 	form = FormRoleAddUser()
-
+	
 	if form.validate_on_submit():
 		new_data = json.loads(json.dumps(request.form))
 		new_user_role = UserRoles(

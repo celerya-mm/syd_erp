@@ -59,7 +59,7 @@ class InvoiceRow(db.Model):
 	def remove(_id):  # noqa
 		"""Cancella un record per id."""
 		x = InvoiceRow.query.filter_by(id=_id).first()
-		db.session.remove(x)
+		db.session.delete(x)
 		db.session.commit()
 
 	def to_dict(self):

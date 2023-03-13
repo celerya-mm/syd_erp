@@ -12,7 +12,7 @@ plant_bp = Blueprint(
 	static_folder='static'
 )
 
-TABLE = 'plants'
+TABLE = Plant.__tablename__
 BLUE_PRINT, B_PRINT = plant_bp, 'plant_bp'
 
 VIEW = "/view/"
@@ -134,7 +134,7 @@ def plants_view_detail(_id):
 @access_required(roles=[f'{TABLE}_admin', f'{TABLE}_write'])
 def plants_update(_id):
 	"""Aggiorna dati Utente."""
-	from app.event_db.routes import events_create
+	from app.event_db.routes import events_db_create
 
 	# recupero i dati
 	partner = Plant.query.get(_id)
@@ -167,7 +167,7 @@ def plants_update(_id):
 			"Modification": f"Update SEDE whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		_event = events_create(_event, plant_id=_id)
+		_event = events_db_create(_event, plant_id=_id)
 		return redirect(url_for(DETAIL_FOR, _id=_id))
 	else:
 		_info = {
